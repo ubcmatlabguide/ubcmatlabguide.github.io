@@ -1,0 +1,1193 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML is auto-generated from an M-file.
+To make changes, update the M-file and republish this document.
+      --><title>Strings, Cells, Structs, Containers, and Sets</title><meta name="generator" content="MATLAB 7.10"><meta name="date" content="2010-07-15"><meta name="m-file" content="dataStructures"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>Strings, Cells, Structs, Containers, and Sets</h1><!--introduction--><p>In this section, we examine strings and string operations as well as two very important Matlab data structures: cell arrays, and structs. We also discuss the new (2008b) container.map hash table class, and various set-theoretic operations.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Character Arrays</a></li><li><a href="#10">Formatting Strings</a></li><li><a href="#13">Cell Arrays</a></li><li><a href="#31">String Matching</a></li><li><a href="#37">Worked example of string processing</a></li><li><a href="#52">Set Operations</a></li><li><a href="#59">Structs</a></li><li><a href="#66">Struct arrays</a></li><li><a href="#75">Containers.map</a></li></ul></div><h2>Character Arrays<a name="1"></a></h2><p>Strings in Matlab are actually character matrices, which can be manipulated in very similar ways to numeric matrices.</p><pre class="codeinput">A = <span class="string">' This is Test String #1! '</span>
+B = A(1:5)              <span class="comment">% extract the first 5 characters</span>
+C = [A ; A]             <span class="comment">% concatenate vertically</span>
+D = repmat(<span class="string">'@!'</span>,2,5)    <span class="comment">% replicate char arrays, just like numeric ones</span>
+E = <span class="string">'z'</span>:-1:<span class="string">'a'</span>          <span class="comment">% create the matrices just like numeric ones.</span>
+check = ischar(A)       <span class="comment">% is it a char array?</span>
+F = isletter(A(1:6))    <span class="comment">% which characters are letters? - returns a logical array</span>
+G = isspace(A(1:6))     <span class="comment">% which characters are spaces? - returns a logical array</span>
+H = upper(A)            <span class="comment">% convert to upper case</span>
+I = lower(A)            <span class="comment">% convert to lower case</span>
+J = strtrim(A)          <span class="comment">% trim leading and trailing blank spaces.</span>
+K = deblank(A)          <span class="comment">% trim trailing blank spaces only.</span>
+</pre><pre class="codeoutput">A =
+ This is Test String #1! 
+B =
+ This
+C =
+ This is Test String #1! 
+ This is Test String #1! 
+D =
+@!@!@!@!@!
+@!@!@!@!@!
+E =
+zyxwvutsrqponmlkjihgfedcba
+check =
+     1
+F =
+     0     1     1     1     1     0
+G =
+     1     0     0     0     0     1
+H =
+ THIS IS TEST STRING #1! 
+I =
+ this is test string #1! 
+J =
+This is Test String #1!
+K =
+ This is Test String #1!
+</pre><p>The <i>isstrprop()</i> function can be used much like the <i>isletter()</i> or <i>isspace()</i> functions, allowing you to test which characters in a matrix belong to one of several different categories. Type <b>doc isstrprop</b> for the full list.</p><pre class="codeinput">str = <span class="string">' a1!'</span>
+A = isstrprop(str,<span class="string">'punct'</span>)       <span class="comment">% punctuation</span>
+B = isstrprop(str,<span class="string">'alphanum'</span>)    <span class="comment">% alpha or numeric characters</span>
+C = isstrprop(str,<span class="string">'digit'</span>)       <span class="comment">% decimal digits</span>
+D = isstrprop(<span class="string">'3A'</span>,<span class="string">'xdigit'</span>)     <span class="comment">% valid hexadecimal digits</span>
+</pre><pre class="codeoutput">str =
+ a1!
+A =
+     0     0     0     1
+B =
+     0     1     1     0
+C =
+     0     0     1     0
+D =
+     1     1
+</pre><p>The <i>char()</i> and <i>abs()</i> functions convert from integers to the ascii equivalents and vice versa.</p><pre class="codeinput">A = char(65)
+B = abs(<span class="string">'B'</span>)
+C = abs(<span class="string">'abcdefg'</span>)
+</pre><pre class="codeoutput">A =
+A
+B =
+    66
+C =
+    97    98    99   100   101   102   103
+</pre><p>We can convert from string representations of hexadecimal or binary numbers to decimal numbers and back using the <i>dec2hex()</i> , <i>hex2dec()</i> , <i>dec2bin()</i>, and <i>bin2dec()</i> functions. The num2xxx and xxx2num functions operate on signed numbers.</p><pre class="codeinput">A = dec2hex(211)
+B = hex2dec(<span class="string">'D3'</span>)
+C = dec2bin(211)
+D = bin2dec(<span class="string">'11010011'</span>)
+</pre><pre class="codeoutput">A =
+D3
+B =
+   211
+C =
+11010011
+D =
+   211
+</pre><p>We can also use the <i>num2str()</i> and <i>mat2str()</i> functions to generate string representations of numeric matrices. Or, parse a number from a string with <i>str2num()</i></p><pre class="codeinput">A = num2str([1:5;1:5]) <span class="comment">%Takes an optional formatting string - see Formatting Strings section</span>
+B = mat2str([1:5;1:5])
+C = str2num(<span class="string">'44'</span>)
+</pre><pre class="codeoutput">A =
+1  2  3  4  5
+1  2  3  4  5
+B =
+[1 2 3 4 5;1 2 3 4 5]
+C =
+    44
+</pre><p>If the size of the strings match, we can concatenate vertically and horizontally just like numeric matrices. If not, we can either use the <i>blanks()</i> function to pad with blanks or the <i>strcat()</i> and <i>strvcat()</i> functions to concatenate, adding blanks for us.</p><pre class="codeinput">C = strvcat(<span class="string">'hello'</span>,<span class="string">'this'</span>,<span class="string">'is'</span>,<span class="string">'a'</span>,<span class="string">'test'</span>) <span class="comment">%concatenate vertically</span>
+size(C)
+class(C)
+</pre><pre class="codeoutput">C =
+hello
+this 
+is   
+a    
+test 
+ans =
+     5     5
+ans =
+char
+</pre><pre class="codeinput">D = sortrows(C)                             <span class="comment">% sort the rows alphabetically</span>
+</pre><pre class="codeoutput">D =
+a    
+hello
+is   
+test 
+this 
+</pre><pre class="codeinput">E = strjust(C)                              <span class="comment">% justify the char array</span>
+</pre><pre class="codeoutput">E =
+hello
+ this
+   is
+    a
+ test
+</pre><p>
+<A NAME="FormattingStrings"></A>
+</p><h2>Formatting Strings<a name="10"></a></h2><p>The <i>sprintf()</i> and <i>fprintf()</i> functions can be used to format strings for output: <i>sprintf()</i> returns a string, while <i>fprintf()</i> directly displays the string, or writes it to a file, depending on the mode.</p><p>We pass these functions a string that includes place holders, (denoted by % signs) which will be replaced by corresponding values listed after the string. These place holders define how these values will be formatted. We use %s for a string, %d for a decimal digit, and %05.2f to indicate that we want a floating point number with 5 characters in total, two digits after the decimal point, and padded with zeros if necessary. There are many formatting options; Type <b>doc sprintf</b> for the full list. We can use escape characters like \n for a new line and \t for a tab. The examples will make this clearer.</p><pre class="codeinput">fprintf(<span class="string">'\n %s won the %s medal in the %s \n for his time of %05.2f seconds.\n'</span>,<span class="keyword">...</span>
+         <span class="string">'Kosuke Kitajima'</span>,<span class="string">'gold'</span>,<span class="string">'100m breaststroke'</span>,60.08);
+str = sprintf(<span class="string">'%07.4f'</span>,pi) <span class="comment">% display pi to 4 decimals, 7 chars in total, padded with zeros.</span>
+str = sprintf(<span class="string">'%x'</span>,999)    <span class="comment">% display number in hexadecimal</span>
+</pre><pre class="codeoutput">
+ Kosuke Kitajima won the gold medal in the 100m breaststroke 
+ for his time of 60.08 seconds.
+str =
+03.1416
+str =
+3e7
+</pre><p>
+<A NAME="cellArrays"></A>
+</p><h2>Cell Arrays<a name="13"></a></h2><p>In addition to matrices, Matlab supports another very general and powerful data structure, the cell array. Cell arrays can hold any type of Matlab object or structure including numeric matrices of different sizes, character arrays, other cells, as well as structs and objects, which we will see later. In fact, the same cell array can hold elements of different types. Cell arrays are frequently used to store strings, (i.e. char arrays of different sizes), which is why we discuss them here. Much of what was said about indexing matrices also applies to cells with one or two important differences.</p><p>We can create a cell array by using the <i>cell()</i> command</p><pre class="codeinput">A = cell(2,4)               <span class="comment">% create a 2-by-4 cell array</span>
+check = iscell(A)           <span class="comment">% really a cell?</span>
+</pre><pre class="codeoutput">A = 
+    []    []    []    []
+    []    []    []    []
+check =
+     1
+</pre><p>or by enclosing an object or objects in curly braces</p><pre class="codeinput">B = {[1,2,3],<span class="string">'hello'</span>,{1};[3;5],<span class="string">'yes'</span>,{<span class="string">'no'</span>}}   <span class="comment">% add a bunch of objects to a cell array</span>
+</pre><pre class="codeoutput">B = 
+    [1x3 double]    'hello'    {1x1 cell}
+    [2x1 double]    'yes'      {1x1 cell}
+</pre><p>A 2-by-4 cell array is in fact made up of 8, 1-by-1 cell arrays, (simply called cells), which store the data. There are two ways to index into, (and assign into) a cell array: using () braces and using {} braces. Using the () braces, we access or assign cells. Using the the {} braces we access or assign the data within those cells.</p><pre class="codeinput">C = B(1,2)      <span class="comment">% Returns a cell holding the string 'hello'</span>
+size(C)
+class(C)
+D = B{1,2}      <span class="comment">% Returns the string itself.</span>
+size(D)
+class(D)
+E = B(:,1)      <span class="comment">% Returns a cell array holding the first column</span>
+</pre><pre class="codeoutput">C = 
+    'hello'
+ans =
+     1     1
+ans =
+cell
+D =
+hello
+ans =
+     1     5
+ans =
+char
+E = 
+    [1x3 double]
+    [2x1 double]
+</pre><p>If we extract the data from more than one cell at once using the curly bracket indexing, Matlab returns each element one at a time much like a function that returns multiple values. We can assign each of these to new variables or perhaps pass them directly to a function expecting that many parameters.</p><pre class="codeinput">[F,G] = B{:,1}
+</pre><pre class="codeoutput">F =
+     1     2     3
+G =
+     3
+     5
+</pre><p>When assigning data, we must be careful what kind of brackets we use.</p><pre class="codeinput">B(1,1) = {<span class="string">'test'</span>}   <span class="comment">% must pass it a cell as we are using () brackets</span>
+B{1,1} = <span class="string">'test'</span>     <span class="comment">% same effect as line before.</span>
+B{1,2} = {<span class="string">'test'</span>}   <span class="comment">% careful, this adds a cell to the cell at (1,2), (nesting cells)</span>
+H = B{1,2}{1}       <span class="comment">% to then extract it, we have to index twice.</span>
+</pre><pre class="codeoutput">B = 
+    'test'          'hello'    {1x1 cell}
+    [2x1 double]    'yes'      {1x1 cell}
+B = 
+    'test'          'hello'    {1x1 cell}
+    [2x1 double]    'yes'      {1x1 cell}
+B = 
+    'test'          {1x1 cell}    {1x1 cell}
+    [2x1 double]    'yes'         {1x1 cell}
+H =
+test
+</pre><p>We can transpose,reshape,replicate, concatenate, and delete cell arrays just like matrices</p><pre class="codeinput">I = B'                           <span class="comment">% transpose</span>
+J = reshape(B,1,6)               <span class="comment">% reshape</span>
+K = [repmat(C,1,3);B]            <span class="comment">% replicate and concatenate</span>
+K(end,:) = []                    <span class="comment">% delete</span>
+</pre><pre class="codeoutput">I = 
+    'test'        [2x1 double]
+    {1x1 cell}    'yes'       
+    {1x1 cell}    {1x1 cell  }
+J = 
+  Columns 1 through 3
+    'test'    [2x1 double]    {1x1 cell}
+  Columns 4 through 6
+    'yes'    {1x1 cell}    {1x1 cell}
+K = 
+    'hello'         'hello'       'hello'   
+    'test'          {1x1 cell}    {1x1 cell}
+    [2x1 double]    'yes'         {1x1 cell}
+K = 
+    'hello'    'hello'       'hello'   
+    'test'     {1x1 cell}    {1x1 cell}
+</pre><p>Suppose we store numeric matrices of different sizes in a cell array.</p><pre class="codeinput">A = {[1,2,3],[4,5],[6],[7,8,9,10]}
+</pre><pre class="codeoutput">A = 
+  Columns 1 through 3
+    [1x3 double]    [1x2 double]    [6]
+  Column 4
+    [1x4 double]
+</pre><p>We can concatenate the entries themselves by first extracting all of the elements using the colon operator and then passing the results to the concatenation operator [].</p><pre class="codeinput">B = [A{:}]
+</pre><pre class="codeoutput">B =
+  Columns 1 through 7
+     1     2     3     4     5     6     7
+  Columns 8 through 10
+     8     9    10
+</pre><p>We can also use the <i>num2cell()</i> , <i>mat2cell()</i> ,and  <i>cell2mat()</i> functions to convert between matrices and cell arrays.</p><pre class="codeinput">A = num2cell(1:5)                     <span class="comment">% convert [1,2,3,4,5] to {[1],[2],[3],[4],[5]}</span>
+M = reshape(1:32, 4, 8)
+B = mat2cell(M,[2,2],[3,3,2]) <span class="comment">% partition matrix ones(4,8) into 6 cells</span>
+celldisp(B)
+C = cell2mat(B)                       <span class="comment">% inverse operation, (group together)</span>
+</pre><pre class="codeoutput">A = 
+    [1]    [2]    [3]    [4]    [5]
+M =
+  Columns 1 through 7
+     1     5     9    13    17    21    25
+     2     6    10    14    18    22    26
+     3     7    11    15    19    23    27
+     4     8    12    16    20    24    28
+  Column 8
+    29
+    30
+    31
+    32
+B = 
+  Columns 1 through 2
+    [2x3 double]    [2x3 double]
+    [2x3 double]    [2x3 double]
+  Column 3
+    [2x2 double]
+    [2x2 double]
+B{1,1} =
+     1     5     9
+     2     6    10
+B{2,1} =
+     3     7    11
+     4     8    12
+B{1,2} =
+    13    17    21
+    14    18    22
+B{2,2} =
+    15    19    23
+    16    20    24
+B{1,3} =
+    25    29
+    26    30
+B{2,3} =
+    27    31
+    28    32
+C =
+  Columns 1 through 7
+     1     5     9    13    17    21    25
+     2     6    10    14    18    22    26
+     3     7    11    15    19    23    27
+     4     8    12    16    20    24    28
+  Column 8
+    29
+    30
+    31
+    32
+</pre><p>We can convert from a character matrix to a cell array of strings, where each string is taken to be a row of the matrix, using the <i>cellstr()</i> command, and back again using the <i>char()</i> command.</p><pre class="codeinput">A = strvcat(<span class="string">'cell'</span>,<span class="string">'array'</span>,<span class="string">'example'</span>)   <span class="comment">% make a char array</span>
+B = cellstr(A)                          <span class="comment">% convert to a cell array of strings</span>
+check = iscellstr(B)                    <span class="comment">% check that its a cell array of strings</span>
+C = char(B)                             <span class="comment">% convert back to a char array</span>
+</pre><pre class="codeoutput">A =
+cell   
+array  
+example
+B = 
+    'cell'
+    'array'
+    'example'
+check =
+     1
+C =
+cell   
+array  
+example
+</pre><p>The <i>cellfun()</i> function can be very useful when we want to apply a function to the data inside every cell. If the function returns values of the same size/type (eg. scalar) for every cell entry, we can write something like this</p><pre class="codeinput">A = {<span class="string">'A '</span>, <span class="string">'test '</span>, <span class="string">'message, '</span>, <span class="string">'Which'</span>, <span class="string">'contains '</span>, <span class="string">'3 '</span>,<span class="string">'punctuation '</span> ,<span class="string">'marks!'</span>}
+f = @(str) isequal(str, lower(str)); <span class="comment">% is  lower case string?</span>
+B = cellfun(f,A)
+</pre><pre class="codeoutput">A = 
+  Columns 1 through 4
+    'A '    'test '    'message, '    'Which'
+  Columns 5 through 7
+    'contains '    '3 '    'punctuation '
+  Column 8
+    'marks!'
+B =
+  Columns 1 through 7
+     0     1     1     0     1     1     1
+  Column 8
+     1
+</pre><p>If the function returns values of variable size/type, we have to specify that the output is not uniform, as in this examples</p><pre class="codeinput">f = @(str)str(isstrprop(str,<span class="string">'alphanum'</span>)); <span class="comment">% function to remove non-alphanumeric chars</span>
+B = cellfun(f,A,<span class="string">'uniformOutput'</span>,false)
+</pre><pre class="codeoutput">B = 
+  Columns 1 through 4
+    'A'    'test'    'message'    'Which'
+  Columns 5 through 7
+    'contains'    '3'    'punctuation'
+  Column 8
+    'marks'
+</pre><p>Here are two other ways of writing this which are more readable</p><pre class="codeinput">B2 = cellfuncell(f, A)
+B3 = cell(1, length(A)); <span class="keyword">for</span> i=1:length(A), B2{i} = f(A{i}); <span class="keyword">end</span>
+B3
+</pre><pre class="codeoutput">B2 = 
+  Columns 1 through 4
+    'A'    'test'    'message'    'Which'
+  Columns 5 through 7
+    'contains'    '3'    'punctuation'
+  Column 8
+    'marks'
+B3 = 
+  Columns 1 through 7
+    []    []    []    []    []    []    []
+  Column 8
+    []
+</pre><p>The <a href="mfiles/cellfuncell.m">cellfuncell</a> function is not builtin, but is quite handy; it always returns a cell array.</p><h2>String Matching<a name="31"></a></h2><p>There are several functions we can use to compare strings.</p><pre class="codeinput">A = <span class="string">'testString'</span>;
+test1 = strcmp(A,<span class="string">'testString'</span>)       <span class="comment">% compare two strings</span>
+test2 = strcmpi(A,<span class="string">'TESTstring'</span>)      <span class="comment">% compare two strings but ignore case</span>
+test3 = strncmp(A,<span class="string">'testFoo'</span>,4)       <span class="comment">% compare only the first 4 chars of two strings</span>
+test4 = strncmpi(A,<span class="string">'TEST'</span>,4)        <span class="comment">% same as above, but ignore case.</span>
+</pre><pre class="codeoutput">test1 =
+     1
+test2 =
+     1
+test3 =
+     1
+test4 =
+     1
+</pre><p>We can find the occurrences of one substring inside another using the <i>strfind()</i> function, or search for all strings, (stored as rows in a matrix or cells in a cell array) that begin with a certain string, using the <i>strmatch()</i> function. We can also grab the first token in a char array delimited by spaces using the <i>strtok()</i>  command, (the delimiter it uses can be changed).</p><pre class="codeinput">str = <span class="string">'actgcgctgacgctgatacacgggagctgacgactgaggacgagc'</span>;
+A = strfind(str,<span class="string">'ctga'</span>)
+</pre><pre class="codeoutput">A =
+     7    13    27    34
+</pre><pre class="codeinput">str2 = {<span class="string">'foobar'</span>,<span class="string">'bar'</span>,<span class="string">'barfoo'</span>,<span class="string">'foofoo'</span>};
+B = strmatch(<span class="string">'foo'</span>,str2)
+</pre><pre class="codeoutput">B =
+     1
+     4
+</pre><pre class="codeinput">[token, remaining] = strtok(<span class="string">'this is a test'</span>)
+</pre><pre class="codeoutput">token =
+this
+remaining =
+ is a test
+</pre><p>Matlab also supports search and replace operations using regular expressions. Type <b>doc regexp</b> for numerous examples and useful functions.</p><p>
+<A NAME="DarwinExample"></a>
+</p><h2>Worked example of string processing<a name="37"></a></h2><p>In the example below, we load Darwin's <i>On the Origin of Species</i> into a cell array, convert to lower case, remove the punctuation and any non-alpha characters, and sort the words by how frequently they occur in the text. The text is available in electronic form <a href="http://www.gutenberg.org/dirs/etext98/otoos11.txt">here</a>.</p><pre class="codeinput">tic                         <span class="comment">% time how long this takes</span>
+fid = fopen(<span class="string">'darwin.txt'</span>);  <span class="comment">% Open file</span>
+text = textscan(fid,<span class="string">'%s'</span>);  <span class="comment">% Grab every word and put it in a cell array</span>
+fclose(fid);                <span class="comment">% Close file</span>
+</pre><pre class="codeinput"><span class="comment">%one big cell is returned, unwrap it and convert to lowercase</span>
+text = lower(text{:});
+Nwords = numel(text)
+</pre><pre class="codeoutput">Nwords =
+      209249
+</pre><pre class="codeinput"><span class="comment">%delete any tokens that do not contain at least one alpha character</span>
+noAlpha = cellfun(@(x)~any(x),isstrprop(text,<span class="string">'alpha'</span>));
+text(noAlpha) = [];
+</pre><pre class="codeinput"><span class="comment">%remove punctuation and any non-alpha characters</span>
+puncRemover = @(str)str(isstrprop(str,<span class="string">'alpha'</span>));
+text = cellfun(puncRemover,text,<span class="string">'UniformOutput'</span>,false);
+</pre><pre class="codeinput"><span class="comment">%find the unique words (in alphabetical order)</span>
+<span class="comment">% and assign them numeric ids, which is the locn</span>
+<span class="comment">% of the last occurence of this word in the text.</span>
+<span class="comment">% wordOrder is a numeric encoding of text using tokens from numericIDs.</span>
+[uniqueWords, numericIDs, wordOrder] = unique(text);
+numel(uniqueWords)
+</pre><pre class="codeoutput">ans =
+        9996
+</pre><pre class="codeinput"><span class="comment">%make sure the variables hold what we think they do.</span>
+assert(isequal(text,uniqueWords(wordOrder),text(numericIDs(wordOrder))));
+</pre><pre class="codeinput"><span class="comment">%count how often each word occurs.</span>
+counts = histc(wordOrder,1:numel(uniqueWords));
+</pre><pre class="codeinput"><span class="comment">%sort from most frequently occurring to least</span>
+[frequency,order] = sort(counts,<span class="string">'descend'</span>);
+<span class="comment">%frequency = frequency / sum(frequency);</span>
+</pre><pre class="codeinput"><span class="comment">%list the words from most frequently occurring to least.</span>
+sortedWords = uniqueWords(order);
+</pre><pre class="codeinput"><span class="comment">%create a cell array of the frequencies</span>
+freqcell = num2cell(frequency);
+</pre><pre class="codeinput"><span class="comment">%create a formatted string array of the frequencies as percentages</span>
+freqstring = num2str(100*frequency/sum(frequency),<span class="string">'%2.2f'</span>);
+</pre><pre class="codeinput"><span class="comment">%add percentage signs and convert to a cell array</span>
+freqstring = cellstr([freqstring,repmat(<span class="string">'%'</span>,size(frequency,1),1)]);
+</pre><pre class="codeinput"><span class="comment">%display the top 15 words with their percent frequencies.</span>
+display([sortedWords(1:15),freqstring(1:15,:)]);
+toc
+</pre><pre class="codeoutput">    'the'        '6.96%'
+    'of'         '5.02%'
+    'and'        '2.81%'
+    'in'         '2.59%'
+    'to'         '2.30%'
+    'a'          '1.61%'
+    'that'       '1.31%'
+    'as'         '1.07%'
+    'have'       '1.01%'
+    'be'         '1.01%'
+    'is'         '1.00%'
+    'on'         '0.94%'
+    'species'    '0.90%'
+    'by'         '0.89%'
+    'which'      '0.86%'
+Elapsed time is 7.408428 seconds.
+</pre><h2>Set Operations<a name="52"></a></h2><p>We can treat matrices and cell arrays as sets or multisets and perform various set operations with the functions <i>union()</i> , <i>intersect()</i> , <i>setdiff()</i> , <i>setxor()</i> , and <i>ismember()</i> .</p><pre class="codeinput">set1 = 1:2:9
+set2 = 1:4
+int = intersect(set1,set2)
+uni = union(set1,set2)
+dif = setdiff(set1,set2)
+xor = setxor(set1,set2)
+check = ismember(3,set1)
+</pre><pre class="codeoutput">set1 =
+     1     3     5     7     9
+set2 =
+     1     2     3     4
+int =
+     1     3
+uni =
+     1     2     3     4     5     7     9
+dif =
+     5     7     9
+xor =
+     2     4     5     7     9
+check =
+     1
+</pre><pre class="codeinput">set3 = {<span class="string">'alpha'</span>,<span class="string">'beta'</span>,<span class="string">'gamma'</span>}
+set4 = {<span class="string">'delta'</span>,<span class="string">'beta'</span>,<span class="string">'epsilon'</span>}
+intc = intersect(set3,set4)
+check2 = ismember(<span class="string">'delta'</span>,set4)
+</pre><pre class="codeoutput">set3 = 
+    'alpha'    'beta'    'gamma'
+set4 = 
+    'delta'    'beta'    'epsilon'
+intc = 
+    'beta'
+check2 =
+     1
+</pre><p>If we are taking the set difference of integers, it can be much faster to use the custom <a href="mfiles/mysetdiff.m">mysetdiff</a>  function, which uses logical indexing.</p><p>Or, perform basic quantification over logical arrays using the <i>all()</i> and <i>any()</i> commands: <i>all()</i> returns true if all of the inputs are true; whereas, <i>any()</i> returns true if at least one input is true.</p><pre class="codeinput">forall = all(isprime(1:2:7))
+exists = any(isprime(1:2:7))
+</pre><pre class="codeoutput">forall =
+     0
+exists =
+     1
+</pre><p>We can also extract the unique elements of a cell array or matrix using the <i>unique()</i> function.</p><pre class="codeinput">uniqueNums = unique([1,2,1,1,2,3,4,4,5,3,2,1])                <span class="comment">% numeric matrix</span>
+uniqueNames = {<span class="string">'Bob'</span>,<span class="string">'Fred'</span>,<span class="string">'Bob'</span>,<span class="string">'Ed'</span>,<span class="string">'Fred'</span>,<span class="string">'Chris'</span>,<span class="string">'Ed'</span>}   <span class="comment">% cell array</span>
+</pre><pre class="codeoutput">uniqueNums =
+     1     2     3     4     5
+uniqueNames = 
+  Columns 1 through 5
+    'Bob'    'Fred'    'Bob'    'Ed'    'Fred'
+  Columns 6 through 7
+    'Chris'    'Ed'
+</pre><p>This can be extended to unique rows of a matrix</p><pre class="codeinput">A = [<span class="string">'bba'</span>;<span class="string">'bab'</span>;perms(<span class="string">'aba'</span>);<span class="string">'aba'</span>]                          <span class="comment">% perms() generates every permutation</span>
+[uniqueElems, firstIndices, perm] = unique(A,<span class="string">'rows'</span>);         <span class="comment">% find unique rows of A</span>
+sorted = issorted(uniqueElems,<span class="string">'rows'</span>)                         <span class="comment">% are they sorted? - yes!</span>
+check = isequal(A,uniqueElems(perm,:),A(firstIndices(perm),:))<span class="comment">% note what each return var represents</span>
+</pre><pre class="codeoutput">A =
+bba
+bab
+aba
+aab
+baa
+baa
+aba
+aab
+aba
+sorted =
+     1
+check =
+     1
+</pre><p>
+<A NAME="structs"></A>
+</p><h2>Structs<a name="59"></a></h2><p>In addition to matrices and cell arrays, Matlab supports structured arrays or structs, which allow you to organize data and access it by name. For those familiar with other programming languages, structs are basically hashmaps with string keys, but depending on how they are used, they can also operate much like a simple database. Structs, like cell arrays, can store anything you throw at them. Conversely, you can store structs in cell arrays and even within matrices so long as the fieldnames of the structs are the same.</p><p>We can create a struct by using the <i>struct()</i> function, passing it fieldnames and data in alternating order.</p><pre class="codeinput">S = struct(<span class="string">'time'</span>,0:5,<span class="string">'distance'</span>,0:2:10,<span class="string">'height'</span>,1:0.5:2)
+check = isstruct(S)             <span class="comment">% really a struct?</span>
+names = fieldnames(S)           <span class="comment">% list the fieldnames</span>
+check2 = isfield(S,<span class="string">'time'</span>)      <span class="comment">% check that 'time' is really a fieldname</span>
+S = orderfields(S)              <span class="comment">% order the fields alphabetically</span>
+S = rmfield(S,<span class="string">'height'</span>)         <span class="comment">% remove a field</span>
+</pre><pre class="codeoutput">S = 
+        time: [0 1 2 3 4 5]
+    distance: [0 2 4 6 8 10]
+      height: [1 1.5000 2]
+check =
+     1
+names = 
+    'time'
+    'distance'
+    'height'
+check2 =
+     1
+S = 
+    distance: [0 2 4 6 8 10]
+      height: [1 1.5000 2]
+        time: [0 1 2 3 4 5]
+S = 
+    distance: [0 2 4 6 8 10]
+        time: [0 1 2 3 4 5]
+</pre><p>Access the data using the . operator and the name of the field.</p><pre class="codeinput">time = S.time
+</pre><pre class="codeoutput">time =
+     0     1     2     3     4     5
+</pre><p>Alternatively, we can use a string for the name, which allows us to access fields dynamically at runtime, much like a map.</p><pre class="codeinput">distance = S.(<span class="string">'distance'</span>)
+fieldname = <span class="string">'distance'</span>
+distance = S.(fieldname)
+</pre><pre class="codeoutput">distance =
+     0     2     4     6     8    10
+fieldname =
+distance
+distance =
+     0     2     4     6     8    10
+</pre><p>We can set set a new value for a field</p><pre class="codeinput">S.time = 2*S.time
+</pre><pre class="codeoutput">S = 
+    distance: [0 2 4 6 8 10]
+        time: [0 2 4 6 8 10]
+</pre><p>or add new fields and data on the fly</p><pre class="codeinput">S.newField = <span class="string">'foo'</span>
+</pre><pre class="codeoutput">S = 
+    distance: [0 2 4 6 8 10]
+        time: [0 2 4 6 8 10]
+    newField: 'foo'
+</pre><p>When the names for the fields will be generated dynamically, (i.e. at runtime) it is often prudent to ensure that the string is a valid fieldname. Fieldnames must begin with a letter and can contain only letters, numbers and the underscore symbol. You can check that a string is valid with the <i>isvarname()</i> command and auto-generate a valid name from a source string with the <i>genvarname()</i> command.</p><pre class="codeinput">test = isvarname(<span class="string">'3alpha'</span>)
+better = genvarname(<span class="string">'3alpha'</span>)
+</pre><pre class="codeoutput">test =
+     0
+better =
+x3alpha
+</pre><h2>Struct arrays<a name="66"></a></h2><p>We can create an array of structs all having the same fieldnames, which allows us to build a kind of database of entries.</p><pre class="codeinput">S = struct(<span class="string">'Name'</span>,{},<span class="string">'ID'</span>,{},<span class="string">'Position'</span>,{});
+S(1).Name = <span class="string">'Greg'</span>; S(1).ID = <span class="string">'123'</span>; S(1).Position = <span class="string">'Manager'</span>;
+S(2).Name = <span class="string">'Ed'</span>  ; S(2).ID = <span class="string">'312'</span>; S(2).Position = <span class="string">'Clerk'</span>;
+S(3).Name = <span class="string">'Pete'</span>; S(3).ID = <span class="string">'301'</span>; S(3).Position = <span class="string">'CEO'</span>;
+</pre><p>We can then access an individual record, itself a struct,</p><pre class="codeinput">EdsRecord = S(2)
+</pre><pre class="codeoutput">EdsRecord = 
+        Name: 'Ed'
+          ID: '312'
+    Position: 'Clerk'
+</pre><p>Or access data across all of the records at once.</p><pre class="codeinput">[gID,eID,pID] = S.ID
+</pre><pre class="codeoutput">gID =
+123
+eID =
+312
+pID =
+301
+</pre><p>We can concatenate the output from the above command</p><pre class="codeinput">A = [S.ID]
+</pre><pre class="codeoutput">A =
+123312301
+</pre><p>However, when dealing with structures, its often more useful to concatenate vertically. We can do this by using the <i>vertcat()</i> function, which is the same function called when you concatenate with semicolons as in [A ; B]. Since we cannot control how we get the data from the struct, we sometimes have to call vertcat explicitly.</p><pre class="codeinput">B = vertcat(S.ID)
+</pre><pre class="codeoutput">B =
+123
+312
+301
+</pre><p>We can create structs from cell arrays using the <i>cell2struct()</i> function and, (possibly multidimensional), cell arrays from structs using the <i>struct2cell()</i> function.</p><pre class="codeinput">data = {1,2,3,4};
+fieldNames = {<span class="string">'one'</span>,<span class="string">'two'</span>,<span class="string">'three'</span>,<span class="string">'four'</span>};
+dim = 2;                                    <span class="comment">%data for each fieldname is ordered along dim 2</span>
+S = cell2struct(data,fieldNames,dim)
+</pre><pre class="codeoutput">S = 
+      one: 1
+      two: 2
+    three: 3
+     four: 4
+</pre><p>Here we give a more interesting example. We extend the Dawin example above by creating a structure from the words so that we can easily search for the frequency of particular words. This is basically a hashmap.</p><pre class="codeinput">map = cell2struct(freqcell,sortedWords);
+</pre><p>As a sanity check, we ensure that number of times a few chosen words occur in the text is the same as the frequency value stored in the map</p><pre class="codeinput">testWord = {<span class="string">'origin'</span>,<span class="string">'of'</span>,<span class="string">'the'</span>,<span class="string">'species'</span>,<span class="string">'natural'</span>,<span class="string">'selection'</span>};
+<span class="keyword">for</span> i=1:numel(testWord)
+  f1 = sum(strcmp(testWord{i},text));
+  f2 = map.(testWord{i});
+  assert(f1==f2)
+<span class="keyword">end</span>
+</pre><p>
+<A NAME="Containers.map"></a>
+</p><h2>Containers.map<a name="75"></a></h2><p><a href="http://www.mathworks.com/access/helpdesk/help/techdoc/index.html?/access/helpdesk/help/techdoc/ref/containers_map.html">containers.Map</a> are an implementation of a <b>hash table</b>. (If your matlab version is older than 2008b, see  <a href="external.html#javaHash">calling Java hash tables from Matlab</a>.) The key can be a string or numeric scalar, the value can be anything. Here is an example, where we map from State name to City name.</p><pre class="codeinput">US_Capitals = containers.Map( <span class="keyword">...</span><span class="comment"> % create object</span>
+   {<span class="string">'Arizona'</span>, <span class="string">'Nebraska'</span>, <span class="string">'Nevada'</span>, <span class="string">'New York'</span>, <span class="string">'Georgia'</span>, <span class="string">'Alaska'</span>}, <span class="keyword">...</span>
+  {<span class="string">'Phoenix'</span>, <span class="string">'Lincoln'</span>, <span class="string">'Carson City'</span>, <span class="string">'Albany'</span>, <span class="string">'Atlanta'</span>, <span class="string">'Juneau'</span>})
+</pre><pre class="codeoutput">US_Capitals = 
+  containers.Map handle
+  Package: containers
+
+  Properties:
+        Count: 6
+      KeyType: 'char'
+    ValueType: 'char'
+</pre><pre class="codeinput">keys(US_Capitals)
+</pre><pre class="codeoutput">ans = 
+  Columns 1 through 3
+    'Alaska'    'Arizona'    'Georgia'
+  Columns 4 through 6
+    'Nebraska'    'Nevada'    'New York'
+</pre><pre class="codeinput">values(US_Capitals)
+</pre><pre class="codeoutput">ans = 
+  Columns 1 through 3
+    'Juneau'    'Phoenix'    'Atlanta'
+  Columns 4 through 6
+    'Lincoln'    'Carson City'    'Albany'
+</pre><pre class="codeinput">US_Capitals(<span class="string">'Vermont'</span>) = <span class="string">'Montpelier'</span>; <span class="comment">% add one more entry</span>
+</pre><pre class="codeinput">query = <span class="string">'Vermont'</span>;
+fprintf(<span class="string">'capital of %s is %s\n'</span>, query, US_Capitals(query));
+</pre><pre class="codeoutput">capital of Vermont is Montpelier
+</pre><pre class="codeinput"><span class="keyword">try</span>
+  query = <span class="string">'Texas'</span>;
+  fprintf(<span class="string">'capital of %s is %s\n'</span>, query, US_Capitals(query));
+<span class="keyword">catch</span> ME
+  warning(ME.message)
+<span class="keyword">end</span>
+</pre><pre class="codeoutput">Warning: The specified key is not present in
+this container. 
+</pre><p>To prevents errors when looking up unknown keys, you can use something like this:</p><pre class="codeinput"><span class="keyword">if</span> ~isKey(US_Capitals,query)
+  fprintf(<span class="string">'don''t know capital of %s\n'</span>, query)
+<span class="keyword">else</span>
+  fprintf(<span class="string">'capital of %s is %s\n'</span>, query, US_Capitals(query));
+<span class="keyword">end</span>
+</pre><pre class="codeoutput">don't know capital of Texas
+</pre><p>Here is a slightly more complex example. We create several random graphs, represented as adjacency matrices, and we count how many times we generate each one.</p><pre class="codeinput">d = 5;
+graphToKey = @(G) num2str(find(G));<span class="comment">% each row is a string encoding of the edge number</span>
+graphsVisited = containers.Map;
+rand(<span class="string">'state'</span>,1);
+N = 100;
+keep = zeros(N, d*d);
+<span class="keyword">for</span> i=1:N
+  G = triu(rand(d,d) &gt; 0.5, 1);
+  key = graphToKey(G);
+  <span class="keyword">if</span> ~isKey(graphsVisited, key)
+    graphsVisited(key) = 1;
+  <span class="keyword">else</span>
+    graphsVisited(key) = graphsVisited(key)+1;
+  <span class="keyword">end</span>
+  keep(i,:) = G(:)'; <span class="comment">% for debugging</span>
+<span class="keyword">end</span>
+</pre><p>Now check it worked</p><pre class="codeinput">Nunique = length(unique(keep,<span class="string">'rows'</span>));
+assert(Nunique == length(keys(graphsVisited)));
+figure; imagesc(keep); title(sprintf(<span class="string">'%d unique rows'</span>, Nunique));
+<span class="keyword">for</span> i=1:N
+  mask = (repmat(keep(i,:),N,1)==keep); <span class="comment">% compare row i to all others</span>
+  cnt(i) = sum(all(mask,2)); <span class="comment">% count how many rows perfectly match this one</span>
+  key = graphToKey(reshape(keep(i,:),d,d));
+  cnt2(i) = graphsVisited(key);
+<span class="keyword">end</span>
+assert(isequal(cnt, cnt2))
+figure; bar(cnt)
+</pre><img vspace="5" hspace="5" src="dataStructures_01.png" alt=""> <img vspace="5" hspace="5" src="dataStructures_02.png" alt=""> <p class="footer"><br>
+      Published with MATLAB&reg; 7.10<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Strings, Cells, Structs, Containers, and Sets
+% In this section, we examine strings and string operations as well as two
+% very important Matlab data structures: cell arrays, and structs. We also
+% discuss the new (2008b) container.map hash table class,
+% and various set-theoretic operations.
+%
+
+%% Character Arrays
+% Strings in Matlab are actually character matrices, which can be manipulated
+% in very similar ways to numeric matrices. 
+A = ' This is Test String #1! '
+B = A(1:5)              % extract the first 5 characters
+C = [A ; A]             % concatenate vertically
+D = repmat('@!',2,5)    % replicate char arrays, just like numeric ones  
+E = 'z':-1:'a'          % create the matrices just like numeric ones.
+check = ischar(A)       % is it a char array?
+F = isletter(A(1:6))    % which characters are letters? - returns a logical array
+G = isspace(A(1:6))     % which characters are spaces? - returns a logical array
+H = upper(A)            % convert to upper case
+I = lower(A)            % convert to lower case
+J = strtrim(A)          % trim leading and trailing blank spaces. 
+K = deblank(A)          % trim trailing blank spaces only.
+%%
+% The _isstrprop()_ function can be used much like the _isletter()_ or
+% _isspace()_ functions, allowing you to test which characters in a matrix
+% belong to one of several different categories. Type *doc isstrprop* for
+% the full list. 
+str = ' a1!'
+A = isstrprop(str,'punct')       % punctuation
+B = isstrprop(str,'alphanum')    % alpha or numeric characters
+C = isstrprop(str,'digit')       % decimal digits
+D = isstrprop('3A','xdigit')     % valid hexadecimal digits
+%%
+% The _char()_ and _abs()_ functions convert from integers to the ascii
+% equivalents and vice versa. 
+A = char(65)
+B = abs('B')
+C = abs('abcdefg')
+%%
+% We can convert from string representations of hexadecimal or binary
+% numbers to decimal numbers and back using the _dec2hex()_ , _hex2dec()_ ,
+% _dec2bin()_, and _bin2dec()_ functions. The num2xxx and xxx2num functions
+% operate on signed numbers.
+A = dec2hex(211)
+B = hex2dec('D3')
+C = dec2bin(211)
+D = bin2dec('11010011')
+%% 
+% We can also use the _num2str()_ and _mat2str()_ functions to generate
+% string representations of numeric matrices. Or, parse a number from a
+% string with _str2num()_
+A = num2str([1:5;1:5]) %Takes an optional formatting string - see Formatting Strings section
+B = mat2str([1:5;1:5])
+C = str2num('44')
+%%
+% If the size of the strings match, we can concatenate vertically and
+% horizontally just like numeric matrices. If not, we can either use the
+% _blanks()_ function to pad with blanks or the _strcat()_ and _strvcat()_
+% functions to concatenate, adding blanks for us. 
+C = strvcat('hello','this','is','a','test') %concatenate vertically 
+size(C)
+class(C)
+%%
+D = sortrows(C)                             % sort the rows alphabetically
+%%
+E = strjust(C)                              % justify the char array
+%%
+% <html> 
+% <A NAME="FormattingStrings"></A>
+% </html>
+%% Formatting Strings
+% The _sprintf()_ and _fprintf()_ functions can be used to format strings
+% for output: _sprintf()_ returns a string, while _fprintf()_ directly
+% displays the string, or writes it to a file, depending on the mode. 
+%
+% We pass these functions a string that includes place holders, (denoted by 
+% % signs) which will be replaced by corresponding values listed after the
+% string. These place holders define how these values will be formatted. We
+% use %s for a string, %d for a decimal digit, and %05.2f to indicate that
+% we want a floating point number with 5 characters in total, two digits
+% after the decimal point, and padded with zeros if necessary. There are
+% many formatting options; Type *doc sprintf* for the full list. We can 
+% use escape characters like \n for a new line and \t for a tab. The
+% examples will make this clearer.
+%%
+fprintf('\n %s won the %s medal in the %s \n for his time of %05.2f seconds.\n',...
+         'Kosuke Kitajima','gold','100m breaststroke',60.08);
+str = sprintf('%07.4f',pi) % display pi to 4 decimals, 7 chars in total, padded with zeros.    
+str = sprintf('%x',999)    % display number in hexadecimal
+%%
+% <html> 
+% <A NAME="cellArrays"></A>
+% </html>
+%% Cell Arrays
+% In addition to matrices, Matlab supports another very general and
+% powerful data structure, the cell array. Cell arrays can hold any type of
+% Matlab object or structure including numeric matrices of different sizes,
+% character arrays, other cells, as well as structs and objects, which we
+% will see later. In fact, the same cell array can hold elements of 
+% different types. Cell arrays are frequently used to store strings, (i.e.
+% char arrays of different sizes), which is why we discuss them here. Much
+% of what was said about indexing matrices also applies to cells with one
+% or two important differences. 
+%
+%% 
+% We can create a cell array by using the _cell()_ command
+A = cell(2,4)               % create a 2-by-4 cell array
+check = iscell(A)           % really a cell?
+%%
+% or by enclosing an object or objects in curly braces
+B = {[1,2,3],'hello',{1};[3;5],'yes',{'no'}}   % add a bunch of objects to a cell array
+%%
+% A 2-by-4 cell array is in fact made up of 8, 1-by-1 cell arrays, (simply
+% called cells), which store the data. There are two ways to index into,
+% (and assign into) a cell array: using () braces and using {} braces. 
+% Using the () braces, we access or assign cells. Using the the {} braces
+% we access or assign the data within those cells. 
+C = B(1,2)      % Returns a cell holding the string 'hello'
+size(C)
+class(C)
+D = B{1,2}      % Returns the string itself. 
+size(D)
+class(D)
+E = B(:,1)      % Returns a cell array holding the first column
+%%
+% If we extract the data from more than one cell at once using the curly
+% bracket indexing, Matlab returns each element one at a time much like a
+% function that returns multiple values. We can assign each of these to new
+% variables or perhaps pass them directly to a function expecting that many
+% parameters.
+[F,G] = B{:,1}
+%%
+% When assigning data, we must be careful what kind of brackets we use.
+B(1,1) = {'test'}   % must pass it a cell as we are using () brackets
+B{1,1} = 'test'     % same effect as line before. 
+B{1,2} = {'test'}   % careful, this adds a cell to the cell at (1,2), (nesting cells)
+H = B{1,2}{1}       % to then extract it, we have to index twice.
+%%
+% We can transpose,reshape,replicate, concatenate, and delete cell arrays just like matrices
+I = B'                           % transpose
+J = reshape(B,1,6)               % reshape
+K = [repmat(C,1,3);B]            % replicate and concatenate
+K(end,:) = []                    % delete
+%%
+% Suppose we store numeric matrices of different sizes in a cell array.
+A = {[1,2,3],[4,5],[6],[7,8,9,10]}
+%%
+% We can concatenate the entries themselves by first extracting all of the elements
+% using the colon operator and then passing the results to the
+% concatenation
+% operator [].
+B = [A{:}]
+%%
+% We can also use the _num2cell()_ , _mat2cell()_ ,and  _cell2mat()_ 
+% functions to convert between matrices and cell arrays. 
+A = num2cell(1:5)                     % convert [1,2,3,4,5] to {[1],[2],[3],[4],[5]}
+M = reshape(1:32, 4, 8)
+B = mat2cell(M,[2,2],[3,3,2]) % partition matrix ones(4,8) into 6 cells
+celldisp(B)
+C = cell2mat(B)                       % inverse operation, (group together)
+%% 
+% We can convert from a character matrix to a cell array of strings, where
+% each string is taken to be a row of the matrix, using the _cellstr()_
+% command, and back again using the _char()_ command. 
+A = strvcat('cell','array','example')   % make a char array
+B = cellstr(A)                          % convert to a cell array of strings
+check = iscellstr(B)                    % check that its a cell array of strings
+C = char(B)                             % convert back to a char array
+%%
+% The _cellfun()_ function can be very useful when we want to apply a
+% function to the data inside every cell. If the function
+% returns values of the same size/type (eg. scalar) for every cell entry,
+% we can write something like this
+%%
+A = {'A ', 'test ', 'message, ', 'Which', 'contains ', '3 ','punctuation ' ,'marks!'}
+f = @(str) isequal(str, lower(str)); % is  lower case string?
+B = cellfun(f,A)
+%%
+% If the function returns values of variable size/type, we have to specify
+% that the output is not uniform, as in this examples
+%%
+f = @(str)str(isstrprop(str,'alphanum')); % function to remove non-alphanumeric chars
+B = cellfun(f,A,'uniformOutput',false)    
+%%
+% Here are two other ways of writing this which are more readable
+%%
+B2 = cellfuncell(f, A)
+B3 = cell(1, length(A)); for i=1:length(A), B2{i} = f(A{i}); end
+B3
+%%
+% The <mfiles/cellfuncell.m cellfuncell> function is not builtin,
+% but is quite handy; it always returns a cell array.
+%% String Matching
+% There are several functions we can use to compare strings.
+A = 'testString';
+test1 = strcmp(A,'testString')       % compare two strings
+test2 = strcmpi(A,'TESTstring')      % compare two strings but ignore case
+test3 = strncmp(A,'testFoo',4)       % compare only the first 4 chars of two strings
+test4 = strncmpi(A,'TEST',4)        % same as above, but ignore case.
+%%
+% We can find the occurrences of one substring inside another using the 
+% _strfind()_ function, or search for all strings, (stored as rows in a 
+% matrix or cells in a cell array) that begin with a certain string, using
+% the _strmatch()_ function. We can also grab the first token in a char array
+% delimited by spaces using the _strtok()_  command, (the delimiter it
+% uses can be changed). 
+str = 'actgcgctgacgctgatacacgggagctgacgactgaggacgagc';
+A = strfind(str,'ctga')
+%%
+str2 = {'foobar','bar','barfoo','foofoo'};
+B = strmatch('foo',str2)
+%%
+[token, remaining] = strtok('this is a test')
+%%
+% Matlab also supports search and replace operations using regular
+% expressions. Type *doc regexp* for numerous examples and useful
+% functions. 
+%%
+% <html> 
+% <A NAME="DarwinExample"></a>
+% </html>
+%% Worked example of string processing
+% In the example below, we load Darwin's _On the Origin of Species_
+% into a cell
+% array, convert to lower case, remove the punctuation and any non-alpha
+% characters, and sort the words by how frequently they occur in the text. 
+% The text is available in electronic form
+% <http://www.gutenberg.org/dirs/etext98/otoos11.txt here>.
+%%
+tic                         % time how long this takes
+fid = fopen('darwin.txt');  % Open file
+text = textscan(fid,'%s');  % Grab every word and put it in a cell array
+fclose(fid);                % Close file
+%%
+%one big cell is returned, unwrap it and convert to lowercase
+text = lower(text{:});
+Nwords = numel(text)
+%%
+%delete any tokens that do not contain at least one alpha character
+noAlpha = cellfun(@(x)~any(x),isstrprop(text,'alpha'));
+text(noAlpha) = [];
+%%
+%remove punctuation and any non-alpha characters
+puncRemover = @(str)str(isstrprop(str,'alpha'));
+text = cellfun(puncRemover,text,'UniformOutput',false);
+%%
+%find the unique words (in alphabetical order)
+% and assign them numeric ids, which is the locn
+% of the last occurence of this word in the text.
+% wordOrder is a numeric encoding of text using tokens from numericIDs.
+[uniqueWords, numericIDs, wordOrder] = unique(text);
+numel(uniqueWords)
+%%
+%make sure the variables hold what we think they do.
+assert(isequal(text,uniqueWords(wordOrder),text(numericIDs(wordOrder))));
+%%
+%count how often each word occurs.
+counts = histc(wordOrder,1:numel(uniqueWords));
+%%
+%sort from most frequently occurring to least
+[frequency,order] = sort(counts,'descend');
+%frequency = frequency / sum(frequency); 
+%%
+%list the words from most frequently occurring to least.
+sortedWords = uniqueWords(order);
+%%
+%create a cell array of the frequencies
+freqcell = num2cell(frequency);
+%%
+%create a formatted string array of the frequencies as percentages
+freqstring = num2str(100*frequency/sum(frequency),'%2.2f');
+%%
+%add percentage signs and convert to a cell array
+freqstring = cellstr([freqstring,repmat('%',size(frequency,1),1)]);
+%%
+%display the top 15 words with their percent frequencies.
+display([sortedWords(1:15),freqstring(1:15,:)]);
+toc
+%%
+%% Set Operations
+% We can treat matrices and cell arrays as sets or multisets and perform
+% various set operations with the functions _union()_ , _intersect()_ ,
+% _setdiff()_ , _setxor()_ , and _ismember()_ .
+set1 = 1:2:9
+set2 = 1:4
+int = intersect(set1,set2)
+uni = union(set1,set2)
+dif = setdiff(set1,set2)  
+xor = setxor(set1,set2)
+check = ismember(3,set1)
+%%
+set3 = {'alpha','beta','gamma'}
+set4 = {'delta','beta','epsilon'}
+intc = intersect(set3,set4)
+check2 = ismember('delta',set4)
+%%
+% If we are taking the set difference of integers, it can be much faster to
+% use the custom <mfiles/mysetdiff.m mysetdiff>  function, which uses
+% logical indexing. 
+%%
+% Or, perform basic quantification over logical arrays using the _all()_
+% and _any()_ commands: _all()_ returns true if all of the inputs are true;
+% whereas, _any()_ returns true if at least one input is true. 
+forall = all(isprime(1:2:7))
+exists = any(isprime(1:2:7))
+%%
+% We can also extract the unique elements of a cell array or matrix using
+% the _unique()_ function. 
+uniqueNums = unique([1,2,1,1,2,3,4,4,5,3,2,1])                % numeric matrix
+uniqueNames = {'Bob','Fred','Bob','Ed','Fred','Chris','Ed'}   % cell array
+%%
+% This can be extended to unique rows of a matrix
+A = ['bba';'bab';perms('aba');'aba']                          % perms() generates every permutation
+[uniqueElems, firstIndices, perm] = unique(A,'rows');         % find unique rows of A
+sorted = issorted(uniqueElems,'rows')                         % are they sorted? - yes!
+check = isequal(A,uniqueElems(perm,:),A(firstIndices(perm),:))% note what each return var represents
+%%
+% <html> 
+% <A NAME="structs"></A>
+% </html>
+%% Structs
+% In addition to matrices and cell arrays, Matlab supports structured
+% arrays or structs, which allow you to organize data and access it by
+% name. For those familiar with other programming languages, structs are 
+% basically hashmaps with string keys, but depending on how they are used,
+% they can also operate much like a simple database. Structs, like cell
+% arrays, can store anything you throw at them. Conversely, you can store
+% structs in cell arrays and even within matrices so long as the fieldnames
+% of the structs are the same. 
+%%
+% We can create a struct by using the _struct()_ function, passing it
+% fieldnames and data in alternating order.
+S = struct('time',0:5,'distance',0:2:10,'height',1:0.5:2)
+check = isstruct(S)             % really a struct?
+names = fieldnames(S)           % list the fieldnames
+check2 = isfield(S,'time')      % check that 'time' is really a fieldname
+S = orderfields(S)              % order the fields alphabetically
+S = rmfield(S,'height')         % remove a field
+%%
+% Access the data using the . operator and the name of the field.
+time = S.time
+%%
+% Alternatively, we can use a string for the name, which allows us to
+% access fields dynamically at runtime, much like a map.
+distance = S.('distance')
+fieldname = 'distance'
+distance = S.(fieldname)
+%%
+% We can set set a new value for a field
+S.time = 2*S.time
+%%
+% or add new fields and data on the fly
+S.newField = 'foo'
+%% 
+% When the names for the fields will be generated dynamically, (i.e. at runtime)
+% it is often prudent to ensure that the string is a valid fieldname.
+% Fieldnames must begin with a letter and can contain only letters, numbers
+% and the underscore symbol. You can check that a string is valid with the
+% _isvarname()_ command and auto-generate a valid name from a source string
+% with the _genvarname()_ command.
+test = isvarname('3alpha')
+better = genvarname('3alpha')
+%% Struct arrays
+% We can create an array of structs all having the same fieldnames, which
+% allows us to build a kind of database of entries. 
+S = struct('Name',{},'ID',{},'Position',{});
+S(1).Name = 'Greg'; S(1).ID = '123'; S(1).Position = 'Manager';
+S(2).Name = 'Ed'  ; S(2).ID = '312'; S(2).Position = 'Clerk';
+S(3).Name = 'Pete'; S(3).ID = '301'; S(3).Position = 'CEO';
+%%
+% We can then access an individual record, itself a struct,
+EdsRecord = S(2)
+%%
+% Or access data across all of the records at once.
+[gID,eID,pID] = S.ID
+%%
+% We can concatenate the output from the above command
+A = [S.ID]
+%% 
+% However, when dealing with structures, its often more useful to
+% concatenate vertically. We can do this by using the _vertcat()_
+% function, which is the same function called when you concatenate with
+% semicolons as in [A ; B]. Since we cannot control how we get the data from
+% the struct, we sometimes have to call vertcat explicitly.
+B = vertcat(S.ID)
+%%
+% We can create structs from cell arrays using the _cell2struct()_ function
+% and, (possibly multidimensional), cell arrays from structs using the
+% _struct2cell()_ function.
+data = {1,2,3,4};
+fieldNames = {'one','two','three','four'};
+dim = 2;                                    %data for each fieldname is ordered along dim 2
+S = cell2struct(data,fieldNames,dim)
+%%
+% Here we give a more interesting example.
+% We extend the Dawin example above by
+% creating a structure from the words so that we can easily search for
+% the frequency of particular words. This is basically a hashmap.
+map = cell2struct(freqcell,sortedWords);
+%%
+% As a sanity check, we ensure that number of times a few chosen
+% words occur in the text is the same as the frequency value
+% stored in the map
+testWord = {'origin','of','the','species','natural','selection'};
+for i=1:numel(testWord)
+  f1 = sum(strcmp(testWord{i},text));
+  f2 = map.(testWord{i});
+  assert(f1==f2)
+end
+%%
+% <html> 
+% <A NAME="Containers.map"></a>
+% </html>
+%% Containers.map
+% <http://www.mathworks.com/access/helpdesk/help/techdoc/index.html?/access/helpdesk/help/techdoc/ref/containers_map.html containers.Map>
+% are an implementation of a *hash table*.
+% (If your matlab version is older than 2008b,
+% see  <external.html#javaHash calling Java hash tables from Matlab>.)
+% The key can be a string or numeric scalar, the value can be anything.
+% Here is an example, where we map from State name to City name.
+%%
+US_Capitals = containers.Map( ... % create object
+   {'Arizona', 'Nebraska', 'Nevada', 'New York', 'Georgia', 'Alaska'}, ...
+  {'Phoenix', 'Lincoln', 'Carson City', 'Albany', 'Atlanta', 'Juneau'})
+%%
+keys(US_Capitals)
+%%
+values(US_Capitals)
+%%
+US_Capitals('Vermont') = 'Montpelier'; % add one more entry
+%%
+query = 'Vermont';
+fprintf('capital of %s is %s\n', query, US_Capitals(query));
+%%
+try
+  query = 'Texas';
+  fprintf('capital of %s is %s\n', query, US_Capitals(query));
+catch ME
+  warning(ME.message)
+end
+%%
+% To prevents errors when looking up unknown keys, you can use
+% something like this:
+if ~isKey(US_Capitals,query)
+  fprintf('don''t know capital of %s\n', query)
+else
+  fprintf('capital of %s is %s\n', query, US_Capitals(query));
+end
+%%
+% Here is a slightly more complex example.
+% We create several random graphs, represented as adjacency
+% matrices, and we count how many times we generate each one.
+d = 5;
+graphToKey = @(G) num2str(find(G));% each row is a string encoding of the edge number
+graphsVisited = containers.Map;
+rand('state',1);
+N = 100;
+keep = zeros(N, d*d);
+for i=1:N
+  G = triu(rand(d,d) > 0.5, 1);
+  key = graphToKey(G);
+  if ~isKey(graphsVisited, key)
+    graphsVisited(key) = 1;
+  else
+    graphsVisited(key) = graphsVisited(key)+1;
+  end
+  keep(i,:) = G(:)'; % for debugging
+end
+%%
+% Now check it worked
+Nunique = length(unique(keep,'rows'));
+assert(Nunique == length(keys(graphsVisited)));
+figure; imagesc(keep); title(sprintf('%d unique rows', Nunique));
+for i=1:N
+  mask = (repmat(keep(i,:),N,1)==keep); % compare row i to all others
+  cnt(i) = sum(all(mask,2)); % count how many rows perfectly match this one
+  key = graphToKey(reshape(keep(i,:),d,d));
+  cnt2(i) = graphsVisited(key);
+end
+assert(isequal(cnt, cnt2))
+figure; bar(cnt)
+
+
+
+
+##### SOURCE END #####
+--></body></html>

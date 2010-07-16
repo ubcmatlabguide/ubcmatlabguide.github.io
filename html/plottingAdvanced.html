@@ -1,0 +1,546 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML is auto-generated from an M-file.
+To make changes, update the M-file and republish this document.
+      --><title>More advanced plotting features</title><meta name="generator" content="MATLAB 7.10"><meta name="date" content="2010-07-15"><meta name="m-file" content="plottingAdvanced"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>More advanced plotting features</h1><!--introduction--><p>In this chapter, we discuss some more advanced features.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">3D Surface and Contour Plots</a></li><li><a href="#11">Annotations and the Plot Editor</a></li><li><a href="#14">Latex</a></li><li><a href="#15">Coordinate Conversion</a></li><li><a href="#16">Multiple figures inside a figure</a></li><li><a href="#18">Root Properties</a></li><li><a href="#21">Rotating Figures and Creating Movies</a></li><li><a href="#24">Creating Graphical User Interfaces</a></li><li><a href="#25">Customizing callback functions when you click on a figure</a></li></ul></div><h2>3D Surface and Contour Plots<a name="1"></a></h2><p>To graph a function of two variables we need to first evaluate that function over a grid of points, not just a line as in the 2D case. We use the <i>meshgrid()</i> function to create such a grid, as in this example.</p><pre class="codeinput">f = @(x,y) exp(cos(sqrt(x.^2 + y.^2))); <span class="comment">% a function of two variables</span>
+d = -2*pi:0.1:2*pi;                     <span class="comment">% domain for both x,y</span>
+[X,Y] = meshgrid(d,d);                  <span class="comment">% create a grid of points</span>
+Z = f(X,Y);                             <span class="comment">% evaluate f at every point on grid</span>
+</pre><p>Some functions, while still vectorized, will only operate on vectors and not matrices. The <i>mvnpdf()</i> function for example interprets a matrix of inputs, (say n-by-d), as n, d-dimensional inputs, not n*d 1-by-1 inputs. We can still plot such functions in 3D with a few small changes. After obtaining X and Y from <i>meshgrid()</i>, save X's size, evaluate f by passing in X and Y as column vectors, (using the : operator), and then reshape the output Z back to the original size and continue as before.</p><pre class="codeinput">[nrows,ncols] = size(X);                <span class="comment">% first obtain the size of X</span>
+Z1 = f(X(:),Y(:));                      <span class="comment">% convert X,Y to column vectors and evaluate f</span>
+Z1 = reshape(Z1,nrows,ncols);           <span class="comment">% reshape</span>
+</pre><p>There are several 3d plot types available. Here we use <i>surf()</i>, which plots the surface of the function, <i>contourf()</i> , which plots the contour lines of a function and fills the area between them with color, and <i>mesh()</i> , which is similar to <i>surf()</i>, displaying a wire mesh rather than a solid surface. The colors used in each are specified by the current colormap and can be changed by using the <i>colormap()</i> command. Type <b>doc colormap</b> for a list of options. There are several other 3d plotting functions: <i>plot3()</i>  for instance is the 3d generalization of <i>plot()</i>.</p><pre class="codeinput">f4 = figure;                            <span class="comment">% create a new figure</span>
+p9 = surf(X,Y,Z);                       <span class="comment">% plot the surface of the function</span>
+shading <span class="string">interp</span>;                         <span class="comment">% interpolate between the points</span>
+material <span class="string">dull</span>;                          <span class="comment">% alter the reflectance</span>
+camlight(90,0);                         <span class="comment">% add some light - see doc camlight</span>
+alpha(0.8);                             <span class="comment">% make slightly transparent</span>
+box <span class="string">on</span>;                                 <span class="comment">% same as set(gca,'box','on')</span>
+</pre><img vspace="5" hspace="5" src="plottingAdvanced_01.png" alt=""> <pre class="codeinput">f5 = figure;                            <span class="comment">% create a new figure</span>
+p10 = contourf(X,Y,Z);                  <span class="comment">% contour plot</span>
+colorbar;                               <span class="comment">% add a colorbar</span>
+set(gca,<span class="string">'XTick'</span>,[],<span class="string">'YTick'</span>,[]);         <span class="comment">% remove all ticks</span>
+</pre><img vspace="5" hspace="5" src="plottingAdvanced_02.png" alt=""> <pre class="codeinput">f6 = figure;                            <span class="comment">% create a new figure</span>
+r = 1:3:126;                            <span class="comment">% mesh plots look better at lower resolution</span>
+p11 = mesh(X(r,r),Y(r,r),Z(r,r));       <span class="comment">% plot a mesh grid</span>
+view([-15 60]);                         <span class="comment">% change the viewing angle - see doc view</span>
+colormap <span class="string">Copper</span>;                        <span class="comment">% change the colormap</span>
+axis <span class="string">off</span>;                               <span class="comment">% turn off the axis completely</span>
+</pre><img vspace="5" hspace="5" src="plottingAdvanced_03.png" alt=""> <p>Note, the command <b>view([90,90])</b> can be very useful to rotate a plot by 90 degrees, effectively reversing the locations of the x and y axes.</p><p>Below we display a 3d bar plot of the same underlying data. We take advantage of the <i>mat2cell()</i> command to partition the Z data into 21x21 6-by-6 blocks, each block stored within a cell. We then use the <i>cellfun()</i> function to replace each block with its mean. We can use this same technique to apply any function to arbitrary sized blocks of a matrix. Note that when the size of the data within cells is different, 'UniformOutput' must be set to false.</p><pre class="codeinput">f7 = figure;
+grouped = mat2cell(Z,6*ones(21,1),6*ones(21,1)); <span class="comment">% partition matrix into 6-by-6 blocks</span>
+fconv = @(X)mean(X(:));                          <span class="comment">% create function handle</span>
+convCell=cellfun(fconv,grouped,<span class="keyword">...</span>
+    <span class="string">'UniformOutput'</span>,false);                      <span class="comment">% apply that function to every block</span>
+convMat = cell2mat(convCell);                    <span class="comment">% convert back to a, (smaller) matrix</span>
+p12 = bar3(convMat);                             <span class="comment">% display a 3d bar plot of the aggregated data</span>
+colormap <span class="string">jet</span>                                     <span class="comment">% change the color map</span>
+</pre><img vspace="5" hspace="5" src="plottingAdvanced_04.png" alt=""> <p>Virtually everything we said about customizing 2D plots applies equally to 3D plots. We can add a title, a legend, labels using <i>xlabel()</i> , <i>ylabel()</i> , and <i>zlabel()</i> , change the range of the axes, the font size, etc.</p><p>3D plotting in Matlab requires a uniform grid of points but the data we obtain from experiments or measurements may not satisfy this constraint. In such cases, we can use the <i>griddata()</i> function to interpolate along a uniform grid of points for us.</p><pre class="codeinput">f8 = figure;
+randn(<span class="string">'state'</span>,0);                 <span class="comment">% seed the normal random num generator</span>
+X = randn(100,50);                <span class="comment">% data captured at these points.</span>
+Y = randn(100,50);
+Z = cos(X.^2).*exp(X.^2 - Y.^2);  <span class="comment">% value of data at these points</span>
+d = -1:0.1:1;                     <span class="comment">% X,Y range of our data</span>
+[XI, YI] = meshgrid(d,d);         <span class="comment">% create our grid as before</span>
+ZI = griddata(X,Y,Z,XI,YI);       <span class="comment">% interpolate to obtain ZI</span>
+p13 = mesh(XI,YI,ZI);             <span class="comment">% mesh of the interpolated points</span>
+</pre><img vspace="5" hspace="5" src="plottingAdvanced_05.png" alt=""> <h2>Annotations and the Plot Editor<a name="11"></a></h2><p>Matlab provides an interactive graphical interface for modifying and inspecting existing figures. This mode can be entered by selecting 'view-&gt;Figure Palette' or by selecting the appropriate shortcut button on the figure toolbar. Here we can add annotations such as text, arrows, and shapes as you would in a program like powerpoint. We can also inspect and change attributes as an alternative to using <i>set()</i> and <i>get()</i> .</p><p>Once you have added elements, you can see the m-code that generates these objects by going to 'File -&gt; Generate M-File'. It is usually easier to add annotations graphically first, generate the m-code and then add the appropriate lines to the original source file so that we can regenerate the complete figure at will. Alternatively, you can save a Matlab figure as a .fig file maintaining all of the graphics object information for future editing.</p><p>We will now add a few annotations to a simple figure. Annotations are placed relative to the figure window, not the axes.  The location is, by default, specified by normalized coordinates between 0 and 1 so that [0.8 0.4] is the point 80% of the width from the left and 40% of the height from the bottom. In the case of a line or an arrow, we specify two x-y pairs, denoting the start and end points. In the case of a text box we specify four numbers, the x and y coordinates followed by the width and height of the box. Type <b>doc annotation</b> for more information. These commands were generated automatically after adding the annotations in the plot editor.</p><pre class="codeinput">f = @(x) x.^2;                  <span class="comment">% create a function of x, namely f(x) = x.^2</span>
+g = @(x) 5*sin(x)+5;            <span class="comment">% create a second function of x, g(x) = 5*sin(x) + 5</span>
+res = 0.001;                    <span class="comment">% resolution of the plot</span>
+domain = -pi:res:pi;            <span class="comment">% the domain of x, (i.e. points at which to evaluate f,g)</span>
+f3 = figure(<span class="string">'Color'</span>,[1,1,1]); hold <span class="string">on</span>;             <span class="comment">% new figure with a white background</span>
+p5 = plot(domain,f(domain),<span class="string">'--r'</span>,<span class="string">'LineWidth'</span>,3);   <span class="comment">% plot a thick dashed red line</span>
+p6 = plot(domain,g(domain),<span class="string">'-b'</span>,<span class="string">'LineWidth'</span>,3);    <span class="comment">% plot a thick solid blue line</span>
+axis([-3,3,-5,15]);
+
+figure(f3);
+<span class="comment">% the text arrow</span>
+annotation(f3,   <span class="string">'textarrow'</span>     , [0.6616 0.5251],[0.1997 0.3038] ,<span class="keyword">...</span>
+                 <span class="string">'TextEdgeColor'</span> , <span class="string">'none'</span>                          ,<span class="keyword">...</span>
+                 <span class="string">'TextLineWidth'</span> , 2                               ,<span class="keyword">...</span>
+                 <span class="string">'FontSize'</span>      , 12                              ,<span class="keyword">...</span>
+                 <span class="string">'String'</span>        , {<span class="string">'global minimum'</span>}              ,<span class="keyword">...</span>
+                 <span class="string">'HeadStyle'</span>     , <span class="string">'deltoid'</span>                       ,<span class="keyword">...</span>
+                 <span class="string">'LineStyle'</span>     , <span class="string">'--'</span>                            ,<span class="keyword">...</span>
+                 <span class="string">'LineWidth'</span>     , 2                               ,<span class="keyword">...</span>
+                 <span class="string">'Color'</span>         , [0.07843 0.1686 0.549]          );
+<span class="comment">% the dotted line</span>
+annotation(f3,   <span class="string">'line'</span>          , [0.7176 0.7176],[0.7176 0.4154] ,<span class="keyword">...</span>
+                 <span class="string">'LineStyle'</span>     , <span class="string">'-.'</span>                            ,<span class="keyword">...</span>
+                 <span class="string">'LineWidth'</span>     , 1                               ,<span class="keyword">...</span>
+                 <span class="string">'Color'</span>         , [0 0 1]                         );
+<span class="comment">% the text box</span>
+annotation(f3,   <span class="string">'textbox'</span>       , [0.59 0.47 0.15 0.05]   ,<span class="keyword">...</span>
+                 <span class="string">'String'</span>        , {<span class="string">'g(c) - f(c)'</span>}                 ,<span class="keyword">...</span>
+                 <span class="string">'FontSize'</span>      , 12                              ,<span class="keyword">...</span>
+                 <span class="string">'FitBoxToText'</span>  , <span class="string">'off'</span>                           ,<span class="keyword">...</span>
+                 <span class="string">'LineStyle'</span>     , <span class="string">'none'</span>                          );
+set(f3,<span class="string">'HandleVisibility'</span>,<span class="string">'on'</span>);
+</pre><img vspace="5" hspace="5" src="plottingAdvanced_06.png" alt=""> <h2>Latex<a name="14"></a></h2><p>Matlab supports the inclusion of both tex and latex markups in figures. This can be useful when you want to include mathematical formulas. For many purposes, simple tex is sufficient. For example, you can write super scripts with the ^ character and subscripts with the _ character, (notice the legend) and include Greek letters using say \alpha or \gamma. To include more complicated latex markups, you have to specify that you want to use the latex interpreter and then surround the mathematical text in $ symbols as shown below. Tex and Latex markups are supported in annotations, legends, and titles but unfortunately not in axis labels via the <i>xlabel()</i> , <i>ylabel()</i> , <i>zlabel()</i> commands or in axis tick labels. If you want to use latex in these locations, you have to add the text manually via annotations.</p><pre class="codeinput">annotation(f3,  <span class="string">'textbox'</span>       , [0.2277 0.6333 0.2081 0.0625]            ,<span class="keyword">...</span>
+                <span class="string">'Interpreter'</span>   , <span class="string">'latex'</span>                                  ,<span class="keyword">...</span>
+                <span class="string">'String'</span>,{<span class="string">'$M_e = \frac{M_o}{\sqrt{1 - \frac{v^2}{c^2}}}$'</span>},<span class="keyword">...</span>
+                <span class="string">'FontSize'</span>      , 14                                       ,<span class="keyword">...</span>
+                <span class="string">'FitBoxToText'</span>  , <span class="string">'on'</span>                                     ,<span class="keyword">...</span>
+                <span class="string">'LineStyle'</span>     , <span class="string">'none'</span>);
+</pre><pre class="codeoutput">Warning: Unable to interpret LaTeX string
+"$M_e" 
+Warning: Unable to interpret LaTeX string "$M_e
+=" 
+Warning: Unable to interpret LaTeX string "$M_e
+= \frac{M_o}{\sqrt{1" 
+Warning: Unable to interpret LaTeX string "$M_e
+= \frac{M_o}{\sqrt{1 -" 
+Warning: Unable to interpret LaTeX string
+"\frac{v^2}{c^2}}}$" 
+Warning: Unable to interpret LaTeX string "$M_e
+= \frac{M_o}{\sqrt{1 -\frac{v^2}{c^2}}}$" 
+</pre><img vspace="5" hspace="5" src="plottingAdvanced_07.png" alt=""> <h2>Coordinate Conversion<a name="15"></a></h2><p>Sometimes we would like to specify where an annotation should go relative to the current set of axes, rather than relative to the figure window as a whole. For instance, perhaps you would like an arrow to point at coordinate (3,4) on your current axes; what point is this relative to the whole figure? <a href="mfiles/graphics/rel2abs.m">rel2abs</a> is a handy function to do this conversion.</p><h2>Multiple figures inside a figure<a name="16"></a></h2><p>Sometimes it can be useful to display multiple sets of axes in a single figure, perhaps to connect them graphically via annotations or just display them next to each other in a compact and convenient way. If we want the axes evenly spaced in a grid, the <i>subplot()</i> command can be useful, but to have more varied and customizable configurations, we have to add the axes manually. To do so, we take advantage of the 'Parent' attribute of the graphics objects. Recall that figures are composed of axes and annotation objects and axes are composed of various plot objects. We will create a new plot and add it along with some of the plots we have already done. The <i>copyobj(h,p)</i> function copies a graphics object with handle h and assigns the new object to parent p.</p><pre class="codeinput">froot = figure;
+nr = 3; nc = 3;
+sp = 0.05;  <span class="comment">% white space around each subfigure in percent</span>
+<span class="comment">% solve nc*(w+sp)+sp = 1 for w: (1-sp)/nc = w + sp</span>
+w = (1-sp)/nr - sp;  <span class="comment">% width of each subfigure</span>
+r = 3; c = 3;
+newAx = axes(<span class="string">'Parent'</span>,froot,<span class="string">'Position'</span>, [sp+(c-1)*(w+sp),sp+(r-1)*(w+sp),w,w]);
+imagesc(rand(5,5), <span class="string">'Parent'</span>, newAx);
+title(sprintf(<span class="string">'r=%d, c=%d '</span>, r, c)); axis <span class="string">off</span>
+figs = [f4, f5, f6, f7, f8];
+rows = [1,  1,  1,  2,  2];
+cols = [1,  2,  3,  1,  2];
+<span class="keyword">for</span> i=1:length(figs)
+  r = rows(i); c = cols(i);
+  set(copyobj(gca(figs(i)),froot),<span class="string">'Position'</span>, [sp+(c-1)*(w+sp),sp+(r-1)*(w+sp),w,w]);
+<span class="keyword">end</span>
+</pre><img vspace="5" hspace="5" src="plottingAdvanced_08.png" alt=""> <p>
+<A NAME="RootProperties"></A>
+</p><h2>Root Properties<a name="18"></a></h2><p>The top level Matlab graphics object is <i>root</i> and its handle is 0. We can access and set the root attributes as we would any other graphics handle object using <i>get(0)</i> and <i>set(0)</i>. Root's most useful attribute is probably 'ScreenSize', which gives the current size, (resolution) of the screen in pixels, by default, or in what ever units the 'Units' property has been set to. If you work with multiple simultaneous monitors, the 'MonitorPositions' attribute is also useful. Here we obtain the screen size and demonstrate how to maximize a figure programatically.</p><pre class="codeinput">set(0,<span class="string">'Units'</span>,<span class="string">'pixels'</span>);                              <span class="comment">% set the units to pixels</span>
+screenSize = get(0,<span class="string">'ScreenSize'</span>)                      <span class="comment">% get the monitor resolution</span>
+hgap = 5; vgap = 45;
+width = screenSize(3)-2*hgap;
+height = screenSize(4)-2*vgap;
+newPosition = [hgap,vgap,width,height];
+f = figure(<span class="string">'Position'</span>,newPosition,<span class="string">'ToolBar'</span>,<span class="string">'none'</span>);  <span class="comment">% set the size and position</span>
+close(f);                                             <span class="comment">% close the figure</span>
+</pre><pre class="codeoutput">screenSize =
+  Columns 1 through 3
+           1           1        1440
+  Column 4
+         900
+</pre><p>As root is the top level graphics object, we can query it for a list of the handles of all of the current figures using the <i>allchild()</i> function.</p><pre class="codeinput">handles = allchild(0)'
+</pre><pre class="codeoutput">handles =
+  Columns 1 through 4
+   13.0000   12.0000   11.0000   10.0000
+  Columns 5 through 8
+    9.0000    8.0000    7.0000  173.0226
+  Columns 9 through 12
+    3.0000    5.0000    6.0000    4.0000
+  Columns 13 through 14
+    2.0000    1.0000
+</pre><p>Window size defaults and related settings as well as the maximum recursion limit is also set here; I suppose for lack of a better place.</p><h2>Rotating Figures and Creating Movies<a name="21"></a></h2><p>Figures can be rotated or moved with the mouse by first clicking on the appropriate shortcut button on a figure window toolbar. However, we can also automate and animate the rotation by using the <i>camorbit()</i> command.</p><pre class="codeinput">figure(4);                                  <span class="comment">% bring this figure to the foreground.</span>
+axis <span class="string">vis3d</span>                                  <span class="comment">% allow for rigid 3d rotation</span>
+<span class="keyword">for</span> i=1:36                                  <span class="comment">% change camera angle 36 times</span>
+    camorbit(10,0,<span class="string">'camera'</span>)                 <span class="comment">% 10 degree increments</span>
+    pause(0.01);                            <span class="comment">% slow it down slightly</span>
+<span class="keyword">end</span>
+close(4);
+</pre><p>We can also create a movie by capturing frames using the <i>getframe()</i> command and playing them with the <i>movie()</i> function. Alternatively we can create an avi file with the <i>avifile()</i> , and <i>addframe()</i> functions. Read their help entries for more information and examples.</p><p>There are many other functions that can be used to adjust the camera angle and motion such as <i>camdolly()</i> , <i>campan()</i> , <i>camzoom()</i> , and <i>camroll()</i> .</p><h2>Creating Graphical User Interfaces<a name="24"></a></h2><p>Matlab has good support for the creation of graphical user interfaces. To launch an interactive GUI builder, type <b>guide</b> at the command prompt. Here, we will only briefly touch on some of the ways in which users can interact with figures. To learn more about creating GUIs type <b>doc guide</b> and click on "Creating GUIs" at the bottom of the help page.</p><h2>Customizing callback functions when you click on a figure<a name="25"></a></h2><p>As a simple exampl of a GUI, we discuss the <i>ginput()</i> function, which returns a matrix of coordinates selected with the mouse. Let's bring up the second plot we made, call <i>ginput()</i> and select a few data points to return their coordinates. <i>ginput(n)</i> waits for n user clicks before returning the n points, whereas <i>ginput()</i> , without any parameters, allows you to select any number you like and returns only when the user presses the enter key. A similar function, <i>gtext(txt)</i> places the specified string at the location selected by the mouse.</p><pre class="codeinput"><span class="comment">%figure(f1);</span>
+<span class="comment">%C = ginput(5)</span>
+<span class="comment">%close(f1);</span>
+</pre><p>The above functions operate by assigning a <i>callback</i> function to the axes object, which gets executed whenever the user clicks within the axes. We can assign our own function to perform whatever action we wish when this happens. Most Matlab graphics objects have callback attributes, which can be viewed using the <i>get()</i> command and set using <i>set()</i> .</p><p>The only constraint on callback functions is that they take 3 or more parameters as in myCallback(hObject, eventdata, handles): hObject is the object selected, whereas eventdata, and handles differ depending on the the callback. For more information, search for <i>CallBack Syntax and Arguments</i> in help.</p><p>All graphics objects in Matlab also have a 'UserData' attribute, which can be assigned any data you like. Since the clicked object is returned in hObject, we can retrieve this data with get(hObject,'UserData').</p><p>In this simple example, we plot 5 points in 5 different plots and assign each plot's 'UserData' attribute a color's name, which we will display when clicked. Since this is a simple example, we can create the callback inline but in general you should create a stand alone function say <b>function myCallback(hObject,eventData,handles)</b> and then assign @myCallback to the object's callback attribute. We also assign the callback to the current axes and figure objects after setting their 'UserData' entries to their respective colors. Try out the code for yourself.</p><pre class="codeinput">figure;
+hold <span class="string">all</span>;
+name = {<span class="string">'red'</span>,<span class="string">'blue'</span>,<span class="string">'green'</span>,<span class="string">'magenta'</span>,<span class="string">'cyan'</span>};
+color = {<span class="string">'.r'</span>,<span class="string">'.b'</span>,<span class="string">'.g'</span>,<span class="string">'.m'</span>,<span class="string">'.c'</span>};
+loc = [(1:5)',2*ones(5,1)];
+callback = @(hObject,eventData,handles)display(get(hObject,<span class="string">'UserData'</span>));
+<span class="keyword">for</span> i=1:numel(name)
+    plot(loc(i,1),loc(i,2),color{i},<span class="keyword">...</span>
+        <span class="string">'MarkerSize'</span>,100,<span class="string">'UserData'</span>,name{i},<span class="keyword">...</span>
+        <span class="string">'ButtonDownFcn'</span>,callback);
+<span class="keyword">end</span>
+axis([0,6,1,3]);
+title(<span class="string">'click on a colored circle to print its name'</span>)
+set(gca,<span class="string">'UserData'</span>,<span class="string">'white'</span>)                 <span class="comment">% Set the axes user data</span>
+set(gca,<span class="string">'XTick'</span>,[],<span class="string">'YTick'</span>,[],<span class="string">'box'</span>,<span class="string">'on'</span>);
+set(gca,<span class="string">'ButtonDownFcn'</span>,callback);          <span class="comment">% assign the callback</span>
+set(gcf,<span class="string">'UserData'</span>,<span class="string">'grey'</span>);                 <span class="comment">% set the figure user data</span>
+set(gcf,<span class="string">'ButtonDownFcn'</span>,callback);          <span class="comment">% assign the callback</span>
+</pre><img vspace="5" hspace="5" src="plottingAdvanced_09.png" alt=""> <p class="footer"><br>
+      Published with MATLAB&reg; 7.10<br></p></div><!--
+##### SOURCE BEGIN #####
+%% More advanced plotting features
+% In this chapter, we discuss some more advanced features.
+%% 3D Surface and Contour Plots
+% To graph a function of two variables we need to first evaluate that
+% function over a grid of points, not just a line as in the 2D case. We use
+% the _meshgrid()_ function to create such a grid, as in this example.
+%%
+f = @(x,y) exp(cos(sqrt(x.^2 + y.^2))); % a function of two variables
+d = -2*pi:0.1:2*pi;                     % domain for both x,y
+[X,Y] = meshgrid(d,d);                  % create a grid of points
+Z = f(X,Y);                             % evaluate f at every point on grid
+%%
+% Some functions, while still vectorized, will only operate on vectors and
+% not matrices. The _mvnpdf()_ function for example interprets a matrix of
+% inputs, (say n-by-d), as n, d-dimensional inputs, not n*d 1-by-1 inputs.
+% We can still plot such functions in 3D with a few small changes. After
+% obtaining X and Y from _meshgrid()_, save X's size, evaluate f by
+% passing in X and Y as column vectors, (using the : operator), and then
+% reshape the output Z back to the original size and continue as before. 
+[nrows,ncols] = size(X);                % first obtain the size of X
+Z1 = f(X(:),Y(:));                      % convert X,Y to column vectors and evaluate f
+Z1 = reshape(Z1,nrows,ncols);           % reshape
+%%
+% There are several 3d plot
+% types available. Here we use _surf()_, which plots the surface of the
+% function, _contourf()_ , which plots the contour lines of a function and
+% fills the area between them with color, and _mesh()_ , which is similar
+% to _surf()_, displaying a wire mesh rather than a solid surface. The
+% colors used in each are specified by the current colormap and can be
+% changed by using the _colormap()_ command. Type *doc colormap* for a list
+% of options. There are several other 3d plotting functions: _plot3()_  for
+% instance is the 3d generalization of _plot()_. 
+%%
+f4 = figure;                            % create a new figure
+p9 = surf(X,Y,Z);                       % plot the surface of the function
+shading interp;                         % interpolate between the points  
+material dull;                          % alter the reflectance
+camlight(90,0);                         % add some light - see doc camlight
+alpha(0.8);                             % make slightly transparent
+box on;                                 % same as set(gca,'box','on')
+%%
+f5 = figure;                            % create a new figure
+p10 = contourf(X,Y,Z);                  % contour plot
+colorbar;                               % add a colorbar
+set(gca,'XTick',[],'YTick',[]);         % remove all ticks
+%%
+f6 = figure;                            % create a new figure
+r = 1:3:126;                            % mesh plots look better at lower resolution
+p11 = mesh(X(r,r),Y(r,r),Z(r,r));       % plot a mesh grid
+view([-15 60]);                         % change the viewing angle - see doc view
+colormap Copper;                        % change the colormap
+axis off;                               % turn off the axis completely
+%%
+% Note, the command *view([90,90])* can be very useful to rotate a plot by
+% 90 degrees, effectively reversing the locations of the x and y axes. 
+%%
+% Below we display a 3d bar plot of the same underlying data. We take
+% advantage of the _mat2cell()_ command to partition the Z data into 21x21
+% 6-by-6 blocks, each block stored within a cell. We then use the
+% _cellfun()_ function to replace each block with its mean. We can use this
+% same technique to apply any function to arbitrary sized blocks of a
+% matrix. Note that when the size of the data within cells is different,
+% 'UniformOutput' must be set to false. 
+f7 = figure;
+grouped = mat2cell(Z,6*ones(21,1),6*ones(21,1)); % partition matrix into 6-by-6 blocks
+fconv = @(X)mean(X(:));                          % create function handle
+convCell=cellfun(fconv,grouped,...
+    'UniformOutput',false);                      % apply that function to every block
+convMat = cell2mat(convCell);                    % convert back to a, (smaller) matrix
+p12 = bar3(convMat);                             % display a 3d bar plot of the aggregated data
+colormap jet                                     % change the color map
+%%
+% Virtually everything we said about customizing 2D plots applies equally to 3D
+% plots. We can add a title, a legend, labels using _xlabel()_ , _ylabel()_
+% , and _zlabel()_ , change the range of the axes, the font size, etc. 
+%
+% 3D plotting in Matlab requires a uniform grid of points but the data we
+% obtain from experiments or measurements may not satisfy this
+% constraint. In such cases, we can use the _griddata()_ function to
+% interpolate along a uniform grid of points for us.
+f8 = figure;
+randn('state',0);                 % seed the normal random num generator
+X = randn(100,50);                % data captured at these points.
+Y = randn(100,50);                
+Z = cos(X.^2).*exp(X.^2 - Y.^2);  % value of data at these points
+d = -1:0.1:1;                     % X,Y range of our data
+[XI, YI] = meshgrid(d,d);         % create our grid as before 
+ZI = griddata(X,Y,Z,XI,YI);       % interpolate to obtain ZI
+p13 = mesh(XI,YI,ZI);             % mesh of the interpolated points
+%% Annotations and the Plot Editor
+% Matlab provides an interactive graphical interface for modifying and
+% inspecting existing figures. This mode can be entered by selecting
+% 'view->Figure Palette' or by selecting the appropriate shortcut button on
+% the figure toolbar. Here we can add annotations such as text, arrows, and
+% shapes as you would in a program like powerpoint. We can also inspect and
+% change attributes as an alternative to using _set()_ and _get()_ .
+%%
+% Once you have added elements, you can see the m-code that generates
+% these objects by going to 'File -> Generate M-File'. It is usually easier
+% to add annotations graphically first, generate the m-code and then add
+% the appropriate lines to the original source file so that we can
+% regenerate the complete figure at will. Alternatively, you can save a
+% Matlab figure as a .fig file maintaining all of the graphics object
+% information for future editing. 
+%%
+% We will now add a few annotations to a simple figure.
+% Annotations are placed relative to the figure window, not the axes.  The
+% location is, by default, specified by normalized coordinates between 0
+% and 1 so that [0.8 0.4] is the point 80% of the width from the left and
+% 40% of the height from the bottom. In the case of a line or an arrow, we
+% specify two x-y pairs, denoting the start and end points. In the case of a
+% text box we specify four numbers, the x and y coordinates followed by the
+% width and height of the box. Type *doc annotation* for more information.
+% These commands were generated automatically after adding the annotations
+% in the plot editor.
+f = @(x) x.^2;                  % create a function of x, namely f(x) = x.^2
+g = @(x) 5*sin(x)+5;            % create a second function of x, g(x) = 5*sin(x) + 5
+res = 0.001;                    % resolution of the plot
+domain = -pi:res:pi;            % the domain of x, (i.e. points at which to evaluate f,g)
+f3 = figure('Color',[1,1,1]); hold on;             % new figure with a white background
+p5 = plot(domain,f(domain),'REPLACE_WITH_DASH_DASHr','LineWidth',3);   % plot a thick dashed red line
+p6 = plot(domain,g(domain),'-b','LineWidth',3);    % plot a thick solid blue line
+axis([-3,3,-5,15]); 
+
+figure(f3);
+% the text arrow
+annotation(f3,   'textarrow'     , [0.6616 0.5251],[0.1997 0.3038] ,...
+                 'TextEdgeColor' , 'none'                          ,...
+                 'TextLineWidth' , 2                               ,...
+                 'FontSize'      , 12                              ,...
+                 'String'        , {'global minimum'}              ,...
+                 'HeadStyle'     , 'deltoid'                       ,...
+                 'LineStyle'     , 'REPLACE_WITH_DASH_DASH'                            ,...
+                 'LineWidth'     , 2                               ,...
+                 'Color'         , [0.07843 0.1686 0.549]          );
+% the dotted line
+annotation(f3,   'line'          , [0.7176 0.7176],[0.7176 0.4154] ,...
+                 'LineStyle'     , '-.'                            ,...
+                 'LineWidth'     , 1                               ,...
+                 'Color'         , [0 0 1]                         );
+% the text box
+annotation(f3,   'textbox'       , [0.59 0.47 0.15 0.05]   ,...
+                 'String'        , {'g(c) - f(c)'}                 ,...
+                 'FontSize'      , 12                              ,...
+                 'FitBoxToText'  , 'off'                           ,...
+                 'LineStyle'     , 'none'                          );
+set(f3,'HandleVisibility','on');
+%% Latex
+% Matlab supports the inclusion of both tex and latex markups in figures.
+% This can be useful when you want to include mathematical formulas. For
+% many purposes, simple tex is sufficient. For example, you can write super
+% scripts with the ^ character and subscripts with the _ character, (notice
+% the legend) and include Greek letters using say \alpha or \gamma. To
+% include more complicated latex markups, you have to specify that you want
+% to use the latex interpreter and then surround the mathematical text in $
+% symbols as shown below. Tex and Latex markups are supported in
+% annotations, legends, and titles but unfortunately not in axis labels via
+% the _xlabel()_ , _ylabel()_ , _zlabel()_ commands or in axis tick labels.
+% If you want to use latex in these locations, you have to add the text
+% manually via annotations. 
+% 
+annotation(f3,  'textbox'       , [0.2277 0.6333 0.2081 0.0625]            ,...
+                'Interpreter'   , 'latex'                                  ,...
+                'String',{'$M_e = \frac{M_o}{\sqrt{1 - \frac{v^2}{c^2}}}$'},...
+                'FontSize'      , 14                                       ,...
+                'FitBoxToText'  , 'on'                                     ,...
+                'LineStyle'     , 'none');
+%% Coordinate Conversion
+% Sometimes we would like to specify where an annotation should go relative
+% to the current set of axes, rather than relative to the figure window as
+% a whole. For instance, perhaps you would like an arrow to point at
+% coordinate (3,4) on your current axes; what point is this relative to the
+% whole figure? <mfiles/graphics/rel2abs.m rel2abs> is a handy function
+% to do this conversion.
+%% Multiple figures inside a figure
+% Sometimes it can be useful to display multiple sets of axes in a single
+% figure, perhaps to connect them graphically via annotations or just
+% display them next to each other in a compact and convenient way. If we
+% want the axes evenly spaced in a grid, the _subplot()_ command can be
+% useful, but to have more varied and customizable configurations, we have
+% to add the axes manually. To do so, we take advantage of the 'Parent'
+% attribute of the graphics objects. Recall that figures are composed of
+% axes and annotation objects and axes are composed of various plot
+% objects. We will create a new plot and add it along with some of the
+% plots we have already done. The _copyobj(h,p)_ function copies a graphics
+% object with handle h and assigns the new object to parent p.
+froot = figure;
+nr = 3; nc = 3;
+sp = 0.05;  % white space around each subfigure in percent
+% solve nc*(w+sp)+sp = 1 for w: (1-sp)/nc = w + sp
+w = (1-sp)/nr - sp;  % width of each subfigure                                
+r = 3; c = 3;
+newAx = axes('Parent',froot,'Position', [sp+(c-1)*(w+sp),sp+(r-1)*(w+sp),w,w]); 
+imagesc(rand(5,5), 'Parent', newAx);
+title(sprintf('r=%d, c=%d ', r, c)); axis off 
+figs = [f4, f5, f6, f7, f8];
+rows = [1,  1,  1,  2,  2];
+cols = [1,  2,  3,  1,  2];
+for i=1:length(figs)
+  r = rows(i); c = cols(i);
+  set(copyobj(gca(figs(i)),froot),'Position', [sp+(c-1)*(w+sp),sp+(r-1)*(w+sp),w,w]);
+end
+%%
+% <html> 
+% <A NAME="RootProperties"></A>
+% </html>
+%% Root Properties
+% The top level Matlab graphics object is _root_ and its handle is 0. We
+% can access and set the root attributes as we would any other graphics
+% handle object using _get(0)_ and _set(0)_. Root's most useful attribute
+% is probably 'ScreenSize', which gives the current size, (resolution) of
+% the screen in pixels, by default, or in what ever units the 'Units'
+% property has been set to. If you work with multiple simultaneous
+% monitors, the 'MonitorPositions' attribute is also useful. Here we obtain
+% the screen size and demonstrate how to maximize a figure programatically.
+set(0,'Units','pixels');                              % set the units to pixels
+screenSize = get(0,'ScreenSize')                      % get the monitor resolution
+hgap = 5; vgap = 45;
+width = screenSize(3)-2*hgap;
+height = screenSize(4)-2*vgap;
+newPosition = [hgap,vgap,width,height]; 
+f = figure('Position',newPosition,'ToolBar','none');  % set the size and position
+close(f);                                             % close the figure
+%%
+% As root is the top level graphics object, we can query it for a list of
+% the handles of all of the current figures using the _allchild()_
+% function.
+handles = allchild(0)'
+%%
+% Window size defaults and related settings as well as the maximum
+% recursion limit is also set here; I suppose for lack of a better place. 
+%% Rotating Figures and Creating Movies
+% Figures can be rotated or moved with the mouse by first clicking on the
+% appropriate shortcut button on a figure window toolbar. However, we can
+% also automate and animate the rotation by using the _camorbit()_
+% command. 
+figure(4);                                  % bring this figure to the foreground. 
+axis vis3d                                  % allow for rigid 3d rotation
+for i=1:36                                  % change camera angle 36 times
+    camorbit(10,0,'camera')                 % 10 degree increments
+    pause(0.01);                            % slow it down slightly
+end
+close(4);                                  
+%% 
+% We can also create a movie by capturing frames using the _getframe()_
+% command and playing them with the _movie()_ function. Alternatively we
+% can create an avi file with the _avifile()_ , and _addframe()_ functions. 
+% Read their help entries for more information and examples. 
+%%
+% There are many other functions that can be used to adjust the camera
+% angle and motion such as _camdolly()_ , _campan()_ , _camzoom()_ , and
+% _camroll()_ .
+%% Creating Graphical User Interfaces
+% Matlab has good support for the creation of graphical user interfaces. To
+% launch an interactive GUI builder, type *guide* at the command prompt.
+% Here, we will only briefly touch on some of the ways in which users can
+% interact with figures. To learn more about creating GUIs type *doc guide*
+% and click on "Creating GUIs" at the bottom of the help page. 
+%% Customizing callback functions when you click on a figure
+% As a simple exampl of a GUI, we discuss the _ginput()_ function, which returns a matrix
+% of coordinates selected with the mouse. Let's bring up the second plot we
+% made, call _ginput()_ and select a few data points to return their
+% coordinates. _ginput(n)_ waits for n user clicks before returning the n
+% points, whereas _ginput()_ , without any parameters, allows you to
+% select any number you like and returns only when the user presses the
+% enter key. A similar function, _gtext(txt)_ places the specified string
+% at the location selected by the mouse.
+%%
+%figure(f1);
+%C = ginput(5)
+%close(f1);
+%%
+% The above functions operate by assigning a _callback_ function to the
+% axes object, which gets executed whenever the user clicks within the
+% axes. We can assign our own function to perform whatever action we wish
+% when this happens. Most Matlab graphics objects have callback attributes,
+% which can be viewed using the _get()_ command and set using _set()_ . 
+%% 
+% The only constraint on callback functions is that they take 3 or more
+% parameters as in myCallback(hObject, eventdata, handles): hObject is the
+% object selected, whereas eventdata, and handles differ depending on the
+% the callback. For more information, search for _CallBack Syntax and
+% Arguments_ in help. 
+%% 
+% All graphics objects in Matlab also have a 'UserData' attribute, which
+% can be assigned any data you like. Since the clicked object is returned
+% in hObject, we can retrieve this data with get(hObject,'UserData'). 
+%%
+% In this simple example, we plot 5 points in 5 different plots and assign
+% each plot's 'UserData' attribute a color's name, which we will display
+% when clicked. Since this is a simple example, we can create the callback
+% inline but in general you should create a stand alone function say
+% *function myCallback(hObject,eventData,handles)* and then assign
+% @myCallback to the object's callback attribute. We also assign the
+% callback to the current axes and figure objects after setting their
+% 'UserData' entries to their respective colors. Try out the code for
+% yourself.
+%%
+figure; 
+hold all;                                   
+name = {'red','blue','green','magenta','cyan'}; 
+color = {'.r','.b','.g','.m','.c'};
+loc = [(1:5)',2*ones(5,1)];                 
+callback = @(hObject,eventData,handles)display(get(hObject,'UserData'));
+for i=1:numel(name)             
+    plot(loc(i,1),loc(i,2),color{i},...
+        'MarkerSize',100,'UserData',name{i},...
+        'ButtonDownFcn',callback);
+end
+axis([0,6,1,3]);
+title('click on a colored circle to print its name')
+set(gca,'UserData','white')                 % Set the axes user data
+set(gca,'XTick',[],'YTick',[],'box','on'); 
+set(gca,'ButtonDownFcn',callback);          % assign the callback
+set(gcf,'UserData','grey');                 % set the figure user data
+set(gcf,'ButtonDownFcn',callback);          % assign the callback
+
+##### SOURCE END #####
+--></body></html>

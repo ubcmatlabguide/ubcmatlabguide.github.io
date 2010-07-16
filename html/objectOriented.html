@@ -1,0 +1,786 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML is auto-generated from an M-file.
+To make changes, update the M-file and republish this document.
+      --><title>Object Oriented Programming in Matlab: basics</title><meta name="generator" content="MATLAB 7.10"><meta name="date" content="2010-07-15"><meta name="m-file" content="objectOriented"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>Object Oriented Programming in Matlab: basics</h1><!--introduction--><p>One of Matlab's best kept secrets is its comprehensive support for Object Oriented Programming, (OOP). Entire courses in computer science are devoted to extolling OOPs many virtues and we will not have space to mention them all here. Instead, we focus on the specifics of OOP in Matlab and provide enough detail to start using objects in your own programs and writing your own classes.</p><p>We make extensive reference to the online Matlab OO documentation available here: <a href="http://www.mathworks.com/access/helpdesk/help/pdf_doc/matlab/matlab_oop.pdf">http://www.mathworks.com/access/helpdesk/help/pdf_doc/matlab/matlab_oop.pdf</a></p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#2">Old vs New Syntax</a></li><li><a href="#4">Relation to Structs</a></li><li><a href="#12">Defining a Class</a></li><li><a href="#26">Properties</a></li><li><a href="#42">Methods</a></li><li><a href="#48">Private Methods</a></li><li><a href="#54">Static Methods</a></li><li><a href="#63">External Functions &amp; Methods</a></li><li><a href="#65">Dynamic Dispatch</a></li><li><a href="#66">Inheritance</a></li><li><a href="#68">Multiple inheritance</a></li><li><a href="#70">Visualizing the class hierarchy</a></li><li><a href="#73">Calling a Superclass Method</a></li><li><a href="#75">Class Aliases</a></li><li><a href="#78">Sealed Classes, Methods &amp; Properties</a></li><li><a href="#81">Abstract Methods &amp; Properties</a></li><li><a href="#85">Object Arrays</a></li></ul></div><p>
+<A NAME="OldVsNewSyntax"></a>
+</p><h2>Old vs New Syntax<a name="2"></a></h2><p>Mathworks recently (as of version 2008a) introduced an entirely new OO framework and syntax, bringing it more in line with Java, python, C++, etc. However, the old style is still supported. This tutorial discusses both in some depth. Topics relating only to the old style are discussed <a href="objectOrientedOldStyle.html">separately</a>. They can be safely skipped by anyone solely interested in the new design.</p><p>
+<A NAME="RelationToStructs"></a>
+</p><h2>Relation to Structs<a name="4"></a></h2><p>At a first approximation, objects in Matlab are just <a href="dataStructures.html#structs">structs</a>. Here are some important differences, which we will elaborate on in due course.</p><div><ul><li>Both structs and objects store data in named fields, (called   <b>properties</b>  in objects) but objects also encapsulate the operations   you can perform on them, (called <b>methods</b>).</li><li>Structs can be created with whatever fields you like but all objects of   the same class have the same properties. The values for these   properties will differ.</li><li>Structs are created with the <i>struct()</i> function, objects use <b>constructors</b> (to be explained below).</li></ul></div><p>Recall that structs are created by specifying field names and data to be stored in these fields. Objects also have fields that store data, called <b>properties</b>, which operate in a very similar way. However, unlike structs, we must predefine what properties we want an entire class of objects to have, and we do so by writing a class definition. While objects of the same class will have the same set of properties, the values of these properties will differ just as two different structs might have the same field names and yet store different data.</p><p>So far we could imagine achieving the same effect by creating, say, an array of structs all with the same fields.  However, there are further differences.</p><p>Objects, unlike structs, also encapsulate the operations we want to perform on the data, called <b>methods</b>.</p><p>Suppose for instance that we want to use and manipulate calendar dates in our program. We could create structs with minute, hour, day, month, and year fields and store all of the information about specific dates and times in these. This would certainly be better than having separate variables for all of these values floating around <i>unstructured</i>. However, there are also a number of operations we might want to perform on these dates, such as incrementing them by a day, comparing them, subtracting them, etc. We could write stand alone functions to perform all of these operations, but it would be nice to organize them together too, just as we did the data. This is precisely what an object oriented approach lets us do.</p><p>There are further differences and advantages, which we will come to in due course. We first describe how to write a class definition.</p><p>
+<A NAME="DefiningAclass"></a>
+</p><h2>Defining a Class<a name="12"></a></h2><p>If you are new to OOP, make sure you mark the distinction between classes and instances of that class, called objects. This distinction will hopefully become clearer as we see more examples. In the class definition, we create a kind of prototype, or specification for the construction of a objects of a certain <i>class</i> or <i>type</i>. From one class definition, we create many instances.</p><p>To begin, create a new m-file with the same name as the class you want to create and start the file with the <b>classdef</b> keyword followed by the class name. Properties and methods are defined and written below this line in designated blocks as shown below. We must include a special method, called the <b>constructor</b> , which is responsible for <i>constructing</i> new objects and it must have the same name as the class. The constructor can take any number of arguments specifying initial values for the properties for instance, and must return one argument, the constructed object. Properties can optionally be assigned default values as with the minute property below. If no default is specified and no value is assigned by the constructor, they are assigned the empty matrix, [].</p><p>Below we create a class called <b>mydate</b> which can perform various operations to do with calendaring. The full class definition is available <a href="mfiles/mydate.m">here</a>, but is rather complex. We will build it up piece by piece during this chapter. We start with the constructor, called mydate, and a simple method, called rollDay.</p><p>
+<hr>
+</p><pre>   classdef mydate
+   % write a description of the class here.</pre><pre>       properties
+       % define the properties of the class here, (like fields of a struct)
+           minute = 0;
+           hour;
+           day;
+           month;
+           year;
+       end</pre><pre>       methods
+       % methods, including the constructor are defined in this block</pre><pre>           function obj = mydate(minute,hour,day,month,year)
+           % class constructor
+               if(nargin &gt; 0)
+                 obj.minute = minute;
+                 obj.hour   = hour;
+                 obj.day    = day;
+                 obj.month  = month;
+                 obj.year   = year;
+               end
+           end</pre><pre>           function obj = rollDay(obj,numdays)</pre><pre>               obj.day = obj.day + numdays;
+           end</pre><pre>       end
+   end</pre><p>
+<hr>
+</p><p>Our date constructor, could have been as simple as the following.</p><pre> function obj = mydate()
+       obj;
+ end</pre><p>Matlab does all of the real work of creating the object, we just have to ensure that we write a constructor by the right name and perform any desired initialization, returning a declared variable.</p><p>Now that we have written the class, we can create date objects by simply calling the constructor.</p><pre class="codeinput">d1 = mydate(0,3,27,2,1998);                    <span class="comment">% Create a new mydate object</span>
+</pre><p>It is usually good practice to write a constructor so we can optionally create objects without having to specify any parameters. As we have written the mydate class, we could create a mydate object like this as well:</p><pre class="codeinput">d2 = mydate();                                 <span class="comment">% create a new mydate object</span>
+</pre><p>However, none of the properties, (except for minute) will be set. (They will all be equal to []).</p><p>Note that if you change a class definition file, you have to type <b>clear classes</b> to force matlab to load the new version. Just typing <b>clear all</b> does not work.</p><h2>Properties<a name="26"></a></h2><p>The properties defined above are, in java lingo, <i>public</i>, that is, accessible from outside the class just like fields of a struct. We can access and assign them using dot notation.</p><pre class="codeinput">day = d1.day;                                 <span class="comment">% access the day property</span>
+d1.year = 2008;                               <span class="comment">% set the year property</span>
+</pre><p>It is usually a good idea, however, to restrict direct access to properties to maintain a separation between implementation and interface. That is, we want clients to be able to use our class without having to know about the details of implementation and we will want the freedom to change how we store properties, for instance, without affecting clients already using our class. Perhaps at a later point, for example, we want the freedom to only calculate the value of a property when the user asks for it, (so called lazy evaluation). Without a level of indirection, this would not be possible. The idea is then to provide access to properties but only through methods. We will discuss such methods, so called getters and setters shortly.</p><p>Matlab offers quite a lot of control over property access. There are three levels, <b>private</b> , <b>protected</b> , and <b>public</b> and these apply separately to read and write access. Private properties are only accessible from methods of the class, and public properties, (the default) are accessible anywhere. Protected properties are private properties that are also accessible from subclasses. We will discuss subclasses and Inheritance later in this tutorial.</p><p>To mark a group of properties as say private, we modify the attributes of a property block. We saw one such property block above, however, we can create as many as we like all with different access rights so that some properties can be public and others private for example. We specify these access rights by assigning the GetAccess and SetAccess attributes the strings 'public', 'private', or 'protected' as in the examples below.</p><p>
+<hr>
+</p><pre>   properties(GetAccess = 'public', SetAccess = 'private')
+       % public read access, but private write access.
+   end</pre><pre>   properties(GetAccess = 'private', SetAccess = 'private')
+       % private read and write access
+   end</pre><p>
+<hr>
+</p><p>There are other property attributes we can assign although they are rarely of use with the exception of 'Constant' and perhaps 'Hidden'. We can specify that a block of properties are constant and thus cannot be changed anywhere as follows:</p><p>
+<hr>
+</p><pre>   properties(Constant = true)
+       DAYS_PER_YEAR =  365;
+       MONTHS_PER_YEAR = 12;
+       WEEKS_PER_YEAR  = 52;
+   end</pre><p>
+<hr>
+</p><p>Hidden properties do not show up when displaying the object. For information on additional attributes see section 6.7 of the Mathworks OO documentation. Method attributes, which we discuss shortly, are listed in section 7.4 and class attributes in section 3.5.</p><p>We can view all of the (non-hidden) properties of a class using the <i>properties()</i> command.</p><pre class="codeinput">properties(mydate)
+</pre><pre class="codeoutput">Properties for class mydate:
+    minute
+    hour
+    day
+    month
+    year
+    numsecs
+    valid
+    DAYS_PER_YEAR
+    MONTHS_PER_YEAR
+    WEEKS_PER_YEAR
+</pre><p>
+<A NAME="Methods"></a>
+</p><h2>Methods<a name="42"></a></h2><p>Methods in OOP, as we mentioned, are functions, defined in a class, that operate specifically on objects of that class, (although they can certainly take objects of other classes as additional arguments). Observe the simple function, <i>rollDay()</i> , which we have already defined. This method adds a specified number of days to the day property. Notice that the first argument of the function definition is an object of the containing class.</p><p>There are two equivalent ways of calling methods, both shown here.</p><pre>d1 = rollDay(d,3);
+d1 = d.rollDay(3);</pre><p>The second option is probably more familiar to java and C++ programmers. It is essentially translated into the first by placing the implicit parameter, (the object d) as the first input into rollDay. Note, the method takes 2 parameters in both cases, (i.e. <i>nargin()</i> will return 2 in each). There is really no particular reason to choose one over the other except perhaps that the second makes it clearer that the function is actually a method applied to object d. Pick one style and be consistent throughout your program.</p><p>We must take care to return the object when we modify any properties. Objects in Matlab are by default, passed by <b>value</b> not by <b>reference</b>, which means that a full copy of the object is passed to methods and it is this copy that is modified. If we do not pass back this copy, effectively overwriting the original, we will not observe any change in the state. We can optionally write classes whose objects are passed by reference, which we discuss in the <i>Handle Superclass</i> section. This point also applies to calls like <b>d3 = d2</b>. If d2 is the mydate object we created above, d3 will be an identical copy.</p><p>
+<A NAME="PrivateMethods"></a>
+</p><h2>Private Methods<a name="48"></a></h2><p>Methods, just like properties, can be private, protected, or public, (the default). Private methods are helper functions that are not intended to be part of the class interface or to be used outside the of the class methods. It is often useful, for instance, to break public methods down into a series of calls to private methods, (this is called functional decomposition). Protected methods, like protected properties, are private except also accessible by subclasses.</p><p>We define access to a block of methods, by assigning the string 'private', 'protected', or 'public', to the Access attribute of the methods block. We are free to create as many methods blocks as we like each with different access attributes.</p><p>
+<hr>
+</p><pre> methods(Access = private)
+    function sec = calcSecs(obj)
+      sec = obj.minute*60 + obj.hour*60*60 + obj.day*24*60*60;
+    end</pre><pre>    function TF = isValid(obj)
+        TF = obj.minute &gt;= 0 &amp;&amp; obj.minute &lt;= 60;
+    end
+ end</pre><p>
+<hr>
+</p><p>
+<A NAME="StaticMethods"></a>
+</p><h2>Static Methods<a name="54"></a></h2><p>Static methods are methods that are associated with a class as opposed to instances of that class and are defined, as you would expect, in a method block that looks like this:</p><p>
+<hr>
+</p><pre> methods(Static = true)
+     function printCurrentDate()
+         display(datestr(now));
+     end
+ end</pre><p>
+<hr>
+</p><p>They are useful when you have methods are are thematically related to the class but which do not use any information particular to specific instances of that class. Methods that demo class functionality are also good candidates.</p><p>To call a static method, you specify the classname, followed by a dot and the static method name.</p><pre class="codeinput">  mydate.printCurrentDate()
+</pre><pre class="codeoutput">15-Jul-2010 22:35:36
+</pre><p>Methods can also be hidden with <i>methods(Hidden = true)</i> hiding them from functions that display class methods such as <i>methods()</i> or <i>methodsview()</i> . We will discuss abstract and sealed methods after first introducing inheritance.</p><p>
+<A NAME="ExternalFunctionsAndMethods"></a>
+</p><h2>External Functions &amp; Methods<a name="63"></a></h2><p>Our class methods are free to call out to any external function on the Matlab path to perform interim calculations. Moreover, if we save our classdef m-file in a directory with the same name as the class but preceded by the @ symbol,(e.g. @mydate), we can write methods in their own files, store them here, and use them as we would any other method. The declaration looks just like the function declarations above and the file name is the same as the function name.</p><p>However, we cannot assign such methods any of the method attributes just discussed, (like static, hidden, or protected), they are automatically public.</p><p>To write external private methods, save them into a subdirectory called private, e.g. \@mydate\private\myMethod.m.</p><p>The alternative is to put everything in one file: the classdef, and any other 'local' functions can come at the end. Such functions will not be visible outside of the classdef file.</p><p>
+<A NAME="DynamicDispatch"></a>
+</p><h2>Dynamic Dispatch<a name="65"></a></h2><p>A big advantage of OOP is that we can create two different classes each with the same method names and Matlab will automatically call the correct method depending on the type of of the object passed. For example, a call like <b>plot(obj)</b> will call foo.plot(obj) if obj is of type foo, and bar.plot(obj) if obj is of type bar.</p><p>This allows us to create multiple implementations of the same functionality, all with the same interface (same function names). Then code that uses these objects does not need to be aware of which version of the class is being used.</p><p>
+<A NAME="Inheritance"></a>
+</p><h2>Inheritance<a name="66"></a></h2><p>When writing classes, we often find that some types are really special cases of others. For instance, integers are really special cases of numbers in general. This is different than the class-object relation, such as the number 3 being a specific instance of the integer class or the Earth being a specific instance of the planet class. Planets, however, are a subclass of say celestial bodies.</p><p>Inheritance in OOP allows us to write subclasses that <i>inherit</i> all of the properties and methods of their superclass so that we do not have to recode all of the parent functionality. The subclass then extends or specializes this functionality.</p><p>We can think of the methods of a subclass as the union of all of its own methods with the methods of its parent superclass, and similarly for properties.</p><p>Subclasses can redefine methods inherited from parents by simply specifying a method by the same name, (the number &amp; names of arguments do not have to be the same). The subclass version is used with objects of that class, while the superclass version is used with supeclass objects - another example of dynamic dispatch.</p><p>If you find yourself writing the same methods in two or more classes, consider creating an inheritance hierarchy in which the superclass contains the code common to all of the subclasses. This hierarchy can be as many levels deep as you like.</p><p>Be aware that classes written in the new syntax cannot inherit from those written in the old, and vice versa.</p><p>You can also subclass built in types like double.</p><p>We can specify a superclass for a class we are writing by using the following syntax in the classdef statement of our class definition.</p><p><b>classdef classname &lt; superclass</b></p><h2>Multiple inheritance<a name="68"></a></h2><p>Matlab supports multiple inheritance, i.e.  subclasses with multiple superclasses. Care must be taken that naming conflicts do not occur. See section 5.11 of the Matlab OO documentation for details on multiple inheritance conflict resolution. To inherit from multiple classes, separate the superclasses with the &amp; symbol as in the following.</p><p><b>classdef classname &lt; super1 &amp; super2 &amp; super3</b></p><p>
+<A NAME="viewClassTree"></a>
+</p><h2>Visualizing the class hierarchy<a name="70"></a></h2><p>Matt Dunham's <a href="mfiles/viewClassTree.m">viewClassTree</a> function displays a class hierarchy starting at a given class. It relies on the graphlayout class, and makes extensive use of <a href="objectOrientedAdvanced.html#MetaClasses">metaclasses</a>. An example of what the output looks like, when run on the ProbModel class from <a href="www.cs.ubc.ca/~murphyk/pmtk">PMTK</a>, is shown below.</p><p>
+<img src="PMTK2-class-diag-models-may09.png" height="300">
+</p><p>
+<A NAME="CallingAsuperclassMethod"></a>
+</p><h2>Calling a Superclass Method<a name="73"></a></h2><p>When a method has been redefined in a subclass, it is sometimes necessary to call the superclass version from the subclass. Sometimes, for example, you want the subclass version to do everything the superclass version does, and more. Rather than copy the code from the superclass, you can first call the superclass version and then execute further code.</p><p>To access superclass methods and properties use the @ operator as in</p><p><b>methodname@superclassname(input1,input2)</b></p><p>While it will not produce an error, it is not necessary to use the @ operator to access inherited methods or properties that have not been redefined. You can access them in the same way as you would a method or property written in the subclass.</p><p>
+<A NAME="ClassAliases"></a>
+</p><h2>Class Aliases<a name="75"></a></h2><p>We can create multiple names for the same class with empty classdef declarations.</p><pre>   classdef newclassname &lt; oldclassname
+   end</pre><p>
+<A NAME="SealedClassesMethodsAndProperties"></a>
+</p><h2>Sealed Classes, Methods &amp; Properties<a name="78"></a></h2><p>A sealed class cannot be subclassed and a sealed method or property cannot be redefined in a subclass. This is similar to Java's <i>final</i> keyword. Classes are defined as sealed in the classdef statement and methods and properties are sealed by modifying the methods or properties block attribute.</p><pre>classdef(Sealed = true) myclass
+methods(Sealed = true)
+properties(Sealed = true)</pre><p>
+<A NAME="AbstractMethodsAndProperties"></a>
+</p><h2>Abstract Methods &amp; Properties<a name="81"></a></h2><p>Abstract methods, simply put, are methods that have a function header, but not a function body, (i.e. no implementation). They are used to define a common interface for all current and future subclasses. Abstract methods must be implemented by subclasses and as such their inclusion in a superclass acts as a kind of contract, enforcing interface consistency. Of course, if the implementations in all of the subclasses are going to be the same, we are better off writing a regular method in the superclass, which will be inherited by all subclasses. Abstract methods are useful when we know subclasses need to have a particular method but each subclass implementation will be slightly different.</p><p>Lets suppose we have a shape superclass with many subclasses like sphere, cube, elipsoid, pyramid, etc. We want every subclass (and future subclasses other people might dream up) to have a calculateVolume() method. The calculation will be different in each case but by creating a calculateVolume() abstract method in the shape superclass, we can rely on the fact that each subclass will have such a method. We can then write other classes or functions that depend on this fact and do not have to rewrite any code when new shape subclasses are created.</p><p>Properties can also be abstract but are of less use - they too have to be defined in subclasses.</p><p>A class with one or more abstract methods or properties is considered abstract itself and instances cannot be created from it. Any subclass that does not implement every one of the abstract methods and properties of its superclasses will itself be abstract, essentially delegating the implementation of some or all of them to further subclasses.</p><p>We define a block of methods as abstract with the Abstract attribute, and when writing the methods, we do not include a body.</p><p>
+<hr>
+</p><pre>   methods(Abstract = true)
+       function vol = calculateVolume(obj,units);
+       function area = calculateSurfaceArea(obj,units);
+       function obj = doubleSize(obj);
+   end</pre><p>
+<A NAME="ObjectArrays"></a>
+</p><h2>Object Arrays<a name="85"></a></h2><p>Objects of the same class can be stored together in object arrays that operate just like numeric arrays. We can concatenate objects together and index into these arrays in the usual way.</p><pre class="codeinput">d2 = mydate(1,4,22,3,2008);   <span class="comment">% create another mydate</span>
+dates = [d1 d2];            <span class="comment">% we can concatenate objects just like numbers</span>
+[nrows ncols] = size(dates) <span class="comment">% and use other familiar functions</span>
+d1 = dates(1,1);            <span class="comment">% retrieve the first entry</span>
+dates(1,1) = d1;            <span class="comment">% assign the first entry</span>
+</pre><pre class="codeoutput">nrows =
+     1
+ncols =
+     2
+</pre><p>The type of a single mydate object is actually an object array of mydate objects, albeit of size 1-by-1. Just about everything in Matlab is an array of some sort and objects are no exception. This is quite unlike java for instance, which distinguishes in terms of class, between an object of type A and a collection of objects of type A. One consequence of this is that method calls involving an array of objects dispatch the same method as would be were only one object involved; this includes calls to <i>subsref()</i> and <i>subsasgn()</i> .</p><p>We can also store objects of multiple types in cells and structs.</p><p class="footer"><br>
+      Published with MATLAB&reg; 7.10<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Object Oriented Programming in Matlab: basics
+% One of Matlab's best kept secrets is its comprehensive support for
+% Object Oriented Programming, (OOP). Entire courses in computer science
+% are devoted to extolling OOPs many virtues and we will not have space to
+% mention them all here. Instead, we focus on the specifics of OOP in
+% Matlab and provide enough detail to start using objects in your own
+% programs and writing your own classes. 
+%
+% We make extensive reference to the online Matlab OO documentation
+% available here:
+% <http://www.mathworks.com/access/helpdesk/help/pdf_doc/matlab/matlab_oop.pdf>
+%%
+% <html> 
+% <A NAME="OldVsNewSyntax"></a>
+% </html>
+%% Old vs New Syntax 
+% 
+% Mathworks recently (as of version 2008a) introduced an entirely new
+% OO framework and syntax, bringing it more in line with Java, python, C++,
+% etc.
+% However, the old style is
+% still supported. This tutorial discusses both in some depth. Topics
+% relating only to the old style are discussed
+% <objectOrientedOldStyle.html separately>. They can be safely skipped by anyone solely
+% interested in the new design. 
+%
+%%
+% <html> 
+% <A NAME="RelationToStructs"></a>
+% </html>
+%% Relation to Structs
+% At a first approximation, objects in Matlab are just
+% <dataStructures.html#structs structs>. Here are
+% some important differences, which we will elaborate on in due course. 
+%%
+% * Both structs and objects store data in named fields, (called
+%   *properties*  in objects) but objects also encapsulate the operations
+%   you can perform on them, (called *methods*).
+% * Structs can be created with whatever fields you like but all objects of
+%   the same class have the same properties. The values for these
+%   properties will differ. 
+% * Structs are created with the _struct()_ function,
+% objects use *constructors* (to be explained below).
+%%
+% Recall that structs are created by specifying field names and data to be
+% stored in these fields. Objects also have fields that store data, called
+% *properties*, which operate in a very similar way. However, unlike
+% structs, we must predefine what properties we want an entire class of
+% objects to have, and we do so by writing a class definition. While
+% objects of the same class will have the same set of properties, the
+% values of these properties will differ just as two different structs
+% might have the same field names and yet store different data. 
+%%
+% So far we could imagine achieving the same effect by creating, say, an
+% array of structs all with the same fields.  However, there are
+% further differences.
+%%
+% Objects, unlike structs, also encapsulate the operations we want
+% to perform on the data, called *methods*. 
+%%
+% Suppose for instance that we want to use and manipulate calendar dates in
+% our program. We could create structs with minute, hour, day, month, and
+% year fields and store all of the information about specific dates and
+% times in these. This would certainly be better than having separate
+% variables for all of these values floating around _unstructured_.
+% However, there are also a number of operations we might want to
+% perform on these dates, such as incrementing them by a day, comparing
+% them, subtracting them, etc. We could write stand alone functions to
+% perform all of these operations, but it would be nice to organize them
+% together too, just as we did the data. This is precisely what an object
+% oriented approach lets us do. 
+%%
+% There are further differences and advantages, which we will come to in
+% due course. We first describe how to write a class definition.
+%%
+% <html> 
+% <A NAME="DefiningAclass"></a>
+% </html>
+%% Defining a Class 
+%
+% If you are new to OOP, make sure you mark the distinction between classes
+% and instances of that class, called objects. This distinction will
+% hopefully become clearer as we see more examples. In the class
+% definition, we create a kind of prototype, or specification for the
+% construction of a objects of a certain _class_ or _type_. From one class
+% definition, we create many instances. 
+%
+%%
+% To begin, create a new m-file with the same name as the class you want to
+% create and start the file with the *classdef* keyword followed by the
+% class name. Properties and methods are defined and written below this
+% line in designated blocks as shown below. We must include a special
+% method, called the *constructor* , which is responsible for
+% _constructing_ new objects and it must have the same name as the class. The
+% constructor can take any number of arguments specifying initial values
+% for the properties for instance, and must return one argument, the
+% constructed object. Properties can optionally be assigned default values
+% as with the minute property below. If no default is specified and no
+% value is assigned by the constructor, they are assigned the empty
+% matrix, []. 
+%
+% Below we create a class called *mydate* which can perform
+% various operations to do with calendaring.
+% The full class definition is available
+% <mfiles/mydate.m here>, but is rather complex.
+% We will build it up piece by piece during this chapter.
+% We start with the constructor, called mydate,
+% and a simple method, called rollDay.
+%
+%% 
+% <html>
+% <hr>
+% </html>
+%%
+%     classdef mydate
+%     % write a description of the class here. 
+%
+%         properties
+%         % define the properties of the class here, (like fields of a struct)
+%             minute = 0;
+%             hour;
+%             day;
+%             month;
+%             year;
+%         end
+%      
+%         methods
+%         % methods, including the constructor are defined in this block
+%
+%             function obj = mydate(minute,hour,day,month,year)
+%             % class constructor
+%                 if(nargin > 0)
+%                   obj.minute = minute;
+%                   obj.hour   = hour;
+%                   obj.day    = day;
+%                   obj.month  = month;
+%                   obj.year   = year;
+%                 end
+%             end
+%             
+%             function obj = rollDay(obj,numdays)
+% 
+%                 obj.day = obj.day + numdays;
+%             end
+%             
+%         end
+%     end
+%%
+% <html>
+% <hr>
+% </html>
+%%
+% Our date constructor, could have been as simple as the following.
+%%
+%   function obj = mydate()
+%         obj;
+%   end
+%%
+% Matlab does all of the real work of creating the object, we just have to
+% ensure that we write a constructor by the right name and perform any
+% desired initialization, returning a declared variable. 
+%%
+% Now that we have written the class, we can create date objects by simply
+% calling the constructor.
+%%
+d1 = mydate(0,3,27,2,1998);                    % Create a new mydate object
+%%
+% It is usually good practice to write a constructor so we can optionally
+% create objects without having to specify any parameters. As we have
+% written the mydate class, we could create a mydate object like this as well:
+%%
+d2 = mydate();                                 % create a new mydate object                        
+%%
+% However, none of the properties, (except for minute) will be set. (They
+% will all be equal to []).
+%%
+% Note that if you change a class definition file, you have to type
+% *clear classes* to force matlab to load the new version.
+% Just typing *clear all* does not work.
+%% Properties
+% The properties defined above are, in java lingo, _public_, that is,
+% accessible from outside the class just like fields of a struct. We can
+% access and assign them using dot notation. 
+%%
+day = d1.day;                                 % access the day property
+d1.year = 2008;                               % set the year property                              
+%%
+% It is usually a good idea, however, to restrict direct access to
+% properties to maintain a separation between implementation and interface.
+% That is, we want clients to be able to use our class without having to
+% know about the details of implementation and we will want the freedom to
+% change how we store properties, for instance, without affecting clients
+% already using our class. Perhaps at a later point, for example, we want
+% the freedom to only calculate the value of a property when the user asks
+% for it, (so called lazy evaluation). Without a level of indirection, this
+% would not be possible. The idea is then to provide access to properties
+% but only through methods. We will discuss such methods, so called getters
+% and setters shortly. 
+%%
+% Matlab offers quite a lot of control over property access. There are
+% three levels, *private* , *protected* , and *public* and these apply
+% separately to read and write access. Private properties are only
+% accessible from methods of the class, and public properties, (the
+% default) are accessible anywhere. Protected properties are private
+% properties that are also accessible from subclasses. We will discuss
+% subclasses and Inheritance later in this tutorial. 
+%
+%%
+% To mark a group of properties as say private, we modify the attributes of
+% a property block. We saw one such property block above, however, we can
+% create as many as we like all with different access rights so that some
+% properties can be public and others private for example. We specify these
+% access rights by assigning the GetAccess and SetAccess attributes
+% the strings 'public', 'private', or 'protected' as in the examples below.
+%%
+% <html>
+% <hr>
+% </html>
+%%
+%     properties(GetAccess = 'public', SetAccess = 'private')
+%         % public read access, but private write access.
+%     end
+%     
+%     properties(GetAccess = 'private', SetAccess = 'private')
+%         % private read and write access
+%     end 
+%%
+% <html>
+% <hr>
+% </html>
+%%
+% There are other property attributes we can assign although they are
+% rarely of use with the exception of 'Constant' and perhaps 'Hidden'. We
+% can specify that a block of properties are constant and thus cannot be
+% changed anywhere as follows:
+%%
+% <html>
+% <hr>
+% </html>
+%%
+%     properties(Constant = true)
+%         DAYS_PER_YEAR =  365;
+%         MONTHS_PER_YEAR = 12;
+%         WEEKS_PER_YEAR  = 52;
+%     end
+%%
+% <html>
+% <hr>
+% </html>
+%%
+% Hidden properties do not show up when displaying the object. For
+% information on additional attributes see section 6.7 of the Mathworks OO
+% documentation. Method attributes, which we discuss shortly, are listed in
+% section 7.4 and class attributes in section 3.5. 
+%%
+% We can view all of the (non-hidden) properties of a class using the
+% _properties()_ command.
+%%
+properties(mydate)
+%%
+% <html> 
+% <A NAME="Methods"></a>
+% </html>
+%% Methods
+% Methods in OOP, as we mentioned, are functions, defined in a class, that
+% operate specifically on objects of that class, (although they can
+% certainly take objects of other classes as additional arguments). Observe
+% the simple function, _rollDay()_ , which we have already defined. This
+% method adds a specified number of days to the day property. Notice that
+% the first argument of the function definition is an object of the
+% containing class. 
+%%
+% There are two equivalent ways of calling methods, both shown here.
+%%
+%  d1 = rollDay(d,3);
+%  d1 = d.rollDay(3);
+%%
+% The second option is probably more familiar to java and C++ programmers.
+% It is essentially translated into the first by placing the implicit
+% parameter, (the object d) as the first input into rollDay. Note, the 
+% method takes 2 parameters in both cases, (i.e. _nargin()_ will return 2
+% in each). There is really no particular reason to choose one over the
+% other except perhaps that the second makes it clearer that the function
+% is actually a method applied to object d. Pick one style and be
+% consistent throughout your program. 
+%% 
+% We must take care to return the object when we modify any properties.
+% Objects in Matlab are by default, passed by *value* not by *reference*,
+% which means that a full copy of the object is passed to methods and it is
+% this copy that is modified. If we do not pass back this copy, effectively
+% overwriting the original, we will not observe any change in the state. We
+% can optionally write classes whose objects are passed by reference,
+% which we discuss in the _Handle Superclass_ section. This point also
+% applies to calls like *d3 = d2*. If d2 is the mydate object we created
+% above, d3 will be an identical copy. 
+%%
+% <html> 
+% <A NAME="PrivateMethods"></a>
+% </html>
+%% Private Methods 
+% Methods, just like properties, can be private, protected, or public, (the
+% default). Private methods are helper functions that are not intended to
+% be part of the class interface or to be used outside the of the class
+% methods. It is often useful, for instance, to break public methods down
+% into a series of calls to private methods, (this is called functional
+% decomposition). Protected methods, like protected properties, are private
+% except also accessible by subclasses. 
+%%
+% We define access to a block of methods, by assigning the string
+% 'private', 'protected', or 'public', to the Access attribute of the
+% methods block. We are free to create as many methods blocks as we like
+% each with different access attributes. 
+%%
+% <html>
+% <hr>
+% </html>
+%%
+%   methods(Access = private)
+%      function sec = calcSecs(obj)
+%        sec = obj.minute*60 + obj.hour*60*60 + obj.day*24*60*60;
+%      end
+%
+%      function TF = isValid(obj)
+%          TF = obj.minute >= 0 && obj.minute <= 60;
+%      end
+%   end
+%%
+% <html>
+% <hr>
+% </html>
+%%
+% <html> 
+% <A NAME="StaticMethods"></a>
+% </html>
+%% Static Methods
+% Static methods are methods that are associated with a class as opposed to
+% instances of that class and are defined, as you would expect, in a method
+% block that looks like this:
+%%
+% <html>
+% <hr>
+% </html>
+%%
+%   methods(Static = true)
+%       function printCurrentDate()
+%           display(datestr(now));
+%       end
+%   end
+%%
+% <html>
+% <hr>
+% </html>
+%%
+% They are useful when you have methods are are thematically related to the
+% class but which do not use any information particular to specific
+% instances of that class. Methods that demo class functionality are also
+% good candidates. 
+%%
+% To call a static method, you specify the classname, followed by a dot and
+% the static method name.
+%%
+  mydate.printCurrentDate()
+%%
+% Methods can also be hidden with _methods(Hidden = true)_ hiding them from
+% functions that display class methods such as _methods()_ or
+% _methodsview()_ . We will discuss abstract and sealed methods after first
+% introducing inheritance. 
+%%
+% <html> 
+% <A NAME="ExternalFunctionsAndMethods"></a>
+% </html>
+%% External Functions & Methods
+% Our class methods are free to call out to any external function on the
+% Matlab path to perform interim calculations. Moreover, if we save our
+% classdef m-file in a directory with the same name as the class but
+% preceded by the @ symbol,(e.g. @mydate), we can write methods in their own
+% files, store them here, and use them as we would any other method. The
+% declaration looks just like the function declarations above and the file
+% name is the same as the function name. 
+%
+% However, we cannot assign such methods any of the method attributes just
+% discussed, (like static, hidden, or protected), they are automatically public. 
+%
+% To write external private methods, save them into a subdirectory called
+% private, e.g. \@mydate\private\myMethod.m.
+%
+% The alternative is to put everything in one file: the classdef,
+% and any other 'local' functions can come at the end. Such functions
+% will not be visible outside of the classdef file.
+%%
+% <html> 
+% <A NAME="DynamicDispatch"></a>
+% </html>
+%% Dynamic Dispatch
+%
+% A big advantage of OOP is that we can create two different classes each with
+% the same method names and Matlab will automatically call the correct
+% method depending on the type of of the object passed. For example, a call
+% like *plot(obj)* will call foo.plot(obj) if obj is of type foo,
+% and bar.plot(obj) if obj is of type bar.
+%
+% This allows us to create multiple implementations of the same
+% functionality, all with the same interface (same function names).
+% Then code that uses these objects does not need to be aware
+% of which version of the class is being used.
+%
+% <html> 
+% <A NAME="Inheritance"></a>
+% </html>
+%% Inheritance 
+% When writing classes, we often find that some types are really special
+% cases of others. For instance, integers are really special cases of
+% numbers in general. This is different than the class-object relation,
+% such as the number 3 being a specific instance of the integer class or
+% the Earth being a specific instance of the planet class. Planets,
+% however, are a subclass of say celestial bodies.
+% 
+% Inheritance in OOP allows us to write subclasses that _inherit_ all of
+% the properties and methods of their superclass so that we do not have to
+% recode all of the parent functionality. The subclass then extends or
+% specializes this functionality. 
+%
+% We can think of the methods of a subclass as the union of all of its own
+% methods with the methods of its parent superclass, and similarly for
+% properties. 
+%
+% Subclasses can redefine methods inherited from parents by simply
+% specifying a method by the same name, (the number & names of arguments do
+% not have to be the same). The subclass version is used with objects of
+% that class, while the superclass version is used with supeclass objects -
+% another example of dynamic dispatch.
+% 
+% If you find yourself writing the same methods in two or more classes,
+% consider creating an inheritance hierarchy in which the superclass
+% contains the code common to all of the subclasses. This hierarchy can be
+% as many levels deep as you like. 
+%
+% Be aware that classes written in the new syntax cannot inherit from
+% those written in the old, and vice versa. 
+%
+% You can also subclass built in types like double.
+%%
+% We can specify a superclass for a class we are writing by using the
+% following syntax in the classdef statement of our class definition. 
+%
+% *classdef classname < superclass*
+%
+%% Multiple inheritance
+% Matlab supports multiple inheritance, i.e.  subclasses with multiple
+% superclasses. Care must be taken that naming conflicts do not occur. See
+% section 5.11 of the Matlab OO documentation for details on multiple
+% inheritance conflict resolution. To inherit from multiple classes,
+% separate the superclasses with the & symbol as in the following. 
+%
+% *classdef classname < super1 & super2 & super3*
+%
+%%
+% <html> 
+% <A NAME="viewClassTree"></a>
+% </html>
+%% Visualizing the class hierarchy
+% Matt Dunham's <mfiles/viewClassTree.m viewClassTree> function displays a class
+% hierarchy starting at a given class.
+% It relies on the graphlayout class,
+% and makes extensive use of <objectOrientedAdvanced.html#MetaClasses metaclasses>.
+% An example of what the output looks like, when run on
+% the ProbModel class from <www.cs.ubc.ca/~murphyk/pmtk PMTK>, is shown below.
+%% 
+% <html>
+% <img src="PMTK2-class-diag-models-may09.png" height="300">
+% </html>
+%%
+% <html> 
+% <A NAME="CallingAsuperclassMethod"></a>
+% </html>
+%% Calling a Superclass Method
+% When a method has been redefined in a subclass, it is sometimes necessary
+% to call the superclass version from the subclass. Sometimes, for example,
+% you want the subclass version to do everything the superclass version
+% does, and more. Rather than copy the code from the superclass, you can
+% first call the superclass version and then execute further code. 
+%
+% To access superclass methods and properties use the @ operator as in
+%
+% *methodname@superclassname(input1,input2)*
+%
+% While it will not produce an error, it is not necessary to use the
+% @ operator to access inherited methods or properties that have not been
+% redefined. You can access them in the same way as you would a method or
+% property written in the subclass.
+%%
+% <html> 
+% <A NAME="ClassAliases"></a>
+% </html>
+%% Class Aliases
+% We can create multiple names for the same class with empty classdef
+% declarations. 
+%%
+%     classdef newclassname < oldclassname
+%     end
+%%
+% <html> 
+% <A NAME="SealedClassesMethodsAndProperties"></a>
+% </html>
+%% Sealed Classes, Methods & Properties
+% A sealed class cannot be subclassed and a sealed method or property
+% cannot be redefined in a subclass. This is similar to Java's _final_
+% keyword. Classes are defined as sealed in the classdef statement and
+% methods and properties are sealed by modifying the methods or properties
+% block attribute.
+%%
+%  classdef(Sealed = true) myclass
+%  methods(Sealed = true)
+%  properties(Sealed = true)
+%
+%%
+% <html> 
+% <A NAME="AbstractMethodsAndProperties"></a>
+% </html>
+%% Abstract Methods & Properties
+% Abstract methods, simply put, are methods that have a function header,
+% but not a function body, (i.e. no implementation). They are used to
+% define a common interface for all current and future subclasses. Abstract
+% methods must be implemented by subclasses and as such their inclusion in
+% a superclass acts as a kind of contract, enforcing interface
+% consistency. Of course, if the implementations in all of the subclasses
+% are going to be the same, we are better off writing a regular method in
+% the superclass, which will be inherited by all subclasses. Abstract
+% methods are useful when we know subclasses need to have a particular
+% method but each subclass implementation will be slightly different. 
+%
+% Lets suppose we have a shape superclass with many subclasses like sphere,
+% cube, elipsoid, pyramid, etc. We want every subclass (and future
+% subclasses other people might dream up) to have a calculateVolume()
+% method. The calculation will be different in each case but by creating a
+% calculateVolume() abstract method in the shape superclass, we can rely on
+% the fact that each subclass will have such a method. We can then write
+% other classes or functions that depend on this fact and do not have to
+% rewrite any code when new shape subclasses are created. 
+%
+% Properties can also be abstract but are of less use - they too have to be
+% defined in subclasses.
+%
+% A class with one or more abstract methods or properties is considered
+% abstract itself and instances cannot be created from it. Any subclass
+% that does not implement every one of the abstract methods and properties
+% of its superclasses will itself be abstract, essentially delegating the
+% implementation of some or all of them to further subclasses. 
+%
+% We define a block of methods as abstract with the Abstract attribute, and
+% when writing the methods, we do not include a body.
+%
+%%
+% <html>
+% <hr>
+% </html>
+%%
+%     methods(Abstract = true)
+%         function vol = calculateVolume(obj,units);
+%         function area = calculateSurfaceArea(obj,units);
+%         function obj = doubleSize(obj);
+%     end
+%%
+% <html> 
+% <A NAME="ObjectArrays"></a>
+% </html>
+%% Object Arrays
+% Objects of the same class can be stored together in object arrays that
+% operate just like numeric arrays. We can concatenate objects together and
+% index into these arrays in the usual way. 
+%%
+d2 = mydate(1,4,22,3,2008);   % create another mydate
+dates = [d1 d2];            % we can concatenate objects just like numbers
+[nrows ncols] = size(dates) % and use other familiar functions
+d1 = dates(1,1);            % retrieve the first entry
+dates(1,1) = d1;            % assign the first entry
+%%
+% The type of a single mydate object is actually an object array of mydate
+% objects, albeit of size 1-by-1. Just about everything in Matlab is an
+% array of some sort and objects are no exception. This is quite unlike
+% java for instance, which distinguishes in terms of class, between an
+% object of type A and a collection of objects of type A. One consequence
+% of this is that method calls involving an array of objects dispatch the
+% same method as would be were only one object involved; this includes
+% calls to _subsref()_ and _subsasgn()_ . 
+%%
+% We can also store objects of multiple types in cells and structs.
+
+##### SOURCE END #####
+--></body></html>

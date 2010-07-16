@@ -1,0 +1,1068 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML is auto-generated from an M-file.
+To make changes, update the M-file and republish this document.
+      --><title>Operations on matrices</title><meta name="generator" content="MATLAB 7.10"><meta name="date" content="2010-07-15"><meta name="m-file" content="matrixOperations"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>Operations on matrices</h1><!--introduction--><p>Matlab stands for 'matrix laboratory'. Not surprisingly, matrices, vectors and multidimensional arrays are at the heart of the language. Here we describe how to create, access, modify and otherwise manipulate matrices - the bread and butter of the Matlab programmer.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Creating Matrices</a></li><li><a href="#8">The Size of a Matrix</a></li><li><a href="#12">Transposing a Matrix</a></li><li><a href="#13">Sums and Means</a></li><li><a href="#15">Concatenating Matrices</a></li><li><a href="#16">Basic Indexing</a></li><li><a href="#17">Logical Indexing</a></li><li><a href="#21">Assignment</a></li><li><a href="#25">Deletion</a></li><li><a href="#26">Expansion</a></li><li><a href="#29">Linear Indexing</a></li><li><a href="#35">Reshaping and Replication</a></li><li><a href="#37">Element-Wise Matrix Arithmetic</a></li><li><a href="#39">Matrix Multiplication</a></li><li><a href="#40">Solving linear systems</a></li><li><a href="#43">More Linear Algebra</a></li><li><a href="#44">Multidimensional Arrays</a></li><li><a href="#49">Sparse Matrices</a></li><li><a href="#52">Other numeric data types</a></li><li><a href="#53">Other Useful Functions</a></li></ul></div><h2>Creating Matrices<a name="1"></a></h2><p>There are a number of ways to create a matrix in Matlab. We begin by simply entering data directly. Entries on each row are separated by a space or comma and rows are separated by semicolons, (or newlines). We say that this matrix is of size 4-by-3 indicating that it has 4 rows and 3 columns. We, (and Matlab) always refer to rows first and columns second.</p><pre class="codeinput">A = [1 3 5 ; 2 4 1 ; 3 3 3 ; 2 1 9]
+</pre><pre class="codeoutput">A =
+     1     3     5
+     2     4     1
+     3     3     3
+     2     1     9
+</pre><p>We can often exploit patterns in the entries to create matrices more succinctly.</p><pre class="codeinput">A = 1:10                        <span class="comment">% start at 1,  increment by 1, stop at 10</span>
+B = 1:2:10                      <span class="comment">% start at 1,  increment by 2, stop at 10</span>
+C = 10:-1:3                     <span class="comment">% start at 10, decrement by 1, stop at 3</span>
+</pre><pre class="codeoutput">A =
+  Columns 1 through 7
+     1     2     3     4     5     6     7
+  Columns 8 through 10
+     8     9    10
+B =
+     1     3     5     7     9
+C =
+  Columns 1 through 7
+    10     9     8     7     6     5     4
+  Column 8
+     3
+</pre><p>We can also create an empty matrix.</p><pre class="codeinput">D = [];
+</pre><p>Alternatively, there are several functions that will generate matrices for us.</p><pre class="codeinput">A = zeros(4,5)                  <span class="comment">% 4-by-5 matrix of all zeros</span>
+B = ones (2,3)                  <span class="comment">% 2-by-3 matrix of all ones</span>
+C = rand(3,3)                   <span class="comment">% 3-by-3 matrix of uniform random numbers in [0,1]</span>
+D = randn(2,5)                  <span class="comment">% 2-by-5 matrix of standard normally distributed numbers</span>
+[E,F] = meshgrid(1:5)           <span class="comment">% 5-by-5 grids of numbers</span>
+G = eye(4)                      <span class="comment">% 4-by-4 identity matrix</span>
+H = diag(1:4)                   <span class="comment">% 4-by-4 diagonal matrix</span>
+I = logspace(0,2,6)             <span class="comment">% 1-by-6 matrix of log-spaced numbers from 10^0 to 10^2</span>
+J = blkdiag(rand(2,2),ones(3,2))<span class="comment">% 5-by-4 block diagonal matrix</span>
+K = tril(ones(3,4))             <span class="comment">% 3-by-4 matrix whose lower triangular part is all ones.</span>
+L = triu(ones(3,4))             <span class="comment">% 3-by-4 matrix whose upper triangular part is all ones.</span>
+M = magic(6)   <span class="comment">% Create a magic square in which sum(A,1) = sum(A,2) = trace(A) = trace(rot90(A))</span>
+</pre><pre class="codeoutput">A =
+     0     0     0     0     0
+     0     0     0     0     0
+     0     0     0     0     0
+     0     0     0     0     0
+B =
+     1     1     1
+     1     1     1
+C =
+    0.4001    0.3693    0.1111
+    0.1956    0.0460    0.6579
+    0.1876    0.0506    0.6853
+D =
+  Columns 1 through 4
+    0.3273   -0.1867   -0.5883   -0.1364
+    0.1746    0.7258    2.1832    0.1139
+  Column 5
+    1.0668
+    0.0593
+E =
+     1     2     3     4     5
+     1     2     3     4     5
+     1     2     3     4     5
+     1     2     3     4     5
+     1     2     3     4     5
+F =
+     1     1     1     1     1
+     2     2     2     2     2
+     3     3     3     3     3
+     4     4     4     4     4
+     5     5     5     5     5
+G =
+     1     0     0     0
+     0     1     0     0
+     0     0     1     0
+     0     0     0     1
+H =
+     1     0     0     0
+     0     2     0     0
+     0     0     3     0
+     0     0     0     4
+I =
+  Columns 1 through 4
+    1.0000    2.5119    6.3096   15.8489
+  Columns 5 through 6
+   39.8107  100.0000
+J =
+    0.8631    0.3784         0         0
+    0.7718    0.4598         0         0
+         0         0    1.0000    1.0000
+         0         0    1.0000    1.0000
+         0         0    1.0000    1.0000
+K =
+     1     0     0     0
+     1     1     0     0
+     1     1     1     0
+L =
+     1     1     1     1
+     0     1     1     1
+     0     0     1     1
+M =
+    35     1     6    26    19    24
+     3    32     7    21    23    25
+    31     9     2    22    27    20
+     8    28    33    17    10    15
+    30     5    34    12    14    16
+     4    36    29    13    18    11
+</pre><p>The functions <i>true()</i> and <i>false()</i>, act just like <i>ones()</i> and <i>zeros()</i> but create logical arrays whose entries take only 1 byte each rather than 32.</p><pre class="codeinput">clear <span class="string">all</span>
+A = false(3,3)
+B = zeros(3,3)
+whos
+</pre><pre class="codeoutput">A =
+     0     0     0
+     0     0     0
+     0     0     0
+B =
+     0     0     0
+     0     0     0
+     0     0     0
+  Name      Size            Bytes  Class      Attributes
+
+  A         3x3                 9  logical              
+  B         3x3                72  double               
+
+</pre><h2>The Size of a Matrix<a name="8"></a></h2><p>We can determine the size of a matrix by using the <i>size()</i> command</p><pre class="codeinput">[nrows,ncols] = size(A)
+</pre><pre class="codeoutput">nrows =
+     3
+ncols =
+     3
+</pre><p>and the number of elements by using the <i>numel()</i> command.</p><pre class="codeinput">n = numel(A)
+</pre><pre class="codeoutput">n =
+     9
+</pre><p>We refer to dimensions of size 1 as singleton dimensions. The <i>length()</i> command gives the number of elements in the first non-singleton dimension, and is frequently used when the input is a row or column vector; however, it can make code less readable as it fails to make the dimensionality of the input explicit.</p><p>We can also determine the size along a specific dimension with <i>size()</i>.</p><pre class="codeinput">n = size(A,2)
+</pre><pre class="codeoutput">n =
+     3
+</pre><h2>Transposing a Matrix<a name="12"></a></h2><p>A m-by-n matrix can be transposed into a n-by-m matrix by using the transpose operator '.</p><pre class="codeinput">A = [1 2 3 4 ; 5 6 7 8]
+B = A'
+</pre><pre class="codeoutput">A =
+     1     2     3     4
+     5     6     7     8
+B =
+     1     5
+     2     6
+     3     7
+     4     8
+</pre><h2>Sums and Means<a name="13"></a></h2><p>You can use the <i>sum()</i> and <i>mean()</i> functions to sum up or take the average of entries along a certain dimension.</p><pre class="codeinput">C = sum(A,1)            <span class="comment">% Sum out dimension 1, (rows)</span>
+D = sum(A,2)            <span class="comment">% Sum out dimension 2, (cols)</span>
+E = mean(A,1)           <span class="comment">% Take the average along dimension 1, (rows)</span>
+</pre><pre class="codeoutput">C =
+     6     8    10    12
+D =
+    10
+    26
+E =
+     3     4     5     6
+</pre><p>The [] argument to the min and max functions indicates that you will specify a dimension.</p><pre class="codeinput">F1 = max(A, 2)          <span class="comment">% Larger of A and 2 elementwise</span>
+F = max(A,[],2)         <span class="comment">% Find the max of each row (collapse dim 2)</span>
+G = min(A,[],1)         <span class="comment">% Find the min of each column (collapse dim 1)</span>
+</pre><pre class="codeoutput">F1 =
+     2     2     3     4
+     5     6     7     8
+F =
+     4
+     8
+G =
+     1     2     3     4
+</pre><h2>Concatenating Matrices<a name="15"></a></h2><p>Matrices can be concatenated by enclosing them inside of square brackets and using either a space or semicolon to specify the dimension. Care must be taken that the matrices are of the right size or Matlab will return an error.</p><pre class="codeinput">A = [[1 2 3],ones(1,3)] <span class="comment">% concatenate [1 2 3], [1 1 1] along columns</span>
+B = [[1 2 3];ones(1,3)] <span class="comment">% concatenate [1 2 3], [1 1 1] along rows</span>
+C = [99 A 42]           <span class="comment">% add a number at the beginning or end of an array</span>
+D = [A ; A]             <span class="comment">% duplicate the whole row</span>
+</pre><pre class="codeoutput">A =
+     1     2     3     1     1     1
+B =
+     1     2     3
+     1     1     1
+C =
+  Columns 1 through 7
+    99     1     2     3     1     1     1
+  Column 8
+    42
+D =
+     1     2     3     1     1     1
+     1     2     3     1     1     1
+</pre><h2>Basic Indexing<a name="16"></a></h2><p>Individual entries can be extracted from a matrix by simply specifying the indices inside round brackets. We can also extract several entries at once by specifying a matrix, or matrices of indices or use the : operator to extract all entries along a certain dimension. The 'end' statement stands for the last index of a dimension.</p><pre class="codeinput">A = magic(6);
+B = A(3,5);              <span class="comment">% extract the entry 3 rows down, 5 cols over</span>
+C = A([1,2,3],4);        <span class="comment">% extract the entries (1,4) ; (2,4) ; (3,4)</span>
+D = A(4,[1,1,1]);        <span class="comment">% extract the entry (4,1) three times</span>
+E = A([2,5],[3,1]);      <span class="comment">% extract the entries (2,3) ; (2,1) ; (5,3) ; (5,1)</span>
+F = A(:,4);              <span class="comment">% extract the fourth column</span>
+G = A(4,:);              <span class="comment">% extract the fourth row</span>
+H = A(:);                <span class="comment">% extract every entry as a column vector</span>
+I = A(end,3);            <span class="comment">% extract the entry in the last row, 3rd column</span>
+J = A(end-1,end-1);      <span class="comment">% extract the entry in the second to last row &amp; col</span>
+K = A(end-4:end,1);      <span class="comment">% extract the last three entries from the first col</span>
+L = A(2:end,2:end);      <span class="comment">% extract everything except the first row and col</span>
+M = A(end:-1:1,:);       <span class="comment">% extract everything with the order of the rows reversed.</span>
+N = diag(A);             <span class="comment">% extract the main diagonal of A</span>
+O = diag(rot90(A));      <span class="comment">% extract the counter diagonal of A</span>
+P = diag(A,-2) ;         <span class="comment">% extract the diagonal entries two diagonals left and below the main</span>
+</pre><h2>Logical Indexing<a name="17"></a></h2><p>We can also extract entries using a bit pattern, i.e. a matrix of logical values. Only the entries corresponding to true are returned. This can be particularly useful for selecting elements that satisfy some logical criteria such as being larger than a certain value. We can create a logical matrix by relating a numeric matrix to either a scalar value or matrix of the same size via one of the logical operators, &lt; &gt; &lt;= &gt;= == ~= or by a binary function such as <i>isprime()</i> or <i>isfinite()</i>.</p><pre class="codeinput">B = A &gt; 30
+</pre><pre class="codeoutput">B =
+     1     0     0     0     0     0
+     0     1     0     0     0     0
+     1     0     0     0     0     0
+     0     0     1     0     0     0
+     0     0     1     0     0     0
+     0     1     0     0     0     0
+</pre><p>We can then use this logical matrix to extract elements from A. In the following line, we repeat the call to A &gt; 30 but pass the result directly in, without first storing the interim result.</p><pre class="codeinput">B1 = A(A &gt; 30)                 <span class="comment">% get all elements in A greater than 30</span>
+B = A(isprime(A) &amp; (A &gt; 30))   <span class="comment">% get all prime elements in A greater than 30</span>
+</pre><pre class="codeoutput">B1 =
+    35
+    31
+    32
+    36
+    33
+    34
+B =
+    31
+</pre><p>We could also achieve the same result using the <i>find()</i> function, which returns the indices of all of the non-zero elements in a matrix. While this command is useful when the indices themselves are of interest, using <i>find()</i> can be slightly slower than logical indexing although it is a very common code idiom.</p><pre class="codeinput">B2 = A(find(A &gt; 30))           <span class="comment">% same result as A(A&gt;30) but calculated differently</span>
+</pre><pre class="codeoutput">B2 =
+    35
+    31
+    32
+    36
+    33
+    34
+</pre><p>We can check that two matrices are equal, (i.e. the same size with the same elements) with the <i>isequal()</i> function. Using the == relation returns a matrix of logical values, not a single value.</p><pre class="codeinput">test = isequal(B1,B2)
+test2 = all(B1==B2)
+</pre><pre class="codeoutput">test =
+     1
+test2 =
+     1
+</pre><h2>Assignment<a name="21"></a></h2><p>Assignment operations, in which we change a value or values in a matrix, are performed in a very similar way to the indexing operations above. Both parallel and logical indexing can be used. We indicate which entries will be changed by performing an indexing operation on the left hand side and then specify the new values on the right hand side. The right must be either a scalar value, or a matrix with the same dimensions as the resulting indexed matrix on the left. Matlab automatically expands scalar values on the right to the correct size.</p><pre class="codeinput">A(3,2) = 999;            <span class="comment">% assign 999 to entry (3,2)</span>
+A(:,1:3:end) = 999;      <span class="comment">% assign 999 to every third column</span>
+A(:,1) = [2;3;5;9;8;7];  <span class="comment">% assign new values to the first column.</span>
+A(A == 999) = 444;       <span class="comment">% assign all entries equal to 999 the value 444</span>
+</pre><p>We can assign every value at once by using the colon operator. The following command temporarily converts A to a column vector, assigns the values on the right hand side and converts back to the original dimensions.</p><pre class="codeinput">A(:) = 1:36
+</pre><pre class="codeoutput">A =
+     1     7    13    19    25    31
+     2     8    14    20    26    32
+     3     9    15    21    27    33
+     4    10    16    22    28    34
+     5    11    17    23    29    35
+     6    12    18    24    30    36
+</pre><p>Recall from the indexing section that indices can be repeated returning the corresponding entry multiple times as in A([1,1,1],3). You can also repeat indices in assignments but the results are not what you might expect.</p><pre class="codeinput">A = ones(3,5);
+A([1,2,3,1,1],1) = A([1,2,3,1,1],1) + 1
+</pre><pre class="codeoutput">A =
+     2     1     1     1     1
+     2     1     1     1     1
+     2     1     1     1     1
+</pre><p>You may have expected the entry A(1,1) to now have a value of 4 instead of 2 since we indexed entry A(1,1) three times. Matlab calculates the right hand side completely before assigning the values and so the value of 2 is simply assigned to A(1,1) three times.</p><h2>Deletion<a name="25"></a></h2><p>Assigning [] deletes the corresponding entries from the matrix. Only deletions that result in a rectangular matrix are allowed.</p><pre class="codeinput">A([1,3],:) = []         <span class="comment">% delete the first and third rows from A</span>
+A(:,end) = []           <span class="comment">% delete the last column from A</span>
+</pre><pre class="codeoutput">A =
+     2     1     1     1     1
+A =
+     2     1     1     1
+</pre><h2>Expansion<a name="26"></a></h2><p>When the indices in an assignment operation exceed the size of the matrix, Matlab, rather than giving an error, quietly expands the matrix for you. If necessary, it pads the matrix with zeros. Using this feature is somewhat inefficient, however, as Matlab must reallocate a sufficiently large chunk of contiguous memory and copy the array. It is much faster to preallocate the maximum desired size with the zeros command first, whenever the maximum size is known in advance: see <a href="speedup.html#prealloc">here</a> for details.</p><pre class="codeinput">[nrows,ncols] = size(A)
+A(4,10) = 222
+</pre><pre class="codeoutput">nrows =
+     1
+ncols =
+     4
+A =
+  Columns 1 through 7
+     2     1     1     1     0     0     0
+     0     0     0     0     0     0     0
+     0     0     0     0     0     0     0
+     0     0     0     0     0     0     0
+  Columns 8 through 10
+     0     0     0
+     0     0     0
+     0     0     0
+     0     0   222
+</pre><pre class="codeinput">A = 3
+A(1:5,1:5) = 3
+</pre><pre class="codeoutput">A =
+     3
+A =
+     3     3     3     3     3
+     3     3     3     3     3
+     3     3     3     3     3
+     3     3     3     3     3
+     3     3     3     3     3
+</pre><h2>Linear Indexing<a name="29"></a></h2><p>When only one dimension is specified in an indexing or assignment operation, Matlab performs linear indexing by counting from top to bottom and then left to right so that the last entry in the first column comes just before the first entry in the second column.</p><pre class="codeinput">A = zeros(3,5);         <span class="comment">% create an empty matrix</span>
+A(4) = 99               <span class="comment">% assign 99 to the fourth entry (row 3, col 1)</span>
+A(1:15) = 1:15          <span class="comment">% assign vals 1:15 to their corresponding entries.</span>
+</pre><pre class="codeoutput">A =
+     0    99     0     0     0
+     0     0     0     0     0
+     0     0     0     0     0
+A =
+     1     4     7    10    13
+     2     5     8    11    14
+     3     6     9    12    15
+</pre><p>The functions <i>ind2sub()</i> and <i>sub2ind()</i> will convert from a linear index to regular indices and vice versa, respectively. In both cases, you must specify the size of the underlying matrix.</p><pre class="codeinput">[rowNDX, colNDX] = ind2sub(size(A),12)
+linearNDX = sub2ind(size(A),rowNDX,colNDX)
+</pre><pre class="codeoutput">rowNDX =
+     3
+colNDX =
+     4
+linearNDX =
+    12
+</pre><p>Sometimes, when dealing with multi-dimensional arrays, it is annoying that these functions return/ require multiple separate arguments. We therefore provide the following alternative functions: <a href="mfiles/ind2subv.m">ind2subv</a> and <a href="mfiles/subv2ind.m">subv2ind</a></p><pre class="codeinput">ndx = ind2subv(size(A),12)
+linearNDX = subv2ind(size(A),ndx)
+</pre><pre class="codeoutput">ndx =
+     3     4
+linearNDX =
+    12
+</pre><h2>Reshaping and Replication<a name="35"></a></h2><p>It is sometimes useful to reshape an array of size m-by-n to size p-by-q where m*n = p*q. The <i>reshape()</i> function lets you do just that. The elements are placed in such a way so as to preserve the order induced by linear indexing. In other words, if a(3) = 3 before reshaping, a(3) will still equal 3 after reshaping.</p><pre class="codeinput">A = zeros(5,6);
+A(1:30) = 1:30
+B = reshape(A,3,10)
+check = A(11) == B(11)
+</pre><pre class="codeoutput">A =
+     1     6    11    16    21    26
+     2     7    12    17    22    27
+     3     8    13    18    23    28
+     4     9    14    19    24    29
+     5    10    15    20    25    30
+B =
+  Columns 1 through 7
+     1     4     7    10    13    16    19
+     2     5     8    11    14    17    20
+     3     6     9    12    15    18    21
+  Columns 8 through 10
+    22    25    28
+    23    26    29
+    24    27    30
+check =
+     1
+</pre><p>Further, the <i>repmat()</i> function can be used to tile an array m-by-n times.</p><pre class="codeinput">A = [1 2 ; 3 4]
+B = repmat(A,3,6)       <span class="comment">% copy A vertically 3 times and horizontally 6 times</span>
+</pre><pre class="codeoutput">A =
+     1     2
+     3     4
+B =
+  Columns 1 through 7
+     1     2     1     2     1     2     1
+     3     4     3     4     3     4     3
+     1     2     1     2     1     2     1
+     3     4     3     4     3     4     3
+     1     2     1     2     1     2     1
+     3     4     3     4     3     4     3
+  Columns 8 through 12
+     2     1     2     1     2
+     4     3     4     3     4
+     2     1     2     1     2
+     4     3     4     3     4
+     2     1     2     1     2
+     4     3     4     3     4
+</pre><h2>Element-Wise Matrix Arithmetic<a name="37"></a></h2><p>We can perform the arithmetical operations, addition, subtraction, multiplication, division, and exponentiation on every element of a matrix. In fact, we can also use functions such as <i>sin()</i>, <i>cos()</i>, <i>tan()</i>, <i>log()</i> , <i>exp()</i> , etc to operate on every entry but we will focus on the former list for now.</p><p>If one operand is a scalar value, an element-wise operation is automatically performed. However, if both operands are matrices, a dot must precede the operator as in .* , .^ , ./, and further, both matrices must be the same size.</p><pre class="codeinput">A = [1 2 3; 4 5 6];
+B = A + 1;               <span class="comment">% Add or subtract a scalar value from every entry</span>
+C = 3.*A;                <span class="comment">% Multiply every entry by a scalar value</span>
+D = A ./ 3;              <span class="comment">% Divide every entry by a scalar value</span>
+E = A .^ 3;              <span class="comment">% Exponentiate every entry by a scalar value</span>
+F = A - [2 4 8 ; 9 1 2]; <span class="comment">% Add or subtract two matrices of the same size, (element-wise)</span>
+G = A ./ B;              <span class="comment">% Divide every entry in A by the corresponding entry in B</span>
+H = A .* B;              <span class="comment">% Multiply every entry in A by the corresponding entry in B</span>
+I = A .^ B;              <span class="comment">% Exponentiate every entry in A by the corresponding entry in B</span>
+</pre><p>Matlab also has the .\ operator which is the same as the ./ operator with the order of the operands reversed so that (A ./ B) = (B .\ A). As this is infrequently used, it should be avoided for the sake of clarity.</p><h2>Matrix Multiplication<a name="39"></a></h2><p>We can also perform matrix multiplication of an m-by-n matrix and an n-by-p matrix yielding an m-by-p matrix. Suppose we multiple A*B = C, then C(i,j) = A(i,:)*B(:,j) , that is, the dot product of the ith row from A and the jth column from B. The dot, (or inner) product of a and b is just <b>sum(a.*b)</b>. Further, if A is a square matrix, we can multiply A by itself k times by the matrix exponentiation A^k.</p><pre class="codeinput"> A = [1 2 3 4 ; 5 6 7 8]
+ B = 2*ones(4,3)
+ C = A*B                 <span class="comment">% Matrix multiplication of A,B</span>
+ D = (A * A') / 100      <span class="comment">% Matrix multiply A and A', divide every entry by 100</span>
+ E = D ^ 4               <span class="comment">% Matrix multiply D by itself 4 four times</span>
+</pre><pre class="codeoutput">A =
+     1     2     3     4
+     5     6     7     8
+B =
+     2     2     2
+     2     2     2
+     2     2     2
+     2     2     2
+C =
+    20    20    20
+    52    52    52
+D =
+    0.3000    0.7000
+    0.7000    1.7400
+E =
+    2.3756    5.8514
+    5.8514   14.4127
+</pre><h2>Solving linear systems<a name="40"></a></h2><p>Suppose we have the matrix equation Y = XW where X is an n-by-d matrix, W is a d-by-k matrix and thus Y is an n-by-k matrix. If X is invertible, we could solve for W= inv(X)*Y. The <i>inv()</i> function returns the inverse of a matrix. If n ~= d, however, we can still solve for the least squares estimate of W by taking the pseudo inverse of X, namely inv(X'*X)*X', or more concisely using the Matlab function, <i>pinv(X)</i>. Matlab allows you to solve more directly, (and efficiently) for W, (i.e. the lsq estimate of W), however, by using the matrix division X \ Y. Both X and Y must have the same number of rows. (Below we specify a seed to the random number generators so that they return the same values every time this demo is run).</p><pre class="codeinput">seed = 1;
+rand(<span class="string">'twister'</span>,seed);randn(<span class="string">'state'</span>,seed);
+X = randn(100, 8);
+w = randn(8,1);                        <span class="comment">% loading vector, Wtrue</span>
+y = X*w;                              <span class="comment">% Target or output variable, (no noise)</span>
+</pre><pre class="codeinput">Wlsq = X \ y;                              <span class="comment">% recommended way</span>
+Wlsq1 = inv(X'*X)*X'*y;                      <span class="comment">% normal eqns - Not the recommended way</span>
+Wlsq2 = pinv(X)*y;                      <span class="comment">% Not the recommended way</span>
+[w'; Wlsq'; Wlsq1'; Wlsq2']             <span class="comment">% In this simple example, all same</span>
+</pre><pre class="codeoutput">ans =
+  Columns 1 through 4
+   -0.3610   -1.6079   -0.7770   -0.3209
+   -0.3610   -1.6079   -0.7770   -0.3209
+   -0.3610   -1.6079   -0.7770   -0.3209
+   -0.3610   -1.6079   -0.7770   -0.3209
+  Columns 5 through 8
+   -1.3135   -0.1085   -1.0176    1.3007
+   -1.3135   -0.1085   -1.0176    1.3007
+   -1.3135   -0.1085   -1.0176    1.3007
+   -1.3135   -0.1085   -1.0176    1.3007
+</pre><p>Matlab also supports matrix right division such that X \ Y = (Y' / X')' but as this is infrequently used, it should be avoided for the sake of clarity.</p><h2>More Linear Algebra<a name="43"></a></h2><p>Matlab was original designed primarily as a linear algebra package, and this remains its forte. Here we only list a few functions for brevity, do not display the results. Many functions can also take additional arguments: type <b>doc svd</b> for instance to see documentation for the <i>svd()</i> function.</p><pre class="codeinput">A = magic(5);
+B = det(A);              <span class="comment">% The determinant of A</span>
+C = rank(A);             <span class="comment">% The rank of A</span>
+E = trace(A);            <span class="comment">% sum of diagonal entries</span>
+G = orth(A);             <span class="comment">% an orthonormal basis for range of A</span>
+H = null(A);             <span class="comment">% an orthonormal basis for the nullspace of A</span>
+I = chol(A*A');          <span class="comment">% Cholesky decomposition s.t. if R = chol(X) then R'*R = X</span>
+[evecs,evals] = eig(A);  <span class="comment">% eigen vectors and values of A, (use eigs on sparse matrices)</span>
+[U,S,V] = svd(A);        <span class="comment">% singular value decomposition s.t. A = U*S*V'</span>
+[Q,R] = qr(A);           <span class="comment">% QR decomposition of A</span>
+</pre><h2>Multidimensional Arrays<a name="44"></a></h2><p>Numeric matrices in Matlab can extend to an arbitrary number of dimensions, not just 2. We can use the <i>zeros()</i>, <i>ones()</i>, <i>rand()</i>, <i>randn()</i> functions to create n-dimensional matrices by simply specifying n parameters. We can also use <i>repmat()</i> to replicate matrices along any number of dimensions, or the <i>cat()</i> function, which is a generalization of the [] concatenation we saw earlier. Indexing, assignment,and extension work just as before, only with n indices, as opposed to just two. Finally, we can use functions like <i>sum()</i>, <i>mean()</i>, <i>max()</i> or <i>min()</i> by specifying the dimension over which we want the function to operate. <i>sum(A,3)</i> for example, sums over, or marginalizes out, the 3rd dimension.</p><pre class="codeinput">A = ones(3,5,9,2,2);                <span class="comment">% a 5 dimensional array</span>
+B = cat(3,[1 2 ; 4 5],[3 2 ; 1 1])  <span class="comment">% concatenate two matrices along the third dimension</span>
+C = repmat([1 2 ; 3 4],[2,2,2,2]);  <span class="comment">% tile a matrix in 4D, twice per dimension</span>
+D = C(1,1,1,1)                      <span class="comment">% retrieve the entry (1,1,1,1)</span>
+A(1,2,2,1) = 99;                    <span class="comment">% assign an entry</span>
+F = mean(C,4);                      <span class="comment">% Take the mean along the 4th dimension</span>
+G = max(A,[],3);                    <span class="comment">% Take the maximum along the 3rd dimension</span>
+</pre><pre class="codeoutput">B(:,:,1) =
+     1     2
+     4     5
+B(:,:,2) =
+     3     2
+     1     1
+D =
+     1
+</pre><p>Taking the mean of say a 4-by-4-by-2-by-2 matrix along the 3rd dimension results in a matrix of size 4-by-4-by-1-by-2. If we want to remove the 3rd singleton dimension, (which is only acting now as a place holder) we can use the <i>squeeze()</i> function.</p><pre class="codeinput">size(C)
+</pre><pre class="codeoutput">ans =
+     4     4     2     2
+</pre><pre class="codeinput">E1 = mean(C,3);
+size(E1)
+E2 = squeeze(E1);
+size(E2)
+</pre><pre class="codeoutput">ans =
+     4     4     1     2
+ans =
+     4     4     2
+</pre><p>The <i>ndims()</i> functions indicates how many dimensions an array has. Final singleton dimensions are ignored but singleton dimensions occurring before non-singleton dimensions are not.</p><pre class="codeinput">F = ndims(A)
+G = ndims(squeeze(mean(A,2)))
+</pre><pre class="codeoutput">F =
+     5
+G =
+     4
+</pre><p>The <i>meshgrid()</i> function we saw earlier extends to 3 dimensions. If you need to grid n-dimensional space, use the <i>ndgrid()</i> function but keep in mind that the number of elements grows exponentially with the dimension.</p><pre class="codeinput">a = 1:10;
+n = numel(ndgrid(a,a,a,a,a,a))      <span class="comment">% 1 million entries.</span>
+</pre><pre class="codeoutput">n =
+     1000000
+</pre><h2>Sparse Matrices<a name="49"></a></h2><p>When dealing with large matrices containing many zeros, you can save a great deal of space by using Matlab's sparse matrix construct. Sparse matrices can be used just like ordinary matrices but can be slower depending on the operation. The functions <i>full()</i> and <i>sparse()</i> convert back and forth. Currently Matlab supports double and logical sparse matrices.</p><pre class="codeinput">A = zeros(100,100);
+A([1,4,8],[7,9,33]) = reshape(1:9,3,3);
+n = nnz(A)              <span class="comment">% The number of non-zero entries in A</span>
+nzeros = nonzeros(A);   <span class="comment">% All of the non-zero entries in one big column vector</span>
+A = sparse(A)           <span class="comment">% Convert to a sparse matrix</span>
+check = issparse(A)     <span class="comment">% Is is really a sparse data type?</span>
+B = A * rand(100,1);    <span class="comment">% Perform operations as you would with a non sparse matrix</span>
+C = full(A);            <span class="comment">% Convert back to a full matrix.</span>
+</pre><pre class="codeoutput">n =
+     9
+A =
+   (1,7)        1
+   (4,7)        2
+   (8,7)        3
+   (1,9)        4
+   (4,9)        5
+   (8,9)        6
+   (1,33)       7
+   (4,33)       8
+   (8,33)       9
+check =
+     1
+</pre><p>The <i>spy()</i> function can be used to visualize the sparsity pattern of a matrix.</p><p>The <i>spalloc()</i> function can be used to preallocate space for a sparse matrix. The following command creates a 100-by-100 matrix with room currently for 10 non-zero elements. More than 10 non-zero elements can be added later but this can be slow as Matlab will need to find a larger chunk of memory and copy the non-zero elements.</p><pre class="codeinput">A = spalloc(100,100,10)
+n = nzmax(A)             <span class="comment">% how many non-zero elements do I have room for?</span>
+</pre><pre class="codeoutput">A =
+   All zero sparse: 100-by-100
+n =
+    10
+</pre><h2>Other numeric data types<a name="52"></a></h2><p>Matlab has limited support for 11 numeric data types similar to those in the C programming language. Below we create matrices of each type and show the space each matrix requires. Matrices can also be created by using the commands <i>int8()</i> , <i>single()</i> , <i>int64()</i> etc. The <i>cast()</i> command, converts from one data type to another. You can determine the class of a variable with the <i>class()</i> command and the maximum or minimum values each class is able to represent with the <i>intmax()</i> , <i>intmin()</i> , <i>realmax()</i> , and <i>realmin()</i> functions. The uint classes are unsigned and not able to represent negative numbers. Unfortunately many Matlab functions do not support types other than double or logical. Functions such as <i>sum()</i> have an optional parameter 'native', which performs summation without automatically casting to double. To perform variable precision arithmetic, check out the <i>vpa()</i> function available in the symbolic math toolbox.</p><pre class="codeinput">clear
+A = zeros(100,100,<span class="string">'double'</span>);        <span class="comment">% same as zeros(100,100)</span>
+B = zeros(100,100,<span class="string">'int64'</span>);         <span class="comment">% signed 64 bit integer</span>
+C = zeros(100,100,<span class="string">'uint64'</span>);        <span class="comment">% unsigned 64 bit integer</span>
+D = zeros(100,100,<span class="string">'single'</span>);        <span class="comment">% single precision number</span>
+E = zeros(100,100,<span class="string">'int32'</span>);         <span class="comment">% signed 32 bit integer</span>
+F = zeros(100,100,<span class="string">'uint32'</span>);        <span class="comment">% unsigned 32 bit integer</span>
+G = zeros(100,100,<span class="string">'int16'</span>);         <span class="comment">% signed 16 bit integer</span>
+H = zeros(100,100,<span class="string">'uint16'</span>);        <span class="comment">% unsigned 16 bit integer</span>
+I = zeros(100,100,<span class="string">'int8'</span>);          <span class="comment">% signed 8 bit integer</span>
+J = zeros(100,100,<span class="string">'uint8'</span>);         <span class="comment">% unsigned 8 bit integer</span>
+K = false(100,100);                 <span class="comment">% logical array</span>
+whos                                <span class="comment">% display size of variables</span>
+AA = realmax(<span class="string">'double'</span>);             <span class="comment">% max sizes representable by different types</span>
+BB = intmax(<span class="string">'int64'</span>);
+CC = intmax(<span class="string">'uint64'</span>);
+DD = realmax(<span class="string">'single'</span>);
+EE = intmax(<span class="string">'int32'</span>);
+FF = intmax(<span class="string">'uint32'</span>);
+GG = intmax(<span class="string">'int16'</span>);
+HH = intmax(<span class="string">'uint16'</span>);
+II = intmax(<span class="string">'int8'</span>);
+JJ = intmax(<span class="string">'uint8'</span>);
+
+K = int32(100);                     <span class="comment">% construct an int32 directly</span>
+check1 = class(K);                  <span class="comment">% check its class</span>
+L = cast(K,<span class="string">'double'</span>);               <span class="comment">% cast to a double() - also see typecast()</span>
+check2 = class(L);                  <span class="comment">% check its class</span>
+M = int8([3,1,2,1,4]);              <span class="comment">% create several int8s</span>
+N = sum(M,<span class="string">'native'</span>);                <span class="comment">% sum ints in 'native' mode, i.e. don't cast to double</span>
+O = sum(M);                         <span class="comment">% don't sum in 'native' mode to see the difference</span>
+class1 = class(N);                  <span class="comment">% check the class type</span>
+class2 = class(O);                  <span class="comment">% check the class type</span>
+</pre><pre class="codeoutput">  Name        Size             Bytes  Class      Attributes
+
+  A         100x100            80000  double               
+  B         100x100            80000  int64                
+  C         100x100            80000  uint64               
+  D         100x100            40000  single               
+  E         100x100            40000  int32                
+  F         100x100            40000  uint32               
+  G         100x100            20000  int16                
+  H         100x100            20000  uint16               
+  I         100x100            10000  int8                 
+  J         100x100            10000  uint8                
+  K         100x100            10000  logical              
+
+</pre><h2>Other Useful Functions<a name="53"></a></h2><p>The <i>cumsum()</i> and <i>cumprod()</i> functions can be useful for generating a running sum or product of an array. The <i>diff()</i> function returns the differences between consecutive elements. You can specify the dimension over which you want them to operate. If you leave this blank, they operate over the first non-singleton dimension.</p><pre class="codeinput">A = cumsum(1:6)
+C = cumprod(1:6)
+D = diff(A)
+</pre><pre class="codeoutput">A =
+     1     3     6    10    15    21
+C =
+     1     2     6    24   120   720
+D =
+     2     3     4     5     6
+</pre><p>The histc function is useful for, (among other things) counting the number of occurrences of numbers in an array.</p><pre class="codeinput">A = sort(floor(10*rand(1,10))+1) <span class="comment">% random ints from 1 to 10</span>
+counts = histc(A,1:10)           <span class="comment">% count how often each int occurs</span>
+</pre><pre class="codeoutput">A =
+  Columns 1 through 7
+     1     4     4     6     7     7     9
+  Columns 8 through 10
+    10    10    10
+counts =
+  Columns 1 through 7
+     1     0     0     2     0     1     2
+  Columns 8 through 10
+     0     1     3
+</pre><p>The <i>filter()</i> function can be used to calculate values that depend on previous values in an array. While it is quite a complicated function, here is an easy way to calculate the points halfway between each consecutive point in an array. The first result is just half the value of the first element. You can calculate a running average in which only a window of k elements are included with filter(ones(1,k)/k,1,data).</p><pre class="codeinput">A = 1:10
+B = filter([0.5,0.5],1,A);
+</pre><pre class="codeoutput">A =
+  Columns 1 through 7
+     1     2     3     4     5     6     7
+  Columns 8 through 10
+     8     9    10
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.10<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Operations on matrices
+%
+% Matlab stands for 'matrix laboratory'. Not surprisingly,
+% matrices, vectors and multidimensional arrays are at
+% the heart of the language.
+% Here we describe how to create, access, modify and otherwise manipulate
+% matrices - the bread and butter of the Matlab programmer. 
+
+%% Creating Matrices
+% There are a number of ways to create a matrix in Matlab. We begin by
+% simply entering data directly. Entries on each row are separated by a
+% space or comma and rows are separated by semicolons, (or newlines). We
+% say that this matrix is of size 4-by-3 indicating that it has 4 rows and
+% 3 columns. We, (and Matlab) always refer to rows first and columns
+% second. 
+A = [1 3 5 ; 2 4 1 ; 3 3 3 ; 2 1 9]
+%%
+% We can often exploit patterns in the entries to create matrices more
+% succinctly.
+A = 1:10                        % start at 1,  increment by 1, stop at 10
+B = 1:2:10                      % start at 1,  increment by 2, stop at 10
+C = 10:-1:3                     % start at 10, decrement by 1, stop at 3
+%%
+% We can also create an empty matrix.
+D = [];
+%%
+% Alternatively, there are several functions that will generate matrices
+% for us.
+A = zeros(4,5)                  % 4-by-5 matrix of all zeros
+B = ones (2,3)                  % 2-by-3 matrix of all ones
+C = rand(3,3)                   % 3-by-3 matrix of uniform random numbers in [0,1]
+D = randn(2,5)                  % 2-by-5 matrix of standard normally distributed numbers
+[E,F] = meshgrid(1:5)           % 5-by-5 grids of numbers
+G = eye(4)                      % 4-by-4 identity matrix
+H = diag(1:4)                   % 4-by-4 diagonal matrix
+I = logspace(0,2,6)             % 1-by-6 matrix of log-spaced numbers from 10^0 to 10^2 
+J = blkdiag(rand(2,2),ones(3,2))% 5-by-4 block diagonal matrix
+K = tril(ones(3,4))             % 3-by-4 matrix whose lower triangular part is all ones. 
+L = triu(ones(3,4))             % 3-by-4 matrix whose upper triangular part is all ones.                     
+M = magic(6)   % Create a magic square in which sum(A,1) = sum(A,2) = trace(A) = trace(rot90(A))
+%%
+% The functions _true()_ and _false()_, act just like _ones()_ and _zeros()_ but create
+% logical arrays whose entries take only 1 byte each rather than 32. 
+%%
+clear all
+A = false(3,3)
+B = zeros(3,3)
+whos
+%%
+%% The Size of a Matrix
+% We can determine the size of a matrix by using the _size()_ command
+[nrows,ncols] = size(A)
+%%
+% and the number of elements by using the _numel()_ command.
+n = numel(A)
+%%
+% We refer to dimensions of size 1 as singleton dimensions. 
+% The _length()_ command gives the number of elements in the first
+% non-singleton dimension, and is frequently used when the input is
+% a row or column vector; however, it can make code less readable as it
+% fails to make the dimensionality of the input explicit. 
+%%
+% We can also determine the size along a specific dimension with _size()_. 
+n = size(A,2)
+%% Transposing a Matrix
+% A m-by-n matrix can be transposed into a n-by-m matrix by using the
+% transpose operator '.
+A = [1 2 3 4 ; 5 6 7 8]
+B = A'
+%% Sums and Means
+% You can use the _sum()_ and _mean()_ functions to sum up or take the
+% average of entries along a certain dimension. 
+C = sum(A,1)            % Sum out dimension 1, (rows)
+D = sum(A,2)            % Sum out dimension 2, (cols)
+E = mean(A,1)           % Take the average along dimension 1, (rows)
+%% 
+% The [] argument to the min and max functions indicates that you will
+% specify a dimension. 
+F1 = max(A, 2)          % Larger of A and 2 elementwise
+F = max(A,[],2)         % Find the max of each row (collapse dim 2)
+G = min(A,[],1)         % Find the min of each column (collapse dim 1)
+%% Concatenating Matrices
+% Matrices can be concatenated by enclosing them inside of square
+% brackets and using either a space or semicolon to specify the dimension.
+% Care must be taken that the matrices are of the right size or Matlab will
+% return an error. 
+A = [[1 2 3],ones(1,3)] % concatenate [1 2 3], [1 1 1] along columns
+B = [[1 2 3];ones(1,3)] % concatenate [1 2 3], [1 1 1] along rows
+C = [99 A 42]           % add a number at the beginning or end of an array
+D = [A ; A]             % duplicate the whole row 
+%% Basic Indexing
+% Individual entries can be extracted from a matrix by simply specifying
+% the indices inside round brackets. We can also extract several entries
+% at once by specifying a matrix, or matrices of indices or use the :
+% operator to extract all entries along a certain dimension. The 'end'
+% statement stands for the last index of a dimension.
+A = magic(6);
+B = A(3,5);              % extract the entry 3 rows down, 5 cols over
+C = A([1,2,3],4);        % extract the entries (1,4) ; (2,4) ; (3,4)
+D = A(4,[1,1,1]);        % extract the entry (4,1) three times
+E = A([2,5],[3,1]);      % extract the entries (2,3) ; (2,1) ; (5,3) ; (5,1)
+F = A(:,4);              % extract the fourth column
+G = A(4,:);              % extract the fourth row
+H = A(:);                % extract every entry as a column vector 
+I = A(end,3);            % extract the entry in the last row, 3rd column
+J = A(end-1,end-1);      % extract the entry in the second to last row & col
+K = A(end-4:end,1);      % extract the last three entries from the first col
+L = A(2:end,2:end);      % extract everything except the first row and col
+M = A(end:-1:1,:);       % extract everything with the order of the rows reversed.
+N = diag(A);             % extract the main diagonal of A
+O = diag(rot90(A));      % extract the counter diagonal of A
+P = diag(A,-2) ;         % extract the diagonal entries two diagonals left and below the main
+%% Logical Indexing
+% We can also extract entries using a bit pattern, i.e. a matrix of logical
+% values. Only the entries corresponding to true are returned. This can be
+% particularly useful for selecting elements that satisfy some logical
+% criteria such as being larger than a certain value. We can create a
+% logical matrix by relating a numeric matrix to either a scalar value or
+% matrix of the same size via one of the logical operators, < > <= >= == ~=
+% or by a binary function such as _isprime()_ or _isfinite()_.
+B = A > 30
+%%
+% We can then use this logical matrix to extract elements from A. In
+% the following line, we repeat the call to A > 30 but pass the result
+% directly in, without first storing the interim result. 
+B1 = A(A > 30)                 % get all elements in A greater than 30
+B = A(isprime(A) & (A > 30))   % get all prime elements in A greater than 30
+%%
+% We could also achieve the same result using the _find()_ function, which
+% returns the indices of all of the non-zero elements in a matrix. While
+% this command is useful when the indices themselves are of interest, using
+% _find()_ can be slightly slower than logical indexing although it is a
+% very common code idiom. 
+B2 = A(find(A > 30))           % same result as A(A>30) but calculated differently
+%%
+% We can check that two matrices are equal, (i.e. the same size with the
+% same elements) with the _isequal()_ function. Using the == relation
+% returns a matrix of logical values, not a single value.
+test = isequal(B1,B2)
+test2 = all(B1==B2)
+%% Assignment
+% Assignment operations, in which we change a value or values in a matrix,
+% are performed in a very similar way to the indexing operations above. 
+% Both parallel and logical indexing can be used. We indicate which entries
+% will be changed by performing an indexing operation on the left hand side
+% and then specify the new values on the right hand side. The right must be
+% either a scalar value, or a matrix with the same dimensions as the
+% resulting indexed matrix on the left. Matlab automatically expands scalar
+% values on the right to the correct size.
+A(3,2) = 999;            % assign 999 to entry (3,2) 
+A(:,1:3:end) = 999;      % assign 999 to every third column 
+A(:,1) = [2;3;5;9;8;7];  % assign new values to the first column.
+A(A == 999) = 444;       % assign all entries equal to 999 the value 444
+%%
+% We can assign every value at once by using the colon operator. The
+% following command temporarily converts A to a column vector, assigns the
+% values on the right hand side and converts back to the original
+% dimensions.
+A(:) = 1:36
+%%
+% Recall from the indexing section that indices can be repeated returning
+% the corresponding entry multiple times as in A([1,1,1],3). You can also
+% repeat indices in assignments but the results are not what you might
+% expect. 
+A = ones(3,5);
+A([1,2,3,1,1],1) = A([1,2,3,1,1],1) + 1
+%%
+% You may have expected the entry A(1,1) to now have a value of 4 instead
+% of 2 since we indexed entry A(1,1) three times. Matlab calculates the
+% right hand side completely before assigning the values and so the value
+% of 2 is simply assigned to A(1,1) three times. 
+%% Deletion
+% Assigning [] deletes the corresponding entries from the matrix. Only
+% deletions that result in a rectangular matrix are allowed.
+A([1,3],:) = []         % delete the first and third rows from A
+A(:,end) = []           % delete the last column from A
+%% Expansion
+% When the indices in an assignment operation exceed the size of the
+% matrix, Matlab, rather than giving an error, quietly expands the matrix
+% for you. If necessary, it pads the matrix with zeros. Using this feature
+% is somewhat inefficient, however, as Matlab must reallocate a
+% sufficiently large chunk of contiguous memory and copy the array. It is
+% much faster to preallocate the maximum desired size with the zeros
+% command first, whenever the maximum size is known in advance:
+% see <speedup.html#prealloc here> for details.
+%%
+[nrows,ncols] = size(A)
+A(4,10) = 222
+%%
+A = 3
+A(1:5,1:5) = 3
+%% Linear Indexing
+% When only one dimension is specified in an indexing or assignment
+% operation, Matlab performs linear indexing by counting from top to bottom
+% and then left to right so that the last entry in the first column comes
+% just before the first entry in the second column. 
+A = zeros(3,5);         % create an empty matrix
+A(4) = 99               % assign 99 to the fourth entry (row 3, col 1)
+A(1:15) = 1:15          % assign vals 1:15 to their corresponding entries. 
+%%
+% The functions _ind2sub()_ and _sub2ind()_ will convert from a linear
+% index to regular indices and vice versa, respectively. In both cases, you
+% must specify the size of the underlying matrix. 
+%%
+[rowNDX, colNDX] = ind2sub(size(A),12)
+linearNDX = sub2ind(size(A),rowNDX,colNDX)
+%%
+% Sometimes, when dealing with multi-dimensional arrays,
+% it is annoying that these functions return/ require multiple separate
+% arguments.
+% We therefore provide the following alternative
+% functions: 
+% <mfiles/ind2subv.m ind2subv>
+% and 
+% <mfiles/subv2ind.m subv2ind>
+%%
+ndx = ind2subv(size(A),12)
+linearNDX = subv2ind(size(A),ndx)
+%%
+%% Reshaping and Replication
+% It is sometimes useful to reshape an array of size m-by-n to size p-by-q
+% where m*n = p*q. The _reshape()_ function lets you do just that. The
+% elements are placed in such a way so as to preserve the order induced by
+% linear indexing. In other words, if a(3) = 3 before reshaping, a(3) will
+% still equal 3 after reshaping.
+A = zeros(5,6); 
+A(1:30) = 1:30
+B = reshape(A,3,10)
+check = A(11) == B(11)
+%% 
+% Further, the _repmat()_ function can be used to tile an array m-by-n
+% times. 
+A = [1 2 ; 3 4]
+B = repmat(A,3,6)       % copy A vertically 3 times and horizontally 6 times
+%% Element-Wise Matrix Arithmetic
+% We can perform the arithmetical operations, addition, subtraction,
+% multiplication, division, and exponentiation on every element of a
+% matrix. In fact, we can also use functions such as _sin()_, _cos()_,
+% _tan()_, _log()_ , _exp()_ , etc to operate on every entry but we will
+% focus on the former list for now. 
+%
+% If one operand is a scalar value, an element-wise operation is
+% automatically performed. However, if both operands are matrices, a dot
+% must precede the operator as in .* , .^ , ./, and further, both matrices
+% must be the same size. 
+
+A = [1 2 3; 4 5 6];
+B = A + 1;               % Add or subtract a scalar value from every entry
+C = 3.*A;                % Multiply every entry by a scalar value
+D = A ./ 3;              % Divide every entry by a scalar value
+E = A .^ 3;              % Exponentiate every entry by a scalar value
+F = A - [2 4 8 ; 9 1 2]; % Add or subtract two matrices of the same size, (element-wise)
+G = A ./ B;              % Divide every entry in A by the corresponding entry in B
+H = A .* B;              % Multiply every entry in A by the corresponding entry in B
+I = A .^ B;              % Exponentiate every entry in A by the corresponding entry in B
+
+%%
+% Matlab also has the .\ operator which is the same as the ./ operator with
+% the order of the operands reversed so that (A ./ B) = (B .\ A). As this
+% is infrequently used, it should be avoided for the sake of clarity. 
+%% Matrix Multiplication 
+% We can also perform matrix multiplication of an m-by-n matrix and an
+% n-by-p matrix yielding an m-by-p matrix. Suppose we multiple A*B = C,
+% then C(i,j) = A(i,:)*B(:,j) , that is, the dot product of the ith row
+% from A and the jth column from B. The dot, (or inner) product of a and b
+% is just *sum(a.*b)*. Further, if A is a square matrix, we can multiply A by
+% itself k times by the matrix exponentiation A^k. 
+ A = [1 2 3 4 ; 5 6 7 8]
+ B = 2*ones(4,3)
+ C = A*B                 % Matrix multiplication of A,B       
+ D = (A * A') / 100      % Matrix multiply A and A', divide every entry by 100
+ E = D ^ 4               % Matrix multiply D by itself 4 four times
+%% Solving linear systems
+% Suppose we have the matrix equation Y = XW where X is an n-by-d matrix, W
+% is a d-by-k matrix and thus Y is an n-by-k matrix. If X is invertible, we
+% could solve for W= inv(X)*Y. The _inv()_ function returns the inverse of
+% a matrix. If n ~= d, however, we can still solve for the least squares
+% estimate of W by taking the pseudo inverse of X, namely inv(X'*X)*X', or
+% more concisely using the Matlab function, _pinv(X)_. Matlab allows you to
+% solve more directly, (and efficiently) for W, (i.e. the lsq estimate of
+% W), however, by using the matrix division X \ Y. Both X and Y must have
+% the same number of rows. (Below we specify a seed to the random number
+% generators so that they return the same values every time this demo is
+% run). 
+seed = 1;       
+rand('twister',seed);randn('state',seed);
+X = randn(100, 8);
+w = randn(8,1);                        % loading vector, Wtrue
+y = X*w;                              % Target or output variable, (no noise)
+%%
+Wlsq = X \ y;                              % recommended way
+Wlsq1 = inv(X'*X)*X'*y;                      % normal eqns - Not the recommended way
+Wlsq2 = pinv(X)*y;                      % Not the recommended way
+[w'; Wlsq'; Wlsq1'; Wlsq2']             % In this simple example, all same
+%% 
+% Matlab also supports matrix right division such that X \ Y = (Y' / X')'
+% but as this is infrequently used, it should be avoided for the sake of
+% clarity. 
+%% More Linear Algebra
+% Matlab was original designed primarily as a linear algebra package,
+% and this remains its forte. Here we only list a few functions
+% for brevity, do not display the results. Many functions can also take
+% additional arguments: type *doc svd* for instance to see documentation
+% for the _svd()_ function.
+A = magic(5); 
+B = det(A);              % The determinant of A
+C = rank(A);             % The rank of A
+E = trace(A);            % sum of diagonal entries
+G = orth(A);             % an orthonormal basis for range of A
+H = null(A);             % an orthonormal basis for the nullspace of A
+I = chol(A*A');          % Cholesky decomposition s.t. if R = chol(X) then R'*R = X
+[evecs,evals] = eig(A);  % eigen vectors and values of A, (use eigs on sparse matrices)
+[U,S,V] = svd(A);        % singular value decomposition s.t. A = U*S*V'
+[Q,R] = qr(A);           % QR decomposition of A
+%% Multidimensional Arrays
+% Numeric matrices in Matlab can extend to an arbitrary number of
+% dimensions, not just 2. We can use the _zeros()_, _ones()_,
+% _rand()_, _randn()_ functions to create n-dimensional matrices by simply
+% specifying n parameters. We can also use _repmat()_ to replicate matrices
+% along any number of dimensions, or the _cat()_ function, which is a
+% generalization of the [] concatenation we saw earlier. Indexing,
+% assignment,and extension work just as before, only with n indices, as
+% opposed to just two. Finally, we can use functions like _sum()_, _mean()_,
+% _max()_ or _min()_ by specifying the dimension over which we want the
+% function to operate. _sum(A,3)_ for example, sums over, or marginalizes
+% out, the 3rd dimension. 
+A = ones(3,5,9,2,2);                % a 5 dimensional array
+B = cat(3,[1 2 ; 4 5],[3 2 ; 1 1])  % concatenate two matrices along the third dimension
+C = repmat([1 2 ; 3 4],[2,2,2,2]);  % tile a matrix in 4D, twice per dimension
+D = C(1,1,1,1)                      % retrieve the entry (1,1,1,1)
+A(1,2,2,1) = 99;                    % assign an entry
+F = mean(C,4);                      % Take the mean along the 4th dimension
+G = max(A,[],3);                    % Take the maximum along the 3rd dimension               
+%%
+% Taking the mean of say a 4-by-4-by-2-by-2 matrix along the 3rd dimension
+% results in a matrix of size 4-by-4-by-1-by-2. If we want to remove the
+% 3rd singleton dimension, (which is only acting now as a place holder) we
+% can use the _squeeze()_ function.
+size(C)
+%%
+E1 = mean(C,3); 
+size(E1)
+E2 = squeeze(E1);
+size(E2)
+%%
+% The _ndims()_ functions indicates how many dimensions an array has. Final
+% singleton dimensions are ignored but singleton dimensions occurring before
+% non-singleton dimensions are not. 
+F = ndims(A)
+G = ndims(squeeze(mean(A,2)))
+%%
+% The _meshgrid()_ function we saw earlier extends to 3 dimensions. If you
+% need to grid n-dimensional space, use the _ndgrid()_ function but keep in
+% mind that the number of elements grows exponentially with the dimension.
+a = 1:10;
+n = numel(ndgrid(a,a,a,a,a,a))      % 1 million entries.
+
+%% Sparse Matrices 
+% When dealing with large matrices containing many zeros, you can save a
+% great deal of space by using Matlab's sparse matrix construct. Sparse
+% matrices can be used just like ordinary matrices but can be slower
+% depending on the operation. The functions _full()_ and _sparse()_ convert
+% back and forth. Currently Matlab supports double and logical sparse
+% matrices.
+A = zeros(100,100);
+A([1,4,8],[7,9,33]) = reshape(1:9,3,3);
+n = nnz(A)              % The number of non-zero entries in A
+nzeros = nonzeros(A);   % All of the non-zero entries in one big column vector
+A = sparse(A)           % Convert to a sparse matrix
+check = issparse(A)     % Is is really a sparse data type?
+B = A * rand(100,1);    % Perform operations as you would with a non sparse matrix
+C = full(A);            % Convert back to a full matrix. 
+%%
+% The _spy()_ function can be used to visualize the sparsity pattern of a
+% matrix. 
+%%
+% The _spalloc()_ function can be used to preallocate space for a sparse
+% matrix. The following command creates a 100-by-100 matrix with room
+% currently for 10 non-zero elements. More than 10 non-zero elements can be
+% added later but this can be slow as Matlab will need to find a larger
+% chunk of memory and copy the non-zero elements. 
+A = spalloc(100,100,10) 
+n = nzmax(A)             % how many non-zero elements do I have room for?
+%% Other numeric data types
+% Matlab has limited support for 11 numeric data types similar to those in
+% the C programming language. Below we create matrices of each type and
+% show the space each matrix requires. Matrices can also be created by
+% using the commands _int8()_ , _single()_ , _int64()_ etc. The _cast()_
+% command, converts from one data type to another. You can determine the
+% class of a variable with the _class()_ command and the maximum or
+% minimum values each class is able to represent with the _intmax()_ ,
+% _intmin()_ , _realmax()_ , and _realmin()_ functions. The uint classes
+% are unsigned and not able to represent negative numbers. Unfortunately 
+% many Matlab functions do not support types other than double or logical.
+% Functions such as _sum()_ have an optional parameter 'native', which
+% performs summation without automatically casting to double. To perform
+% variable precision arithmetic, check out the _vpa()_ function available
+% in the symbolic math toolbox.
+clear
+A = zeros(100,100,'double');        % same as zeros(100,100)
+B = zeros(100,100,'int64');         % signed 64 bit integer
+C = zeros(100,100,'uint64');        % unsigned 64 bit integer
+D = zeros(100,100,'single');        % single precision number
+E = zeros(100,100,'int32');         % signed 32 bit integer
+F = zeros(100,100,'uint32');        % unsigned 32 bit integer
+G = zeros(100,100,'int16');         % signed 16 bit integer
+H = zeros(100,100,'uint16');        % unsigned 16 bit integer
+I = zeros(100,100,'int8');          % signed 8 bit integer
+J = zeros(100,100,'uint8');         % unsigned 8 bit integer
+K = false(100,100);                 % logical array
+whos                                % display size of variables
+AA = realmax('double');             % max sizes representable by different types
+BB = intmax('int64');
+CC = intmax('uint64');
+DD = realmax('single');
+EE = intmax('int32');
+FF = intmax('uint32');
+GG = intmax('int16');
+HH = intmax('uint16');
+II = intmax('int8');
+JJ = intmax('uint8');
+
+K = int32(100);                     % construct an int32 directly
+check1 = class(K);                  % check its class
+L = cast(K,'double');               % cast to a double() - also see typecast()
+check2 = class(L);                  % check its class
+M = int8([3,1,2,1,4]);              % create several int8s
+N = sum(M,'native');                % sum ints in 'native' mode, i.e. don't cast to double
+O = sum(M);                         % don't sum in 'native' mode to see the difference
+class1 = class(N);                  % check the class type
+class2 = class(O);                  % check the class type
+%% Other Useful Functions
+% The _cumsum()_ and _cumprod()_ functions can be useful for generating a
+% running sum or product of an array. The _diff()_ function returns the
+% differences between consecutive elements. You can specify the dimension
+% over which you want them to operate. If you leave this blank, they operate
+% over the first non-singleton dimension. 
+A = cumsum(1:6)
+C = cumprod(1:6)
+D = diff(A)
+%%
+% The histc function is useful for, (among other things) counting the
+% number of occurrences of numbers in an array. 
+A = sort(floor(10*rand(1,10))+1) % random ints from 1 to 10
+counts = histc(A,1:10)           % count how often each int occurs
+%%
+% The _filter()_ function can be used to calculate values that depend on
+% previous values in an array. While it is quite a complicated function,
+% here is an easy way to calculate the points halfway between each
+% consecutive point in an array. The first result is just half the value of
+% the first element. You can calculate a running average in which only a
+% window of k elements are included with filter(ones(1,k)/k,1,data).
+A = 1:10
+B = filter([0.5,0.5],1,A);
+ 
+
+##### SOURCE END #####
+--></body></html>

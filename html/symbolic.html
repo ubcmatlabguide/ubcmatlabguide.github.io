@@ -1,0 +1,825 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML is auto-generated from an M-file.
+To make changes, update the M-file and republish this document.
+      --><title>Symbolic Toolbox and Related Functions</title><meta name="generator" content="MATLAB 7.10"><meta name="date" content="2010-07-15"><meta name="m-file" content="symbolic"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>Symbolic Toolbox and Related Functions</h1><!--introduction--><p>The Symbolic Math Toolkit is a Mathworks package that augments Matlab's existing functionality with the core Maple&reg; symbolic kernel. With this package, you can solve and simplify systems of symbolic equations, find symbolic expressions for the inverse of a function, integrate, differentiate, take limits, and perform Taylor expansions, sums, variable precision arithmetic, or linear algebraic operations. If you have the extended symbolic toolkit, (which we do not discuss here), all of Maple's non-graphics packages are available.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#3">Working with Symbolic Variables</a></li><li><a href="#18">Basic Algebra</a></li><li><a href="#26">Function Inverse</a></li><li><a href="#27">Solving Symbolic Equations</a></li><li><a href="#32">Limits</a></li><li><a href="#34">Symbolic Sums</a></li><li><a href="#35">Taylor Series Expansions</a></li><li><a href="#38">Differentiation</a></li><li><a href="#43">Integration</a></li><li><a href="#45">Multivariate Calculus</a></li><li><a href="#50">Linear Algebra</a></li><li><a href="#61">Variable Precision Arithmetic</a></li><li><a href="#62">Rational Fraction Approximation</a></li></ul></div><p>There is more to this package than we can describe here. For more information, see the online documentation.</p><p>
+<A HREF="http://www.mathworks.com/access/helpdesk/help/pdf_doc/symbolic/symbolic_tb.pdf">Online Documentation</A>
+</p><h2>Working with Symbolic Variables<a name="3"></a></h2><p>Symbolic variables are treated differently than regular variables in Matlab and must be created using the <i>sym()</i> or <i>syms()</i> functions.</p><pre class="codeinput">syms <span class="string">A</span> <span class="string">B</span> <span class="string">lambda</span> <span class="string">X</span> <span class="string">Y</span> <span class="string">Z</span> <span class="string">a</span>
+</pre><p>Constant symbols can be defined too, which are not evaluated numerically.</p><pre class="codeinput">r = sym(sqrt(2)/2)
+rr = r^2
+t = sym(2/3)                        <span class="comment">% Need to use sym here, not syms</span>
+v = r + t
+w = r*2-3/t                         <span class="comment">% notice that r is not evaluated</span>
+q = sym(22/14 + 18/402)             <span class="comment">% add two fractions exactly</span>
+</pre><pre class="codeoutput">r =
+2^(1/2)/2
+rr =
+1/2
+t =
+2/3
+v =
+2^(1/2)/2 + 2/3
+w =
+2^(1/2) - 9/2
+q =
+758/469
+</pre><p>To convert a constant symbolic expression to a regular Matlab double value, use the <i>double()</i> function.</p><pre class="codeinput">double(r)                           <span class="comment">% numerically evaluate r</span>
+</pre><pre class="codeoutput">ans =
+    0.7071
+</pre><p>We can build up more complicated symbolic expressions by defining functions of these variables. Note that these too are symbolic expressions, not function handles.</p><pre class="codeinput">f = cos(X)
+g = exp(X^2 - 2*X)
+h = compose(f,g)                   <span class="comment">% functional composition: f(g(X))</span>
+</pre><pre class="codeoutput">f =
+cos(X)
+g =
+exp(X^2 - 2*X)
+h =
+cos(exp(X^2 - 2*X))
+</pre><p>Functions of multiple variables can also be created.</p><pre class="codeinput">f = X^2 + Y^2 - 2*cos(X)
+g = sqrt(X^2 + Y^2) + Z^2 - lambda
+</pre><pre class="codeoutput">f =
+X^2 - 2*cos(X) + Y^2
+g =
+(X^2 + Y^2)^(1/2) - lambda + Z^2
+</pre><p>The <i>pretty()</i> function tries to display a symbolic expression in a <i>prettier</i> way. It takes a bit of getting used to. Exponents, for example are printed on the line above, trying to mimic how you might write them by hand</p><pre class="codeinput">pretty(g)
+</pre><pre class="codeoutput"> 
+    2    2 1/2             2 
+  (X  + Y )    - lambda + Z
+</pre><p>You can convert an expression to latex as follows</p><pre class="codeinput">latex(g)
+</pre><pre class="codeoutput">ans =
+\sqrt{X^2 + Y^2} - \mathrm{lambda} + Z^2
+</pre><p>You can convert an expression to C code as follows</p><pre class="codeinput">ccode(g)
+</pre><pre class="codeoutput">ans =
+  t0 = -lambda+sqrt(X*X+Y*Y)+Z*Z;
+</pre><p>Symbolic matrices are created in much the same way numeric matrices are.</p><pre class="codeinput">syms <span class="string">E</span> <span class="string">F</span> <span class="string">G</span> <span class="string">H</span> <span class="string">I</span> <span class="string">J</span>
+mat = [E F G ; H I J]
+</pre><pre class="codeoutput">mat =
+[ E, F, G]
+[ H, I, J]
+</pre><p>We will make use of these in the sections to come.</p><p>The <i>subs()</i> function can be used to substitute one value for another, including a numeric value for symbolic one.</p><pre class="codeinput">subs(f,X,3)             <span class="comment">% substitute 3 for X in f</span>
+</pre><pre class="codeoutput">ans =
+Y^2 - 2*cos(3) + 9
+</pre><p>Once all of the symbolic variables are numeric, the result is numerically evaluated. We can prevent this by substituting sym(3) and sym(10) instead.</p><pre class="codeinput">subs(f,{X,Y},{3,10})    <span class="comment">% substitute 3 for X, 10 for Y in f</span>
+</pre><pre class="codeoutput">ans =
+  110.9800
+</pre><pre class="codeinput">subs(f,X,lambda-Y)      <span class="comment">% substitute (lambda - Y) for X in f</span>
+</pre><pre class="codeoutput">ans =
+Y^2 - 2*cos(lambda - Y) + (Y - lambda)^2
+</pre><p>Many operations on symbolic expressions are ambiguous unless the independent variable is specified. If this is not given explicitly, Matlab chooses the variable closest in alphabetical order to x, (ties broken in favor of the end of the alphabet). You can see how Matlab will order the variables in an expression with the <i>findsym()</i> function.</p><pre class="codeinput">findsym(f)
+</pre><pre class="codeoutput">ans =
+X,Y
+</pre><h2>Basic Algebra<a name="18"></a></h2><p>There are a number of functions that we can use to perform basic high school algebra that might be tedious or error prone to do by hand. We have already seen <i>compose()</i>, which belongs on this list.</p><pre class="codeinput">S = (((2*X + 8*X^2)/(2*X)+(2*X^2 - 2*X + X)*(X+2)-(2*X^2 + 2)/(4*X^2 - 2*X^2)*(X+2))/(X+1))+1;
+pretty(S);
+</pre><pre class="codeoutput"> 
+    /                         2 
+    |                 2    8 X  + 2 X 
+1 - | (X + 2) (X - 2 X ) - ---------- + 
+    |                         2 X 
+    \ 
+ 
+       2              \ 
+   (2 X  + 2) (X + 2) | 
+   ------------------ | / (X + 1) 
+             2        | 
+          2 X         /
+</pre><p>We can then factor or expand S.</p><pre class="codeinput">Sf = factor(S);                  <span class="comment">% factor S</span>
+pretty(Sf);
+</pre><pre class="codeoutput"> 
+     5      4      3 
+  2 X  + 3 X  + 2 X  - X - 2 
+  -------------------------- 
+           2 
+          X  (X + 1)
+</pre><pre class="codeinput">Se = expand(S);                  <span class="comment">% expand s</span>
+pretty(Se);
+</pre><pre class="codeoutput"> 
+   2               3 
+3 X       1     2 X        2        X 
+----- - ----- + ----- - ------- + ----- - 
+X + 1   X + 1   X + 1    3    2   X + 1 
+                        X  + X 
+ 
+     1 
+   ------ + 1 
+    2 
+   X  + X
+</pre><p>The <i>simple()</i> and <i>simplify()</i> functions can be used to try and find the simplest representation: <i>simple</i> tends to do better with trigonometric expressions. Surprisingly, we can sometimes get simpler expressions by applying the function multiple times.</p><pre class="codeinput">T = 1/2*(2*tan(1/2*X)/(1+tan(1/2*X)^2)              *<span class="keyword">...</span>
+    (1-tan(1/2*Y)^2)/(1+tan(1/2*Y)^2)-2             *<span class="keyword">...</span>
+    (1-tan(1/2*X)^2)/(1+tan(1/2*X)^2)               *<span class="keyword">...</span>
+    tan(1/2*Y)/(1+tan(1/2*Y)^2))/tan(1/2*X-1/2*Y)   *<span class="keyword">...</span>
+    (1+tan(1/2*X-1/2*Y)^2);
+Tsimple = simple(T)
+TverySimple = simple(simple(T))
+</pre><pre class="codeoutput">Tsimple =
+1
+TverySimple =
+1
+</pre><p>If you call <i>simple()</i> without saving the output, i.e. just <b>simple(T)</b> as opposed to <b>t = simple(T)</b>, it displays many equivalent expressions.</p><p>The <i>collect()</i> function can be used to collect like terms. Here we collect all of the Y variables together and find we have (3X - 3Z) of them</p><pre class="codeinput">t = (X + Y)*(2*X-3*Z)+Z+X*Y-(3*X+4);
+pretty(t);
+</pre><pre class="codeoutput"> 
+  Z - 3 X + X Y + (X + Y) (2 X - 3 Z) - 4
+</pre><pre class="codeinput">t = collect(t,Y);
+pretty(t);
+</pre><pre class="codeoutput"> 
+  (3 X - 3 Z) Y + Z - 3 X + X (2 X - 3 Z) - 4
+</pre><h2>Function Inverse<a name="26"></a></h2><p>We can find the inverse of a function, (if it exists) with <i>finverse()</i>.</p><pre class="codeinput">f = 2*sin(cos(3*log(X)/4))+1
+finv = finverse(f)
+</pre><pre class="codeoutput">f =
+2*sin(cos((3*log(X))/4)) + 1
+Warning: finverse(2*sin(cos((3*ln(X))/4)) + 1)
+cannot be found.  
+finv =
+[ empty sym ]
+</pre><h2>Solving Symbolic Equations<a name="27"></a></h2><p>The <i>solve()</i> function can be used to solve systems of equations, symbolically. Its inputs are either symbolic expressions or strings, with each equation separated by a comma followed by the variable or variables you wish to solve for. The output is a struct with a field for each variable.</p><pre class="codeinput">S = solve(<span class="string">'k = a/(a-b+p)'</span>,<span class="string">'p = k*(1+k)^2/(2*a + b+ 1)'</span>,<span class="string">'a'</span>,<span class="string">'b'</span>)
+</pre><pre class="codeoutput">S = 
+    a: [1x1 sym]
+    b: [1x1 sym]
+</pre><pre class="codeinput">pretty(S.a)
+</pre><pre class="codeoutput"> 
+     4      3    2      2 
+    k  + 2 k  + k  - k p  - k p 
+  - --------------------------- 
+             p - 3 k p
+</pre><pre class="codeinput">pretty(S.b)
+</pre><pre class="codeoutput"> 
+     4    3    2        2 
+    k  + k  - k  + 2 k p  - k p - k + p 
+  - ----------------------------------- 
+                 p - 3 k p
+</pre><p>If the equations do not contain an equals sign, they are assumed equal to 0.</p><pre class="codeinput">pretty(solve(<span class="string">'a*X^2+b*X+c'</span>,<span class="string">'X'</span>))
+</pre><pre class="codeoutput"> 
+  +-                       -+ 
+  |          2         1/2  | 
+  |    b + (b  - 4 a c)     | 
+  |  - -------------------  | 
+  |            2 a          | 
+  |                         | 
+  |          2         1/2  | 
+  |    b - (b  - 4 a c)     | 
+  |  - -------------------  | 
+  |            2 a          | 
+  +-                       -+
+</pre><pre class="codeinput">S = solve(<span class="string">'X = 2*Y-1'</span>,<span class="string">'Y=3*Z'</span>,<span class="string">'Z=X+Y'</span>,<span class="string">'X'</span>,<span class="string">'Y'</span>,<span class="string">'Z'</span>);
+S.X
+S.Y
+S.Z
+</pre><pre class="codeoutput">ans =
+-1/4
+ans =
+3/8
+ans =
+1/8
+</pre><h2>Limits<a name="32"></a></h2><p>We can take limits of functions, (two-sided, as well as left and right) as they approach specific values, (symbolic or numeric) or as they tend to inf or -inf.</p><pre class="codeinput">limit((X-1)/(sqrt(X)-1),1)              <span class="comment">% limit as X --&gt; 2</span>
+limit(X^X/(exp(X)^log(X)),inf)          <span class="comment">% limit as X --&gt; inf</span>
+limit(cos(X)-2*3^X,X,a)                 <span class="comment">% limit as X --&gt; a</span>
+limit(cos(X*Y)^X-2*3^Y,Y,0)             <span class="comment">% limit as Y --&gt; 0</span>
+limit(exp(Y-X),Y,-inf)                  <span class="comment">% limit as Y --&gt; -inf</span>
+</pre><pre class="codeoutput">ans =
+2
+ans =
+1
+ans =
+cos(a) - 2*3^a
+ans =
+-1
+ans =
+0
+</pre><pre class="codeinput">f = 1/(1 + 2^(-1/X));
+limit(f,0)                              <span class="comment">% two sided limit as X --&gt; 0 (D.N.E.)</span>
+limit(f,X,0,<span class="string">'left'</span>)                     <span class="comment">% left  sided limit: X--&gt;0-</span>
+limit(f,X,0,<span class="string">'right'</span>)                    <span class="comment">% right sided limit: X--&gt;0+</span>
+</pre><pre class="codeoutput">ans =
+NaN
+ans =
+0
+ans =
+1
+</pre><h2>Symbolic Sums<a name="34"></a></h2><p>The <i>symsum()</i> function performs symbolic sums. We specify the summand w.r.t. the indexing variable, followed by the start and end indices. The end index can be inf, in which case an infinite sum is performed.</p><pre class="codeinput">symsum(2^(-X),0,inf)
+symsum((-1)^(X+1)*(1/X),1,inf)
+symsum(1/(X^2),1,inf)
+symsum((-1)^(X+1)*(1/(2*X-1)),1,inf)
+symsum(1/X,1,10)
+</pre><pre class="codeoutput">ans =
+2
+ans =
+log(2)
+ans =
+pi^2/6
+ans =
+pi/4
+ans =
+7381/2520
+</pre><h2>Taylor Series Expansions<a name="35"></a></h2><p>We can perform a Taylor expansion of a function. We specify the function, and optionally, the degree of the expansion, (default is 6), and a symbol or numeric value about which the expansion is performed.</p><pre class="codeinput">taylor(sin(X))                      <span class="comment">% 6th order Taylor expansion of sin(X)</span>
+taylor(exp(X))                      <span class="comment">% 6th order Taylor expansion of exp(X)</span>
+</pre><pre class="codeoutput">ans =
+X^5/120 - X^3/6 + X
+ans =
+X^5/120 + X^4/24 + X^3/6 + X^2/2 + X + 1
+</pre><pre class="codeinput">syms <span class="string">A</span>
+pretty(taylor(sin(X),10,A))         <span class="comment">% 10th order expansion about the point A</span>
+</pre><pre class="codeoutput"> 
+                                        3 
+                          cos(A) (A - X) 
+sin(A) - cos(A) (A - X) + --------------- - 
+                                 6 
+ 
+                 5                 7 
+   cos(A) (A - X)    cos(A) (A - X) 
+   --------------- + --------------- - 
+         120              5040 
+ 
+                 9                 2 
+   cos(A) (A - X)    sin(A) (A - X) 
+   --------------- - --------------- + 
+       362880               2 
+ 
+                 4                 6 
+   sin(A) (A - X)    sin(A) (A - X) 
+   --------------- - --------------- + 
+         24                720 
+ 
+                 8 
+   sin(A) (A - X) 
+   --------------- 
+        40320
+</pre><pre class="codeinput">pretty(taylor(int(normpdf(X)),10)); <span class="comment">% 10th order expansion of the integral of the normal distribution</span>
+</pre><pre class="codeoutput"> 
+                9                     7 
+17592186044416 X     140737488355328 X 
+------------------ - ------------------ + 
+152399477208391047   118532926717637481 
+ 
+                    5                     3 
+   281474976710656 X    1125899906842624 X 
+   ------------------ - ------------------- + 
+   28222125408961305     16933275245376783 
+ 
+   2251799813685248 X 
+   ------------------ 
+    5644425081792261
+</pre><h2>Differentiation<a name="38"></a></h2><p>The <i>diff()</i> function performs differentiation.</p><pre class="codeinput">diff(log(X))               <span class="comment">% differentiate with respect to X</span>
+diff(log(X),3)             <span class="comment">% take the 3rd derivative of log(X) w.r.t. X</span>
+diff(Y*sin(X)+2*X^Y,<span class="string">'Y'</span>)   <span class="comment">% differentiate w.r.t Y</span>
+</pre><pre class="codeoutput">ans =
+1/X
+ans =
+2/X^3
+ans =
+sin(X) + 2*X^Y*log(X)
+</pre><p>We can combine <i>diff()</i> with <i>solve()</i> to find maxima and minima</p><pre class="codeinput">solve((diff(sqrt(log(3*X^3-2*X)))))
+</pre><pre class="codeoutput">ans =
+ -2^(1/2)/3
+  2^(1/2)/3
+</pre><p>Here we attempt to find the MLE for the product of N univariate Gaussians. Unfortunately, we have to specify a value for N and proceed via induction.</p><pre class="codeinput">syms <span class="string">mu</span> <span class="string">s2</span> <span class="string">pi</span>
+normconst = sqrt(2*pi*s2);                                <span class="comment">% s2 for sigma^2</span>
+NormPDF = (1/normconst)*exp((-(X-mu)^2)/(2*s2));          <span class="comment">% single Gaussian distribution</span>
+prodNorm = 1;
+N = 5;                                                    <span class="comment">% we will start with N=5</span>
+<span class="keyword">for</span> i=1:N
+   syms([<span class="string">'X'</span>,num2str(i)]);
+   prodNorm =  prodNorm*subs(NormPDF,X,[<span class="string">'X'</span>,num2str(i)]); <span class="comment">% take product of N Gaussians</span>
+<span class="keyword">end</span>
+muMLE = solve(diff(prodNorm,mu),mu);                      <span class="comment">% MLE w.r.t. mu</span>
+s2MLE = solve(diff(prodNorm,s2),s2);                      <span class="comment">% MLE w.r.t. sigma^2</span>
+pretty(muMLE)
+</pre><pre class="codeoutput"> 
+  X1   X2   X3   X4   X5 
+  -- + -- + -- + -- + -- 
+  5    5    5    5    5
+</pre><p>We can easily spot the pattern: (1/N)sum(X)</p><p>Unfortunately, s2MLE is not quite as pretty.</p><pre class="codeinput">pretty(s2MLE)
+</pre><pre class="codeoutput"> 
+  2               2               2 
+X1    2 X1 mu   X2    2 X2 mu   X3    2 X3 mu 
+--- - ------- + --- - ------- + --- - ------- + 
+ 5       5       5       5       5       5 
+ 
+     2               2 
+   X4    2 X4 mu   X5    2 X5 mu     2 
+   --- - ------- + --- - ------- + mu 
+    5       5       5       5
+</pre><h2>Integration<a name="43"></a></h2><p>The <i>int()</i> function can perform definite and indefinite integration.</p><pre class="codeinput">int(log(X))                         <span class="comment">%indefinite integral w.r.t X</span>
+int(sin(X)^2)                       <span class="comment">%indefinite integral w.r.t X</span>
+int(int(log(X+Y),<span class="string">'X'</span>),<span class="string">'Y'</span>)          <span class="comment">%indefinite integral w.r.t Y</span>
+</pre><pre class="codeoutput">ans =
+X*(log(X) - 1)
+ans =
+X/2 - sin(2*X)/4
+ans =
+((X + Y)^2*(2*log(X + Y) - 3))/4
+</pre><pre class="codeinput">result = int(2*X*log(X),1,10)       <span class="comment">% definite integral</span>
+double(result)                      <span class="comment">% convert exact to a double</span>
+</pre><pre class="codeoutput">result =
+100*log(10) - 99/2
+ans =
+  180.7585
+</pre><h2>Multivariate Calculus<a name="45"></a></h2><p>Here we take the Jacobian of f with respect to v, where both are vectors.</p><pre class="codeinput">syms <span class="string">r</span> <span class="string">theta</span>
+v = [r theta];
+x1 = r*cos(theta);
+x2 = r*sin(theta);
+f = [x1,x2];
+J = jacobian(f,v)
+</pre><pre class="codeoutput">J =
+[ cos(theta), -r*sin(theta)]
+[ sin(theta),  r*cos(theta)]
+</pre><p>We can calculate the determinant exactly.</p><pre class="codeinput">detJ = (det(J))
+</pre><pre class="codeoutput">detJ =
+r*cos(theta)^2 + r*sin(theta)^2
+</pre><p>Lets simplify the above expression.</p><pre class="codeinput">detJ = simplify(detJ)
+</pre><pre class="codeoutput">detJ =
+r
+</pre><p>We can also use this function to compute a gradient, so long as our function f is scalar valued.</p><pre class="codeinput">syms <span class="string">X</span> <span class="string">Y</span> <span class="string">Z</span>
+f = 2*sin(X) + cos(Y)^2 -3*log(Z)
+J = jacobian(f,[X,Y,Z]);
+pretty(J);
+</pre><pre class="codeoutput">f =
+cos(Y)^2 - 3*log(Z) + 2*sin(X)
+ 
+  +-                                   -+ 
+  |                                  3  | 
+  |  2 cos(X), (-2) cos(Y) sin(Y), - -  | 
+  |                                  Z  | 
+  +-                                   -+
+</pre><h2>Linear Algebra<a name="50"></a></h2><p>We can create symbolic matrices as we saw above, and perform various operations. Constant symbols can be used to perform computations exactly.</p><pre class="codeinput">clear
+syms <span class="string">a</span> <span class="string">b</span> <span class="string">c</span> <span class="string">d</span> <span class="string">e</span> <span class="string">f</span> <span class="string">g</span> <span class="string">h</span> <span class="string">i</span> <span class="string">j</span> <span class="string">k</span> <span class="string">l</span> <span class="string">m</span> <span class="string">n</span> <span class="string">o</span> <span class="string">p</span>
+A = [a b ; c d ; e f];
+B = [g h i ; j k l];
+C = A*B
+</pre><pre class="codeoutput">C =
+[ a*g + b*j, a*h + b*k, a*i + b*l]
+[ c*g + d*j, c*h + d*k, c*i + d*l]
+[ e*g + f*j, e*h + f*k, e*i + f*l]
+</pre><pre class="codeinput">D = [a b ; c d];
+inv(D)
+</pre><pre class="codeoutput">ans =
+[  d/(a*d - b*c), -b/(a*d - b*c)]
+[ -c/(a*d - b*c),  a/(a*d - b*c)]
+</pre><pre class="codeinput">det(D)
+</pre><pre class="codeoutput">ans =
+a*d - b*c
+</pre><pre class="codeinput">eig(D)
+</pre><pre class="codeoutput">ans =
+ a/2 + d/2 - (a^2 - 2*a*d + d^2 + 4*b*c)^(1/2)/2
+ a/2 + d/2 + (a^2 - 2*a*d + d^2 + 4*b*c)^(1/2)/2
+</pre><pre class="codeinput">E = sym([1/3 4/15 2/5 ; 2/3 1/3 0; 1/2 1/4 1/4])
+E2 = E^2
+</pre><pre class="codeoutput">E =
+[ 1/3, 4/15, 2/5]
+[ 2/3,  1/3,   0]
+[ 1/2,  1/4, 1/4]
+E2 =
+[ 22/45,   5/18,  7/30]
+[   4/9,  13/45,  4/15]
+[ 11/24, 67/240, 21/80]
+</pre><pre class="codeinput">det(E)
+</pre><pre class="codeoutput">ans =
+-1/60
+</pre><pre class="codeinput">inv(E)
+</pre><pre class="codeoutput">ans =
+[ -5, -2,   8]
+[ 10,  7, -16]
+[  0, -3,   4]
+</pre><p>Here we try and compute the SVD exactly but to no avail. We can find a rational approximation to the entries, however, by using the <i>rats()</i> function, which we discuss in more depth below.</p><pre class="codeinput">[U S V] = svd(E)               <span class="comment">% compute the SVD of E</span>
+U = rats(double(U))
+S = rats(double(S))
+V = rats(double(V))
+</pre><pre class="codeoutput">U =
+[ 0.49109823962669798664999567078201, -0.72406791233697925247981479395538, -0.48430174205708454355751477479149]
+[ 0.65982853521141748292248273038817,  0.67217592578665185464712183886594, -0.33586579003169211900746006123949]
+[ 0.56872561324096659876202200872008, -0.15461301082646966779516726932017,  0.80786508386416877686874947261274]
+S =
+[ 1.0706292924174921593709666623039,                                  0,                                   0]
+[                                 0, 0.35296678714206734207932738121935,                                   0]
+[                                 0,                                  0, 0.044103777275924655598566463054976]
+V =
+[ 0.82937008753546424369310341285868,   0.36676200815867437795437640947586,   0.4214627946483922404785452801969]
+[ 0.46055509823988214272694229122357, -0.021756685559871156482933444224287, -0.88736443929126515473068325503709]
+[ 0.31628193022471088744597118209586,  -0.93006036148460029020028489223978,  0.18695845690544664601643216465309]
+U =
+    331/674      -349/482      -108/223   
+    225/341       244/363      -221/658   
+    571/1004      -62/401       185/229   
+S =
+   1531/1430         0             0      
+       0          809/2292         0      
+       0             0           46/1043  
+V =
+    593/715       128/349       161/382   
+    216/469       -27/1241     -323/364   
+     68/215      -625/672        43/230   
+</pre><p>Symbolic and non-symbolic expressions can be combined.</p><pre class="codeinput">[a b ; c d]*[2 0 ; 3 5]
+</pre><pre class="codeoutput">ans =
+[ 2*a + 3*b, 5*b]
+[ 2*c + 3*d, 5*d]
+</pre><p>Here we test the correctness of the Matrix Inversion Lemma. We define A,B,C, and D to be arbitrary square matrices. Unfortunately, their size is fixed and so the test is not perfectly general.</p><p>Keep in mind that two symbolic equations are only considered equal if Matlab is able to <i>find</i> identical representations of each. Its searches are not exhaustive and as such, it might claim that two expressions are unequal, when in fact they are, but not conversely.</p><pre class="codeinput">syms <span class="string">a</span> <span class="string">b</span> <span class="string">c</span> <span class="string">d</span> <span class="string">e</span> <span class="string">f</span> <span class="string">g</span> <span class="string">h</span> <span class="string">i</span> <span class="string">j</span> <span class="string">k</span> <span class="string">l</span> <span class="string">m</span> <span class="string">n</span> <span class="string">o</span> <span class="string">p</span>
+A = [ a b ; c d]; B= [e f ; g h];
+C = [ i j ; k l]; D = [m n ; o p];
+
+lhs = inv([A B ; C D]);
+
+rhs11 = inv(A) + inv(A)*B*inv(D-C*inv(A)*B)*C*inv(A);
+rhs12 = -inv(A)*B*inv(D - C*inv(A)*B);
+rhs21 = -inv(D-C*inv(A)*B)*C*inv(A);
+rhs22 = inv(D-C*inv(A)*B);
+rhs = [rhs11 rhs12 ; rhs21 rhs22];
+
+test = simplify(lhs) == simplify(rhs)
+</pre><pre class="codeoutput">test =
+     1     1     1     1
+     1     1     1     1
+     1     1     1     1
+     1     1     1     1
+</pre><h2>Variable Precision Arithmetic<a name="61"></a></h2><p>The <i>vpa()</i> function lets us perform variable precision arithmetic. The default is 32 digits, which can be changed for the current session with the <i>digits()</i> function.</p><pre class="codeinput">PI = vpa(pi,80)                         <span class="comment">% pi to 80 digits</span>
+s = vpa(sin(sqrt(2)/2),40)              <span class="comment">% calculate to 40 digits</span>
+</pre><pre class="codeoutput">PI =
+3.141592653589793115997963468544185161590576171875
+s =
+0.6496369390800624810111685292213223874569
+</pre><h2>Rational Fraction Approximation<a name="62"></a></h2><p>As the title suggests, we an approximate any real number as a rational fraction, (whose numerator and denominator are relatively prime). This is actually a Matlab function, (not from the symbolic toolbox).</p><pre class="codeinput">q = rats((22/14) + (18/402))
+e = rats(exp(1))
+simplified = rats(940/40)
+val = rats(9.352422118484)
+</pre><pre class="codeoutput">q =
+    758/469   
+e =
+   1457/536   
+simplified =
+     47/2     
+val =
+   2123/227   
+</pre><pre class="codeinput">clear
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.10<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Symbolic Toolbox and Related Functions
+% The Symbolic Math Toolkit is a Mathworks package that augments Matlab's
+% existing functionality with the core Maple(R) symbolic kernel. With this
+% package, you can solve and simplify systems of symbolic equations, find
+% symbolic expressions for the inverse of a function, integrate,
+% differentiate, take limits, and perform Taylor expansions, sums, variable
+% precision arithmetic, or linear algebraic operations. If you have the
+% extended symbolic toolkit, (which we do not discuss here), all of Maple's
+% non-graphics packages are available. 
+%%
+% There is more to this package than we can describe here. For more
+% information, see the online documentation.
+%%
+% <html>
+% <A HREF="http://www.mathworks.com/access/helpdesk/help/pdf_doc/symbolic/symbolic_tb.pdf">Online Documentation</A>
+% </html>
+%% Working with Symbolic Variables
+% Symbolic variables are treated differently than regular variables in
+% Matlab and must be created using the _sym()_ or _syms()_ functions. 
+syms A B lambda X Y Z a
+%%
+% Constant symbols can be defined too, which are not evaluated numerically.
+%%
+r = sym(sqrt(2)/2)                          
+rr = r^2
+t = sym(2/3)                        % Need to use sym here, not syms
+v = r + t
+w = r*2-3/t                         % notice that r is not evaluated
+q = sym(22/14 + 18/402)             % add two fractions exactly
+%%
+% To convert a constant symbolic expression to a regular Matlab double
+% value, use the _double()_ function.
+double(r)                           % numerically evaluate r
+%%
+% We can build up more complicated symbolic expressions by defining
+% functions of these variables. Note that these too are symbolic
+% expressions, not function handles. 
+f = cos(X)
+g = exp(X^2 - 2*X)                
+h = compose(f,g)                   % functional composition: f(g(X))
+%%
+% Functions of multiple variables can also be created. 
+f = X^2 + Y^2 - 2*cos(X)    
+g = sqrt(X^2 + Y^2) + Z^2 - lambda
+%%
+% The _pretty()_ function tries to display a symbolic expression in a
+% _prettier_ way. It takes a bit of getting used to. Exponents, for example
+% are printed on the line above, trying to mimic how you might write them
+% by hand
+pretty(g)
+%%
+% You can convert an expression to latex as follows
+latex(g)
+%%
+% You can convert an expression to C code as follows
+ccode(g)
+%%
+% Symbolic matrices are created in much the same way numeric matrices are. 
+syms E F G H I J
+mat = [E F G ; H I J]
+%%
+% We will make use of these in the sections to come.
+%%
+% The _subs()_ function can be used to substitute one value for another,
+% including a numeric value for symbolic one.
+subs(f,X,3)             % substitute 3 for X in f
+%%
+% Once all of the symbolic variables are numeric, the result is numerically
+% evaluated. We can prevent this by substituting sym(3) and sym(10) instead.
+subs(f,{X,Y},{3,10})    % substitute 3 for X, 10 for Y in f
+%%
+subs(f,X,lambda-Y)      % substitute (lambda - Y) for X in f
+%%
+% Many operations on symbolic expressions are ambiguous unless the
+% independent variable is specified. If this is not given explicitly,
+% Matlab chooses the variable closest in alphabetical order to x, (ties
+% broken in favor of the end of the alphabet). You can see how Matlab will
+% order the variables in an expression with the _findsym()_ function. 
+findsym(f)
+%% Basic Algebra
+% There are a number of functions that we can use to perform basic
+% high school algebra that might be tedious or error prone to do by hand. We
+% have already seen _compose()_, which belongs on this list. 
+S = (((2*X + 8*X^2)/(2*X)+(2*X^2 - 2*X + X)*(X+2)-(2*X^2 + 2)/(4*X^2 - 2*X^2)*(X+2))/(X+1))+1;
+pretty(S);
+%%
+% We can then factor or expand S.
+Sf = factor(S);                  % factor S
+pretty(Sf);             
+%%
+Se = expand(S);                  % expand s
+pretty(Se);
+%%
+% The _simple()_ and _simplify()_ functions can be used to try and find the
+% simplest representation: _simple_ tends to do better with trigonometric
+% expressions. Surprisingly, we can sometimes get simpler expressions by
+% applying the function multiple times. 
+%% 
+T = 1/2*(2*tan(1/2*X)/(1+tan(1/2*X)^2)              *...
+    (1-tan(1/2*Y)^2)/(1+tan(1/2*Y)^2)-2             *...
+    (1-tan(1/2*X)^2)/(1+tan(1/2*X)^2)               *...
+    tan(1/2*Y)/(1+tan(1/2*Y)^2))/tan(1/2*X-1/2*Y)   *...
+    (1+tan(1/2*X-1/2*Y)^2);
+Tsimple = simple(T)
+TverySimple = simple(simple(T))
+%%
+% If you call _simple()_ without saving the output, i.e. just *simple(T)*
+% as opposed to *t = simple(T)*, it displays many equivalent
+% expressions. 
+%%
+% The _collect()_ function can be used to collect like terms. Here we
+% collect all of the Y variables together and find we have (3X - 3Z) of
+% them
+t = (X + Y)*(2*X-3*Z)+Z+X*Y-(3*X+4);
+pretty(t);
+%%
+t = collect(t,Y);
+pretty(t);
+%% Function Inverse
+% We can find the inverse of a function, (if it exists) with _finverse()_.
+f = 2*sin(cos(3*log(X)/4))+1
+finv = finverse(f)
+%% Solving Symbolic Equations
+% The _solve()_ function can be used to solve systems of equations,
+% symbolically. Its inputs are either symbolic expressions or strings, with
+% each equation separated by a comma followed by the variable or variables
+% you wish to solve for. The output is a struct with a field
+% for each variable. 
+S = solve('k = a/(a-b+p)','p = k*(1+k)^2/(2*a + b+ 1)','a','b')
+%%
+pretty(S.a)
+%%
+pretty(S.b)
+%%
+% If the equations do not contain an equals sign, they are assumed equal to
+% 0.
+pretty(solve('a*X^2+b*X+c','X'))
+%%
+%
+S = solve('X = 2*Y-1','Y=3*Z','Z=X+Y','X','Y','Z');
+S.X
+S.Y
+S.Z
+%% Limits
+% We can take limits of functions, (two-sided, as well as left and
+% right) as they approach specific values, (symbolic or numeric) or as they
+% tend to inf or -inf.
+limit((X-1)/(sqrt(X)-1),1)              % limit as X REPLACE_WITH_DASH_DASH> 2
+limit(X^X/(exp(X)^log(X)),inf)          % limit as X REPLACE_WITH_DASH_DASH> inf
+limit(cos(X)-2*3^X,X,a)                 % limit as X REPLACE_WITH_DASH_DASH> a
+limit(cos(X*Y)^X-2*3^Y,Y,0)             % limit as Y REPLACE_WITH_DASH_DASH> 0
+limit(exp(Y-X),Y,-inf)                  % limit as Y REPLACE_WITH_DASH_DASH> -inf  
+%%
+f = 1/(1 + 2^(-1/X));
+limit(f,0)                              % two sided limit as X REPLACE_WITH_DASH_DASH> 0 (D.N.E.)
+limit(f,X,0,'left')                     % left  sided limit: XREPLACE_WITH_DASH_DASH>0-
+limit(f,X,0,'right')                    % right sided limit: XREPLACE_WITH_DASH_DASH>0+
+%% Symbolic Sums
+% The _symsum()_ function performs symbolic sums. We specify the summand
+% w.r.t. the indexing variable, followed by the start and end indices. The
+% end index can be inf, in which case an infinite sum is performed. 
+symsum(2^(-X),0,inf)
+symsum((-1)^(X+1)*(1/X),1,inf)
+symsum(1/(X^2),1,inf)
+symsum((-1)^(X+1)*(1/(2*X-1)),1,inf)
+symsum(1/X,1,10)
+%% Taylor Series Expansions
+% We can perform a Taylor expansion of a function. We specify the function,
+% and optionally, the degree of the expansion, (default is 6), and a symbol
+% or numeric value about which the expansion is performed. 
+taylor(sin(X))                      % 6th order Taylor expansion of sin(X)
+taylor(exp(X))                      % 6th order Taylor expansion of exp(X)
+%%
+syms A                             
+pretty(taylor(sin(X),10,A))         % 10th order expansion about the point A
+%%
+pretty(taylor(int(normpdf(X)),10)); % 10th order expansion of the integral of the normal distribution
+%% Differentiation
+% The _diff()_ function performs differentiation.
+diff(log(X))               % differentiate with respect to X
+diff(log(X),3)             % take the 3rd derivative of log(X) w.r.t. X
+diff(Y*sin(X)+2*X^Y,'Y')   % differentiate w.r.t Y
+%%
+% We can combine _diff()_ with _solve()_ to find maxima and minima
+solve((diff(sqrt(log(3*X^3-2*X)))))
+%%
+% Here we attempt to find the MLE for the product of N univariate
+% Gaussians. Unfortunately, we have to specify a value for N and proceed
+% via induction.
+syms mu s2 pi
+normconst = sqrt(2*pi*s2);                                % s2 for sigma^2
+NormPDF = (1/normconst)*exp((-(X-mu)^2)/(2*s2));          % single Gaussian distribution
+prodNorm = 1;                   
+N = 5;                                                    % we will start with N=5
+for i=1:N
+   syms(['X',num2str(i)]);
+   prodNorm =  prodNorm*subs(NormPDF,X,['X',num2str(i)]); % take product of N Gaussians
+end
+muMLE = solve(diff(prodNorm,mu),mu);                      % MLE w.r.t. mu
+s2MLE = solve(diff(prodNorm,s2),s2);                      % MLE w.r.t. sigma^2
+pretty(muMLE)
+%%
+% We can easily spot the pattern: (1/N)sum(X)
+%%
+% Unfortunately, s2MLE is not quite as pretty.
+pretty(s2MLE)
+%% Integration
+% The _int()_ function can perform definite and indefinite integration.
+int(log(X))                         %indefinite integral w.r.t X
+int(sin(X)^2)                       %indefinite integral w.r.t X
+int(int(log(X+Y),'X'),'Y')          %indefinite integral w.r.t Y
+%%
+result = int(2*X*log(X),1,10)       % definite integral
+double(result)                      % convert exact to a double
+%% Multivariate Calculus
+%%
+% Here we take the Jacobian of f with respect to v, where both are vectors.
+syms r theta
+v = [r theta];
+x1 = r*cos(theta);
+x2 = r*sin(theta);
+f = [x1,x2];
+J = jacobian(f,v)
+%%
+% We can calculate the determinant exactly.
+detJ = (det(J))
+%%
+% Lets simplify the above expression.
+detJ = simplify(detJ)
+%%
+% We can also use this function to compute a gradient, so long as our
+% function f is scalar valued.
+syms X Y Z
+f = 2*sin(X) + cos(Y)^2 -3*log(Z)
+J = jacobian(f,[X,Y,Z]);
+pretty(J);
+%% Linear Algebra
+% We can create symbolic matrices as we saw above, and perform various
+% operations. Constant symbols can be used to perform computations
+% exactly.
+clear
+syms a b c d e f g h i j k l m n o p
+A = [a b ; c d ; e f];
+B = [g h i ; j k l];
+C = A*B
+%%
+D = [a b ; c d];
+inv(D)
+%%
+det(D)
+%%
+eig(D)
+%%
+E = sym([1/3 4/15 2/5 ; 2/3 1/3 0; 1/2 1/4 1/4])
+E2 = E^2
+%%
+det(E)
+%%
+inv(E)
+%%
+% Here we try and compute the SVD exactly but to no avail. We can
+% find a rational approximation to the entries, however, by using the
+% _rats()_ function, which we discuss in more depth below.
+[U S V] = svd(E)               % compute the SVD of E
+U = rats(double(U))
+S = rats(double(S))
+V = rats(double(V))
+%%
+% Symbolic and non-symbolic expressions can be combined. 
+[a b ; c d]*[2 0 ; 3 5]
+%%
+% Here we test the correctness of the Matrix Inversion Lemma. We define
+% A,B,C, and D to be arbitrary square matrices. Unfortunately, their
+% size is fixed and so the test is not perfectly general. 
+%%
+% Keep in mind that two symbolic equations are only considered equal if
+% Matlab is able to _find_ identical representations of each. Its searches
+% are not exhaustive and as such, it might claim that two expressions are
+% unequal, when in fact they are, but not conversely. 
+
+syms a b c d e f g h i j k l m n o p
+A = [ a b ; c d]; B= [e f ; g h]; 
+C = [ i j ; k l]; D = [m n ; o p];
+
+lhs = inv([A B ; C D]);
+
+rhs11 = inv(A) + inv(A)*B*inv(D-C*inv(A)*B)*C*inv(A);
+rhs12 = -inv(A)*B*inv(D - C*inv(A)*B);
+rhs21 = -inv(D-C*inv(A)*B)*C*inv(A);
+rhs22 = inv(D-C*inv(A)*B);
+rhs = [rhs11 rhs12 ; rhs21 rhs22];
+
+test = simplify(lhs) == simplify(rhs)
+
+%% Variable Precision Arithmetic
+% The _vpa()_ function lets us perform variable precision arithmetic. The
+% default is 32 digits, which can be changed for the current session with
+% the _digits()_ function. 
+PI = vpa(pi,80)                         % pi to 80 digits
+s = vpa(sin(sqrt(2)/2),40)              % calculate to 40 digits
+%% Rational Fraction Approximation
+%%
+% As the title suggests, we an approximate any real number as a rational
+% fraction, (whose numerator and denominator are relatively prime). This is
+% actually a Matlab function, (not from the symbolic toolbox).
+q = rats((22/14) + (18/402))
+e = rats(exp(1))
+simplified = rats(940/40)
+val = rats(9.352422118484)
+%%
+clear
+##### SOURCE END #####
+--></body></html>

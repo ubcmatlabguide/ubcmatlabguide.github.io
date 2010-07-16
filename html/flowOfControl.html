@@ -1,0 +1,294 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML is auto-generated from an M-file.
+To make changes, update the M-file and republish this document.
+      --><title>Flow of Control</title><meta name="generator" content="MATLAB 7.10"><meta name="date" content="2010-07-15"><meta name="m-file" content="flowOfControl"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>Flow of Control</h1><!--introduction--><p>Matlab's constructs for controlling the conditional execution of commands are very similar to those found in most popular programming languages. One major difference, however, is that variables created within the if, for, while, switch, and try statements, are not locally scoped but instead share their scope with all variables in the same function. This is quite unlike java, for example, where a variable created inside a loop can only be used inside that loop.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#2">if, else, elseif</a></li><li><a href="#7">switch statements</a></li><li><a href="#8">for loops</a></li><li><a href="#11">while loops</a></li><li><a href="#15">try/catch statements</a></li></ul></div><p>
+<META HTTP-EQUIV="PRAGMA" CONTENT="NO-CACHE">
+</p><h2>if, else, elseif<a name="2"></a></h2><p>Matlab <i>if</i> statements allow you to execute different code depending on the current state of the program, i.e. the values of certain variables.</p><pre class="codeinput">test1 = true;
+test2 = false;
+test3 = false;
+</pre><pre class="codeinput"><span class="keyword">if</span>(test1), A = 1; <span class="keyword">end</span>       <span class="comment">% simple if statement on one line. A=1 executed if test1 is true</span>
+</pre><pre class="codeinput"><span class="keyword">if</span>(test1)
+    A = 2;                  <span class="comment">% executed if test1 = true</span>
+<span class="keyword">else</span>
+    A = 3;                  <span class="comment">% executed if test1 = false</span>
+<span class="keyword">end</span>
+</pre><pre class="codeinput"><span class="keyword">if</span>(test1)
+    A = 3;                  <span class="comment">% executed if test1 = true</span>
+<span class="keyword">elseif</span>(test2)
+    A = 4;                  <span class="comment">% executed if test1 = false and test2 = true</span>
+<span class="keyword">elseif</span>(test3)
+    A = 5;                  <span class="comment">% executed if test1 = false, test2 = false, test3 = true</span>
+<span class="keyword">else</span>
+    A = 6;                  <span class="comment">% executed if test1=test2=test3=false</span>
+<span class="keyword">end</span>
+</pre><p>All if statements must end with an <i>end</i> statement.</p><h2>switch statements<a name="7"></a></h2><p>Switch statements are useful when what code to execute depends on a variable that takes on a countable number of values. Most commonly, this value is an integer or a string. Switch statements can be replaced by a long series of if-else statements but this usually results in less readable code. Note that unlike languages such as C or java, switch statements do not <i>fall through</i>; that is, the code from, (at most), one case statement is executed. As such, break statements are not necessary.</p><pre class="codeinput">color = <span class="string">'blue'</span>;
+<span class="keyword">switch</span> color                    <span class="comment">% switching variable</span>
+    <span class="keyword">case</span> <span class="string">'red'</span>
+        A = 1;                  <span class="comment">% code for case 'red'</span>
+    <span class="keyword">case</span> <span class="string">'blue'</span>
+        A = 2;
+    <span class="keyword">case</span> {<span class="string">'green'</span>,<span class="string">'purple'</span>}     <span class="comment">% either 'green' or 'purple'</span>
+        A = 3;
+    <span class="keyword">otherwise</span>                   <span class="comment">% optional 'catch all'</span>
+        A = 4;
+<span class="keyword">end</span>
+</pre><h2>for loops<a name="8"></a></h2><p>For loops allow you to execute a block of code a specified number of times. That number can be determined dynamically as the program runs.</p><pre class="codeinput">n = ceil(100*rand);                 <span class="comment">% can be set dynamically</span>
+A = zeros(n,1);                     <span class="comment">% improve speed by preallocating space</span>
+<span class="keyword">for</span> i=1:n                           <span class="comment">% set i = 1, then loop and increment i by 1, until i = n</span>
+    A(i,1) = max(i,50);             <span class="comment">% execute code within the loop - usually depends on i.</span>
+<span class="keyword">end</span>                                 <span class="comment">% both i and A can then be accessed outside the loop.</span>
+</pre><p>We can terminate for loops early in several ways. <b>Continue</b> instructs Matlab to skip directly to the next iteration of the current loop without  executing the lines directly below the continue command. <b>Break</b> breaks from the current loop completely. <b>Return</b> breaks completely from the current script or function without executing any further code.</p><pre class="codeinput">A = rand(20,20,20);
+counter = 0;
+<span class="keyword">for</span> i=1:size(A,1)
+    <span class="keyword">for</span> j=2:size(A,2)
+        <span class="keyword">for</span> k=3:size(A,3)
+            <span class="comment">%if k is even, go immediately to beginning of loop</span>
+            <span class="keyword">if</span>(mod(k,2) == 0),          <span class="keyword">continue</span>; <span class="keyword">end</span>
+            <span class="comment">%if j+k is prime, break from this inner loop completely</span>
+            <span class="keyword">if</span>(isprime(j+k)),           <span class="keyword">break</span>   ; <span class="keyword">end</span>
+            <span class="comment">%if all three of i,j,k prime, stop all further execution.</span>
+            <span class="keyword">if</span>(all(isprime([i,j,k])) &amp;&amp; false),  <span class="keyword">return</span>  ; <span class="keyword">end</span>
+            <span class="keyword">if</span>(isprime(floor(100*A(i,j,k))))
+                counter = counter + 1;
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><p>The continue, break, and return statements should be used sparingly as they can easily obscure the code and can almost always be replaced by if,else,elseif statements.</p><h2>while loops<a name="11"></a></h2><p>While loops are used to execute a block of code until some condition is satisfied. This condition is usually more complicated than simply reaching a set number of iterations as with a for loop. The comments on scope, and the continue, break and return statements apply equally to while loops.</p><pre class="codeinput">A = true; B = true; C = true;
+val = 1;
+<span class="keyword">while</span>(A || B || C)
+    val = 2*val +1;
+    A = isprime(val);
+    B = val &lt; 10;
+    C = ((round(sqrt(val)))^2) == val;
+<span class="keyword">end</span>
+</pre><p>Here is common code idiom involving break. This effectively allows us to test at the end of the loop, (or in multiple spots).</p><pre>while(true)
+    %execute code
+    if(condition)
+        break;
+    end
+end</pre><p>
+<A NAME="tryCatch"></A>
+</p><h2>try/catch statements<a name="15"></a></h2><p>Try/catch blocks give you some control over Matlab error handling. They are useful for executing code that might potentially fail, such as writing to a file, allowing you to perform cleanup or recover gracefully. In the example below, ME stands for 'matlab exception'; this is an object of type Exception.</p><pre class="codeinput">a = rand;
+b = a*(a&lt; 0.5);
+<span class="keyword">try</span>
+    c = a / b;
+    assert(true);                       <span class="comment">% set to false to have code throw an error</span>
+<span class="keyword">catch</span> ME                                <span class="comment">% disaster recovery, cleanup, inform user, etc...</span>
+    display(<span class="string">'Something went wrong'</span>);
+    warning(<span class="string">'WARNING:ID'</span>,<span class="string">'my own warning message'</span>);
+    display(ME.message);                <span class="comment">% ME is a structure with info on the error</span>
+    <span class="comment">%error('my own error message');     % stops execution</span>
+    <span class="comment">%rethrow(ME);                       % rethrows the original error and stops execution</span>
+<span class="keyword">end</span>
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.10<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Flow of Control 
+%
+% Matlab's constructs for controlling the conditional execution of commands
+% are very similar to those found in most popular programming languages.
+% One major difference, however, is that variables created within the if,
+% for, while, switch, and try statements, are not locally scoped but
+% instead share their scope with all variables in the same function. This
+% is quite unlike java, for example, where a variable created inside a loop
+% can only be used inside that loop. 
+%%
+% <html>
+% <META HTTP-EQUIV="PRAGMA" CONTENT="NO-CACHE">
+% </html>
+%% if, else, elseif
+% Matlab _if_ statements allow you to execute different code depending on the
+% current state of the program, i.e. the values of certain variables. 
+test1 = true;
+test2 = false;
+test3 = false;
+%%
+if(test1), A = 1; end       % simple if statement on one line. A=1 executed if test1 is true
+%%
+if(test1)
+    A = 2;                  % executed if test1 = true
+else
+    A = 3;                  % executed if test1 = false
+end
+%%
+if(test1)
+    A = 3;                  % executed if test1 = true
+elseif(test2)
+    A = 4;                  % executed if test1 = false and test2 = true
+elseif(test3)
+    A = 5;                  % executed if test1 = false, test2 = false, test3 = true
+else
+    A = 6;                  % executed if test1=test2=test3=false
+end
+%%
+% All if statements must end with an _end_ statement.
+%% switch statements
+% Switch statements are useful when what code to execute depends on a
+% variable that takes on a countable number of values. Most commonly, this
+% value is an integer or a string. Switch statements can be replaced by a
+% long series of if-else statements but this usually results in less
+% readable code. Note that unlike languages such as C or java, switch
+% statements do not _fall through_; that is, the code from, (at most), one
+% case statement is executed. As such, break statements are not necessary.
+color = 'blue';        
+switch color                    % switching variable
+    case 'red'                  
+        A = 1;                  % code for case 'red'
+    case 'blue'
+        A = 2;
+    case {'green','purple'}     % either 'green' or 'purple'
+        A = 3;
+    otherwise                   % optional 'catch all'
+        A = 4;
+end            
+%% for loops
+% For loops allow you to execute a block of code a specified number of
+% times. That number can be determined dynamically as the program runs.
+n = ceil(100*rand);                 % can be set dynamically
+A = zeros(n,1);                     % improve speed by preallocating space
+for i=1:n                           % set i = 1, then loop and increment i by 1, until i = n
+    A(i,1) = max(i,50);             % execute code within the loop - usually depends on i.
+end                                 % both i and A can then be accessed outside the loop.
+%%
+% We can terminate for loops early in several ways.
+% *Continue* instructs Matlab to skip directly to the next iteration of
+% the current loop without  executing the lines directly below 
+% the continue command.
+% *Break* breaks from the current loop completely. *Return*
+% breaks completely from the current script or function without executing
+% any further code. 
+A = rand(20,20,20);
+counter = 0;
+for i=1:size(A,1)
+    for j=2:size(A,2)
+        for k=3:size(A,3)
+            %if k is even, go immediately to beginning of loop
+            if(mod(k,2) == 0),          continue; end
+            %if j+k is prime, break from this inner loop completely
+            if(isprime(j+k)),           break   ; end    
+            %if all three of i,j,k prime, stop all further execution.
+            if(all(isprime([i,j,k])) && false),  return  ; end 
+            if(isprime(floor(100*A(i,j,k))))
+                counter = counter + 1;
+            end
+        end
+    end
+end
+%%
+% The continue, break, and return statements should be used sparingly as
+% they can easily obscure the code and can almost always be replaced by
+% if,else,elseif statements.
+%% while loops
+% While loops are used to execute a block of code until some condition is
+% satisfied. This condition is usually more complicated than simply
+% reaching a set number of iterations as with a for loop. The comments on
+% scope, and the continue, break and return statements apply equally to
+% while loops. 
+A = true; B = true; C = true;
+val = 1;
+while(A || B || C)
+    val = 2*val +1;
+    A = isprime(val);
+    B = val < 10;
+    C = ((round(sqrt(val)))^2) == val; 
+end
+%%
+% Here is common code idiom involving break. This effectively allows us to
+% test at the end of the loop, (or in multiple spots).
+%%
+%  while(true)
+%      %execute code
+%      if(condition)
+%          break;
+%      end
+%  end
+%%
+% <html> 
+% <A NAME="tryCatch"></A>
+% </html>
+%% try/catch statements
+% Try/catch blocks give you some control over Matlab error handling. They
+% are useful for executing code that might potentially fail, such as
+% writing to a file, allowing you to perform cleanup or recover gracefully.
+% In the example below, ME stands for 'matlab exception'; this
+% is an object of type Exception.
+
+a = rand;
+b = a*(a< 0.5);
+try
+    c = a / b;
+    assert(true);                       % set to false to have code throw an error
+catch ME                                % disaster recovery, cleanup, inform user, etc...
+    display('Something went wrong');    
+    warning('WARNING:ID','my own warning message');
+    display(ME.message);                % ME is a structure with info on the error
+    %error('my own error message');     % stops execution
+    %rethrow(ME);                       % rethrows the original error and stops execution
+end
+
+
+
+##### SOURCE END #####
+--></body></html>

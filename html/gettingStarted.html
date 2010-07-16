@@ -1,0 +1,384 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML is auto-generated from an M-file.
+To make changes, update the M-file and republish this document.
+      --><title>Getting Started</title><meta name="generator" content="MATLAB 7.10"><meta name="date" content="2010-07-15"><meta name="m-file" content="gettingStarted"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>Getting Started</h1><!--introduction--><p>This section serves as an introduction to the Matlab environment and programming language as well as to this tutorial. It describes how to configure and start using Matlab, search for help, and how to perform file input and output.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">What is Matlab?</a></li><li><a href="#3">Starting Matlab</a></li><li><a href="#10">Variables</a></li><li><a href="#17">Workspace</a></li><li><a href="#21">Command Window</a></li><li><a href="#25">Help</a></li><li><a href="#30">Using this Guide</a></li><li><a href="#34">Other Matlab resources</a></li></ul></div><h2>What is Matlab?<a name="1"></a></h2><p>Matlab is a programming environment as well as a high level, interpreted, dynamically typed language, supporting functional, object oriented, and event driven paradigms. It is well suited for numerical computation, particularly computations involving matrix operations and linear algebra.</p><p>Matlab has excellent support for data visualization and its concise and expressive syntax, as well as the plethora of predefined functions, results in a powerful environment excellent for rapid prototyping with minimal overhead.</p><p>Yet, Matlab is not just a scripting language for quick and dirty calculations. Recent versions have seen a dramatic increase for the support of large scale, highly structured code to rival C++, Java and the like. If you want the best of both worlds, Matlab's integrated java support lets you create and manipulate instances of java classes right in your Matlab programs. You can also call out to code written in C, C++, Perl, Fortran, or execute dos or unix system commands. Furthermore, Matlab code can be exported for use in Java, C, C++, and .Net programs, or as a stand alone application, mitigating its primary disadvantage - that it is not free.</p><p>As an interpreted language, some operations are slower than in a compiled language, particularly those involving loops. This too has improved in recent versions. In many cases, however, loops can be <i>vectorized</i> resulting in very quick code that invokes low level, highly optimized, <i>compiled</i> functions from the Matlab library. When the most computationally expensive parts of your program can be written this way, the speed of Matlab code rivals that of compiled languages.</p><p>Finally, with the addition of various toolkits, e.g. for Statistics, Bioinformatics, Optimization, or Image Processing, to name just a few, the Matlab environment can be extended for more specialized requirements.</p><p>Matlab&reg; is a product of the The Mathworks&#8482; company; for more general information, consult their website at <a href="http://www.mathworks.com/">http://www.mathworks.com/</a>.</p><h2>Starting Matlab<a name="3"></a></h2><p>To launch Matlab double click on the Matlab icon or type <b>Matlab</b> at a command prompt. You should get a display something like the one below</p><p>
+<img src="matlab2008aStartup.png" height="600">
+</p><p>You can immediately type things in to the command window and compute their value</p><pre class="codeinput">1 + 1 <span class="comment">% arithmetic</span>
+sqrt(pi) <span class="comment">% more arithmetic</span>
+<span class="string">'foo'</span> <span class="comment">% a string</span>
+or(true, false) <span class="comment">% a boolean value</span>
+randn(2,2) <span class="comment">% a 2d real matrix</span>
+xs = 1:10; plot(xs, xs .^ 2, <span class="string">'o-'</span>); <span class="comment">% a 1d plot</span>
+</pre><pre class="codeoutput">ans =
+     2
+ans =
+    1.7725
+ans =
+foo
+ans =
+     1
+ans =
+    0.5377   -2.2588
+    1.8339    0.8622
+</pre><img vspace="5" hspace="5" src="gettingStarted_01.png" alt=""> <p>We explain the built-in functions and data types in more detail below.</p><p>Typing <b>matlab -nojvm</b> starts Matlab  without the Java virtual machine, significantly reducing memory requirements at the cost of reduced functionality. None of the Matlab desktop windows are available in this mode, except for the command window. Here is how it looks.</p><p><img vspace="5" hspace="5" src="nojvm.png" alt=""> </p><h2>Variables<a name="10"></a></h2><p>We can create named memory locations to store data, called variables, very easily in Matlab.</p><pre class="codeinput">myvar = 3
+a   = <span class="string">'hello'</span>
+f   = log10(100)
+g   = 2^10 - 1
+</pre><pre class="codeoutput">myvar =
+     3
+a =
+hello
+f =
+     2
+g =
+        1023
+</pre><p>Variable names must begin with a character and can contain up to 63 characters on most systems.</p><p>Matlab stands for "matrix laboratory", since it was originally designed as a front-end to various numerical linear algebra packages. Consequently it is easy to create vectors and matrices. For example,</p><pre class="codeinput">a = 1:3 <span class="comment">% 1d vector</span>
+b = [1 2; 3 4] <span class="comment">% 2d matrix</span>
+c = ones(2,2,2) <span class="comment">% 3d array</span>
+</pre><pre class="codeoutput">a =
+     1     2     3
+b =
+     1     2
+     3     4
+c(:,:,1) =
+     1     1
+     1     1
+c(:,:,2) =
+     1     1
+     1     1
+</pre><p>We discuss matrices and vectors in much more detail <a href="matrixOperations.html">here</a>. The built-in scalar data types are: real, int, char, bool. The 'container' types are:  <a href="matrixOperations.html">numeric or logical arrays</a>, <a href="dataStructures.html#cellArrays">cell arrays</a>, <a href="dataStructures.html#structs">structures</a>, and <a href="objectOriented.html">objects</a>.</p><p>Since Matlab is a dynamically typed language, we do not predefine the type of data we will store in a particular variable and can overwrite data of one type with data of another. Notice that the variable g, currently holds the number 1023. We will now assign it the following string.</p><pre class="codeinput">g = <span class="string">'does this really work?'</span>
+</pre><pre class="codeoutput">g =
+does this really work?
+</pre><p>You can save all of the variables in a workspace to a file by typing <b>save filename</b> at the command prompt and reload them again with <b>load filename</b>.</p><h2>Workspace<a name="17"></a></h2><p>To see which variables you have defined, and what their size and type is, type <b>whos</b></p><pre class="codeinput">whos
+</pre><pre class="codeoutput">  Name       Size             Bytes  Class     Attributes
+
+  a          1x3                 24  double              
+  ans        2x2                 32  double              
+  b          2x2                 32  double              
+  c          2x2x2               64  double              
+  f          1x1                  8  double              
+  g          1x22                44  char                
+  myvar      1x1                  8  double              
+  xs         1x10                80  double              
+
+</pre><p>Alternatively, you can use a convenient graphical window called the workspace (see below). If it is not already visible, you can bring it up by typing <b>workspace</b> at the command prompt or by going to the desktop drop down menu.  You can then drag and place it wherever it is convenient.</p><p><img vspace="5" hspace="5" src="workspace.png" alt=""> </p><p>You can clear all the variables using</p><pre class="codeinput">clear <span class="string">all</span>
+</pre><h2>Command Window<a name="21"></a></h2><p>You have already seen how to type expressions or commands into the command window. If you do not add a semicolon at the end of your commands, the return value will be displayed, otherwise the expression will be silently evaluated. For example, compare</p><pre class="codeinput">a = ones(2,2)
+</pre><pre class="codeoutput">a =
+     1     1
+     1     1
+</pre><p>to this</p><pre class="codeinput">a = ones(2,2); <span class="comment">% nothing is displayed</span>
+</pre><p>The last typed command can be retrieved by selecting the command window and pressing the <i>up arrow key</i> on your keyboard. Pressing it several times scrolls you backwards through the history of typed commands. By first typing in part of the command before pressing the up arrow, only those statements that began with the typed text are displayed.</p><p>Furthermore, you can invoke Matlab's autocomplete feature by typing part of a command or function and pressing tab. A number of suggested options will appear. The same is true when editing files.</p><h2>Help<a name="25"></a></h2><p>One of Matlab's best features is its extensive library of help files. There are far too many built in functions to memorize and even if you remember the name, the exact syntax might allude you. You can bring up the help navigator by going to Desktop -&gt; Help or search right from the command window. Typing <b>help functionname</b> at the command prompt displays that function's documentation as text in the command window, whereas <b>doc functionname</b> brings this up in the help window (this is usually preferable).</p><p>
+<img src="helpEig.png" height="600">
+</p><p>You can look for functions which contain a specified string in the first line of their documentation (see <a href="writingFunctions.html#comments">here</a> for details) using <b>lookfor string</b>, as in this example.</p><pre class="codeinput">lookfor <span class="string">quadratic</span>
+</pre><pre class="codeoutput">quadform                       - Implementation of the quadratic formula.
+lincontest6                    - A quadratic objective function (from Optimization Toolbox)
+nnd8qf                         - Quadratic function demonstration.
+nnd9sdq                        - Steepest descent for quadratic function demonstration.
+quadprog                       - Quadratic programming. 
+circustent                     - Large-Scale Quadratic Programming
+qpsub                          - solves quadratic programming problems. 
+</pre><h2>Using this Guide<a name="30"></a></h2><p>This tutorial so broken into several small chapters, which are themselves composed of a number of subsections. For the most part, the chapters are self contained and can be read in isolation as needed. As the code for the examples is embedded right into the document, it may be advantageous to open the tutorial in the Matlab web browser so that you can try out the examples as you read. Just type something like <b>web www.cs.ubc.ca/~murphyk/matlabTutorial/html/index.html</b> at the command prompt. You can then click on 'Desktop -&gt; dock browser' so the browser will appear inside the matlab <a href="#Editor">editor</a>, as illustrated below.</p><p>
+<img src="matlabTutorialBrowser.png" height="500">
+</p><p>You can execute code by highlighting it on the web page and pressing <b>F9</b>. The statements are processed as though they were typed one at a time in the command window. Or you can cut and paste between different windows. Note that some of the examples use functions or data that are not built-in to matlab. These can be download here: <a href="http://www.cs.ubc.ca/~murphyk/Software/matlabTutorial/mfiles.zip">mfiles.zip</a>. You should unzip these in some directory, and then add them to your matlab path by typing something like</p><pre class="codeinput">addpath(genpath(<span class="string">'C:\kmurphy\matlabTutorial\mfiles'</span>))
+</pre><p>Click <a href="files.html#MatlabPath">here</a> for more details on the matlab path.</p><h2>Other Matlab resources<a name="34"></a></h2><p>There are many other resources related to Matlab. We list some of them below.</p><p>
+<ul>
+<li>
+<a
+href="http://www.mathworks.com/access/helpdesk/help/pdf_doc/matlab/getstart.pdf">
+Getting started in Matlab</a>, the official 260 page  guide.
+<li>
+<a
+href="http://www.mathworks.com/academia/student_center/tutorials/launchpad.html">
+official links to other tutorials</a>
+<li> <a href="http://www.mathworks.com/matlabcentral">matlab central</a>, source of
+free software, of variable quality.
+<li> <a href="http://www.mathworks.com/matlabcentral/newsreader"> matlab
+newsgroup</a>,
+a place where you can post questions and people may answer them for you.
+</ul>
+</p><p class="footer"><br>
+      Published with MATLAB&reg; 7.10<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Getting Started 
+% This section serves as an introduction to the Matlab environment and
+% programming language as well as to this tutorial. It describes how to 
+% configure and start using Matlab, search for help, and how to perform 
+% file input and output.
+%
+%% What is Matlab? 
+% Matlab is a programming environment as well as a high level, interpreted,
+% dynamically typed language, supporting functional, object oriented, and
+% event driven paradigms. It is well suited for numerical computation,
+% particularly computations involving matrix operations and linear algebra.
+%
+% Matlab has excellent support for data visualization and its concise and
+% expressive syntax, as well as the plethora of predefined functions,
+% results in a powerful environment excellent for rapid prototyping with
+% minimal overhead. 
+%
+% Yet, Matlab is not just a scripting language for quick and dirty
+% calculations. Recent versions have seen a dramatic increase for the
+% support of large scale, highly structured code to rival C++, Java and the
+% like. If you want the best of both worlds, Matlab's integrated java
+% support lets you create and manipulate instances of java classes right in
+% your Matlab programs. You can also call out to code written in C, C++,
+% Perl, Fortran, or execute dos or unix system commands. Furthermore,
+% Matlab code can be exported for use in Java, C, C++, and .Net programs,
+% or as a stand alone application, mitigating its primary disadvantage
+% - that it is not free. 
+%
+% As an interpreted language, some operations are slower than in a compiled
+% language, particularly those involving loops. This too has improved in
+% recent versions. In many cases, however, loops can be _vectorized_
+% resulting in very quick code that invokes low level, highly optimized,
+% _compiled_ functions from the Matlab library. When the most
+% computationally expensive parts of your program can be written this way,
+% the speed of Matlab code rivals that of compiled languages. 
+% 
+% Finally, with the addition of various toolkits, e.g. for Statistics,
+% Bioinformatics, Optimization, or Image Processing, to name just a few,
+% the Matlab environment can be extended for more specialized requirements.
+%%
+% Matlab(R) is a product of the The Mathworks(TM) company; for more general
+% information, consult their website at <http://www.mathworks.com/>.
+% 
+%% Starting Matlab
+% To launch Matlab double click on the Matlab icon or type *Matlab* at
+% a command prompt. 
+% You should get a display something like the one below
+%%
+% <html>
+% <img src="matlab2008aStartup.png" height="600">
+% </html>
+%%
+% You can immediately type things in to the command window
+% and compute their value
+1 + 1 % arithmetic
+sqrt(pi) % more arithmetic
+'foo' % a string
+or(true, false) % a boolean value
+randn(2,2) % a 2d real matrix
+xs = 1:10; plot(xs, xs .^ 2, 'o-'); % a 1d plot 
+%%
+% We explain the built-in functions and data types in more detail below.
+%%
+% Typing *matlab -nojvm* starts Matlab  without the Java virtual machine, 
+% significantly
+% reducing memory requirements at the cost of reduced functionality. None
+% of the Matlab desktop windows are available in this mode, except for the
+% command window. Here is how it looks.
+%%
+% <<nojvm.png>>
+%%
+%% Variables
+% We can create named memory locations to store data, called variables, very
+% easily in Matlab. 
+%%
+myvar = 3
+a   = 'hello'
+f   = log10(100)
+g   = 2^10 - 1
+%%
+% Variable names must begin with a character and can contain up to 63
+% characters on most systems. 
+%
+% Matlab stands for "matrix laboratory", since it was originally
+% designed as a front-end to various numerical linear algebra packages.
+% Consequently it is easy to create vectors and matrices.
+% For example,
+%%
+a = 1:3 % 1d vector
+b = [1 2; 3 4] % 2d matrix
+c = ones(2,2,2) % 3d array
+%%
+% We discuss matrices and vectors in
+% much more detail <matrixOperations.html here>.
+% The built-in scalar data types are: real, int, char, bool.
+% The 'container' types are:
+%  <matrixOperations.html numeric or logical arrays>,
+% <dataStructures.html#cellArrays cell arrays>,
+% <dataStructures.html#structs structures>,
+% and <objectOriented.html objects>.
+% 
+%%
+% Since Matlab is a dynamically typed language, we do not predefine the
+% type of data we will store in a particular variable and can overwrite
+% data of one type with data of another. Notice that the variable g,
+% currently holds the number 1023. We will now assign it the following
+% string. 
+g = 'does this really work?'
+%%
+% You can save all of the variables in a workspace to a file by typing
+% *save filename* at the command prompt and reload them again with *load
+% filename*.
+%% Workspace
+% To see which variables you have defined, and what their size and type is,
+% type *whos*
+whos
+%%
+% Alternatively, you can use a convenient graphical window called the workspace
+% (see below). If
+% it is not already visible, you can bring it up by typing *workspace* at
+% the command prompt or by going to the desktop drop down menu.  You can
+% then drag and place it wherever it is convenient. 
+%%
+% <<workspace.png>>
+%%
+% You can clear all the variables using
+clear all
+%% Command Window
+% You have already seen how to type expressions or commands
+% into the command window. If you do not
+% add a semicolon at the end of your commands, the return value will be
+% displayed, otherwise the expression will be silently evaluated.
+% For example, compare
+a = ones(2,2)
+%%
+% to this
+a = ones(2,2); % nothing is displayed  
+%%
+% The last typed command can be retrieved by selecting the command window
+% and pressing the _up arrow key_ on your keyboard. Pressing it several
+% times scrolls you backwards through the history of typed commands. By
+% first typing in part of the command before pressing the up arrow, only
+% those statements that began with the typed text are displayed. 
+%%
+% Furthermore, you can invoke Matlab's autocomplete feature by typing part
+% of a command or function and pressing tab. A number of suggested options
+% will appear. The same is true when editing files.
+%
+%% Help
+% One of Matlab's best features is its extensive library of help files.
+% There are far too many built in functions to memorize and even if you
+% remember the name, the exact syntax might allude you. You can bring up
+% the help navigator by going to Desktop -> Help or search right from the
+% command window. Typing *help functionname* at the command prompt displays
+% that function's documentation as text in the command window, whereas *doc functionname*
+% brings this up in the help window (this is usually preferable).
+%
+%%
+% <html>
+% <img src="helpEig.png" height="600">
+% </html>
+%%
+% You can look for functions which contain a specified string in the first
+% line of their documentation (see <writingFunctions.html#comments here>
+% for details) using *lookfor string*, as in this example.
+%%
+lookfor quadratic
+%%
+%% Using this Guide
+% This tutorial so broken into several small chapters, which are themselves
+% composed of a number of subsections. For the most part, the chapters are
+% self contained and can be read in isolation as needed. As the code for
+% the examples is embedded right into the document, it may be advantageous
+% to open the tutorial in the Matlab web browser so that you can try out
+% the examples as you read. 
+% Just type something like
+% *web www.cs.ubc.ca/~murphyk/matlabTutorial/html/index.html*
+% at the command prompt. You can then click on 'Desktop -> dock browser'
+% so the browser will appear inside the matlab <#Editor editor>,
+% as illustrated below.
+%%
+% <html>
+% <img src="matlabTutorialBrowser.png" height="500">
+% </html>
+%%
+% You can execute code by highlighting it on the
+% web page and pressing *F9*. The statements are processed as though they
+% were typed one at a time in the command window. 
+% Or you can cut and paste between different windows.
+% Note that some of the examples use functions or data that
+% are not built-in to matlab.
+% These can be download here: <http://www.cs.ubc.ca/~murphyk/Software/matlabTutorial/mfiles.zip mfiles.zip>.
+% You should unzip these in some directory,
+% and then add them to your matlab path by typing
+% something like
+addpath(genpath('C:\kmurphy\matlabTutorial\mfiles'))
+%%
+% Click <files.html#MatlabPath here> for more details on the matlab path.
+%% Other Matlab resources
+% There are many other resources related to Matlab.
+% We list some of them below.
+%%
+% <html>
+% <ul>
+% <li> 
+% <a
+% href="http://www.mathworks.com/access/helpdesk/help/pdf_doc/matlab/getstart.pdf">
+% Getting started in Matlab</a>, the official 260 page  guide.
+% <li> 
+% <a
+% href="http://www.mathworks.com/academia/student_center/tutorials/launchpad.html">
+% official links to other tutorials</a>
+% <li> <a href="http://www.mathworks.com/matlabcentral">matlab central</a>, source of
+% free software, of variable quality.
+% <li> <a href="http://www.mathworks.com/matlabcentral/newsreader"> matlab
+% newsgroup</a>, 
+% a place where you can post questions and people may answer them for you.
+% </ul>
+% </html>
+
+##### SOURCE END #####
+--></body></html>

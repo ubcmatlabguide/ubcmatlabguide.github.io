@@ -1,0 +1,166 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML is auto-generated from an M-file.
+To make changes, update the M-file and republish this document.
+      --><title>Debugging</title><meta name="generator" content="MATLAB 7.10"><meta name="date" content="2010-07-15"><meta name="m-file" content="debugging"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>Debugging</h1><!--introduction--><p>Matlab code is very flexible, particularly with respect to its dynamic typing, however, this can also lead to enormous headaches when it comes time to debug a crashing program. You may have overwritten or misspelled an important variable without knowing it, or inadvertently expanded the size of your matrix, and Matlab will happily continue executing without warning until your program grinds to a halt. Trying to discover the original problem that started dozens of lines before or in another function is not always easy. Fortunately, Matlab has several tools that can help, which we discuss below. More information can be found online <a href="http://www.mathworks.com/support/tech-notes/1200/1207.html?s_cid=MLD0506na2TS1">here</a>.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">M-lint Warnings &amp; Errors inside the editor</a></li><li><a href="#3">Keyboard command</a></li><li><a href="#6">Turning on the debugger</a></li><li><a href="#8">Break Points</a></li><li><a href="#15">Variable Stacks</a></li></ul></div><h2>M-lint Warnings &amp; Errors inside the editor<a name="1"></a></h2><p>Matlab automatically checks for certain problems and suggests fixes as you edit your m-files. The problem code is underlined in red much like word processors underline misspelled words. It is worthwhile paying attention to these as they can often point out problems before you run your code and frequently suggest ways to speed up execution. The suggestions appear when you hover your mouse over the underlined text, and you can quickly find these spots by looking for the red markers to the right of the document. The warnings and errors <i>M-lint</i> warns you about can be set under <i>File-&gt;Preferences-&gt;M-lint</i>.</p><p>In newer versions of Matlab, you can generate a full M-lint html report by going to <i>Tools-&gt;Save and Show M-lint Report</i>. You can also bring up a file dependency report or compare two versions of a file from the Tools drop down menu.</p><h2>Keyboard command<a name="3"></a></h2><p>The <i>keyboard()</i> function can  be used to stop execution of a program at any given place, temporarily relinquishing control back to you at the command window. Simply add the line <b>keyboard</b> anywhere in your file to stop at that point. You can print or modify variables, run scripts, etc. To return execution, type <b>return</b>.</p><p>When you are in debug or keyboard mode, the command window prompt will look slightly different: it will have a <i>k</i> in front.</p><p><img vspace="5" hspace="5" src="debugprompt.png" alt=""> </p><h2>Turning on the debugger<a name="6"></a></h2><p>If your program is crashing or displaying cryptic warnings, it is very useful to have it automatically halt execution right at the point where it ran into trouble. Type <b>dbstop if error</b> and <b>dbstop if warning</b>. Or you can use the GUI: Select <i>Debug --&gt; Stop if Errors/Warnings</i> to turn this on.</p><p>
+<A NAME="breakpoints"></A>
+</p><h2>Break Points<a name="8"></a></h2><p>Break points can be set at any line in the document that executes code by pressing just right of the line number. A small circle will appear and will turn red when the file is saved.</p><p><img vspace="5" hspace="5" src="breakpoint.png" alt=""> </p><p>These can be temporarily disabled by right clicking on them and selecting <i>disable</i>. To clear them all, type <b>dbclear all</b> or press the equivalent tool bar button.</p><p>You can set a condition on the breakpoints so that it is only triggered if a variable takes on a certain value, by right clicking on the variable and selecting 'Set/Modify Condition'.</p><p>Once your code has stopped at a breakpoint, you can step one line at a time, continue on until the next break point, or exit debug mode completely using the tool bar buttons at the top of the editor.</p><p>The <i>step in</i> and <i>step out</i> buttons, shown on the right of the editor toolbar below, let you enter into, or leave a function called at the current line.</p><p><img vspace="5" hspace="5" src="debugToolbar.png" alt=""> </p><p>There are function equivalents to these commands if you prefer, namely <b>dbstep</b>, <b>dbstep nlines</b>, <b>dbstep in</b>, <b>dbstep out</b>, <b>dbcont</b>, and <b>dbquit</b>. The <i>dbstop()</i> function can be used to set breakpoints and the <i>dbstatus()</i> function displays all of the breakpoints currently set. You can save these into a variable as in <b>s = dbstatus()</b>, clear the breakpoints and then reset them at a later point with <b>dbstop(s)</b>.</p><h2>Variable Stacks<a name="15"></a></h2><p>Once execution has stopped because of a break point or <i>keyboard()</i> command, you can inspect the current values of the variables by just typing their name, as usual. Or you can open a GUI by typing <b>workspace</b>. Typically functions call other functions, and the variables get pushed on the stack. To change stackframes (step into other the scope of other functions), use <b>dbup</b> or <b>dbdown</b>, or click the stack button on the GUI. You can also execute commands at the command prompt while execution has stopped, and assign new values to existing variables.</p><p class="footer"><br>
+      Published with MATLAB&reg; 7.10<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Debugging
+% Matlab code is very flexible, particularly with respect to its dynamic
+% typing, however, this can also lead to enormous headaches when it comes
+% time to debug a crashing program. You may have overwritten or misspelled
+% an important variable without knowing it, or inadvertently expanded the
+% size of your matrix, and Matlab will happily continue executing without
+% warning until your program grinds to a halt. Trying to discover the
+% original problem that started dozens of lines before or in another
+% function is not always easy. 
+% Fortunately, Matlab has several tools that can help, which we discuss
+% below.
+% More information can be found online
+% <http://www.mathworks.com/support/tech-notes/1200/1207.html?s_cid=MLD0506na2TS1
+% here>.
+%% M-lint Warnings & Errors inside the editor
+% Matlab automatically checks for certain problems and suggests fixes as
+% you edit your m-files. The problem code is underlined in red much like
+% word processors underline misspelled words. It is worthwhile paying
+% attention to these as they can often point out problems before you run
+% your code and frequently suggest ways to speed up execution. The
+% suggestions appear when you hover your mouse over the underlined text,
+% and you can quickly find these spots by looking for the red markers to
+% the right of the document. The warnings and errors _M-lint_ warns you
+% about can be set under _File->Preferences->M-lint_.
+%%
+% In newer versions of Matlab, you can generate a full M-lint html report
+% by going to _Tools->Save and Show M-lint Report_. You can also bring up a
+% file dependency report or compare two versions of a file from the Tools
+% drop down menu.
+%% Keyboard command
+% The _keyboard()_ function can  be used to stop execution of a program
+% at any given place, 
+% temporarily relinquishing control back to you at the command window. Simply add
+% the line *keyboard* anywhere in your file to stop at that point.
+% You can print or modify variables, run scripts, etc.
+% To return execution, type *return*.
+%%
+% When you are in debug or keyboard mode, the command window prompt will look slightly
+% different: it will have a _k_ in front.
+%%
+% <<debugprompt.png>> 
+%
+%% Turning on the debugger
+% If your program is crashing or displaying cryptic warnings, it is very
+% useful to have it automatically halt execution right at the point where
+% it ran into trouble. Type *dbstop if error*
+% and *dbstop if warning*.
+% Or you can use the GUI: Select _Debug REPLACE_WITH_DASH_DASH> Stop if Errors/Warnings_ to turn
+% this on.
+%%
+% <html> 
+% <A NAME="breakpoints"></A>
+% </html>
+%% Break Points 
+% Break points can be set at any line in the document that executes code by
+% pressing just right of the line number. A small circle will appear and
+% will turn red when the file is saved. 
+%%
+% <<breakpoint.png>>
+%%
+% These can be temporarily disabled by right clicking on them and selecting
+% _disable_. To clear them all, type *dbclear all* or press the equivalent
+% tool bar button.
+%%
+% You can set a condition on the breakpoints so that it is only triggered
+% if a variable takes on a certain value, by right clicking on the variable
+% and selecting 'Set/Modify Condition'.
+%%
+% Once your code has stopped at a breakpoint, you can step one line at a
+% time, continue on until the next break point, or exit debug mode
+% completely using the tool bar buttons at the top of the editor. 
+%
+% The _step in_ and _step out_ buttons, shown on the right of the editor toolbar below,
+% let you enter into, or leave a
+% function called at the current line. 
+%%
+% <<debugToolbar.png>>
+%%
+% There are function equivalents to these commands if you prefer, namely
+% *dbstep*, *dbstep nlines*, *dbstep in*, *dbstep out*, *dbcont*, and
+% *dbquit*. The _dbstop()_ function can be used to set breakpoints and the
+% _dbstatus()_ function displays all of the breakpoints currently set. You
+% can save these into a variable as in *s = dbstatus()*, clear the
+% breakpoints and then reset them at a later point with *dbstop(s)*. 
+%% Variable Stacks
+% Once execution has stopped because of a break point or _keyboard()_
+% command, you can inspect the current values of the variables by just typing
+% their name, as usual. Or you can open a GUI by typing *workspace*.
+% Typically functions call other functions, and the variables get pushed
+% on the stack. To change stackframes (step into other the scope of other functions),
+% use *dbup* or *dbdown*,
+% or click the stack button on the GUI.
+% You can also execute commands at the command prompt while execution has
+% stopped, and assign new values to existing variables.
+%
+##### SOURCE END #####
+--></body></html>
