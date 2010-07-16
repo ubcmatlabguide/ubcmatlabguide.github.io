@@ -1,0 +1,1 @@
+We will write this string to a file

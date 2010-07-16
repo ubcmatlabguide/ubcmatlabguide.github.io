@@ -6,7 +6,7 @@
    <!--
 This HTML is auto-generated from an M-file.
 To make changes, update the M-file and republish this document.
-      --><title>Getting Started</title><meta name="generator" content="MATLAB 7.10"><meta name="date" content="2010-07-15"><meta name="m-file" content="gettingStarted"><style type="text/css">
+      --><title>Getting Started</title><meta name="generator" content="MATLAB 7.10"><meta name="date" content="2010-07-16"><meta name="m-file" content="gettingStarted"><style type="text/css">
 
 body {
   background-color: white;
@@ -79,8 +79,8 @@ foo
 ans =
      1
 ans =
-    3.5784   -1.3499
-    2.7694    3.0349
+    1.3005   -0.1551
+    0.2691    0.0342
 </pre><img vspace="5" hspace="5" src="gettingStarted_01.png" alt=""> <p>We explain the built-in functions and data types in more detail below.</p><p>Typing <b>matlab -nojvm</b> starts Matlab  without the Java virtual machine, significantly reducing memory requirements at the cost of reduced functionality. None of the Matlab desktop windows are available in this mode, except for the command window. Here is how it looks.</p><p><img vspace="5" hspace="5" src="nojvm.png" alt=""> </p><h2>Variables<a name="10"></a></h2><p>We can create named memory locations to store data, called variables, very easily in Matlab.</p><pre class="codeinput">myvar = 3
 a   = <span class="string">'hello'</span>
 f   = log10(100)
@@ -111,16 +111,37 @@ c(:,:,2) =
 </pre><pre class="codeoutput">g =
 does this really work?
 </pre><p>You can save all of the variables in a workspace to a file by typing <b>save filename</b> at the command prompt and reload them again with <b>load filename</b>.</p><h2>Workspace<a name="17"></a></h2><p>To see which variables you have defined, and what their size and type is, type <b>whos</b></p><pre class="codeinput">whos
-</pre><pre class="codeoutput">  Name       Size             Bytes  Class     Attributes
+</pre><pre class="codeoutput">  Name           Size             Bytes  Class      Attributes
 
-  a          1x3                 24  double              
-  ans        2x2                 32  double              
-  b          2x2                 32  double              
-  c          2x2x2               64  double              
-  f          1x1                  8  double              
-  g          1x22                44  char                
-  myvar      1x1                  8  double              
-  xs         1x10                80  double              
+  A              1x1                  1  logical              
+  B              1x1                  1  logical              
+  C              1x1                  1  logical              
+  a              1x3                 24  double               
+  allfiles       1x1               1294  struct               
+  ans            2x2                 32  double               
+  b              2x2                 32  double               
+  c              2x2x2               64  double               
+  color          1x4                  8  char                 
+  counter        1x1                  8  double               
+  dinfo         93x1              36539  struct               
+  ext            1x4                  8  char                 
+  f              1x1                  8  double               
+  g              1x22                44  char                 
+  i              1x1                  8  double               
+  j              1x1                  8  double               
+  k              1x1                  8  double               
+  myvar          1x1                  8  double               
+  n              1x1                  8  double               
+  name           1x7                 14  char                 
+  pathstr        1x2                  4  char                 
+  sep            1x1                  2  char                 
+  sfile          1x14                28  char                 
+  test1          1x1                  1  logical              
+  test2          1x1                  1  logical              
+  test3          1x1                  1  logical              
+  val            1x1                  8  double               
+  versn          0x0                  0  char                 
+  xs             1x10                80  double               
 
 </pre><p>Alternatively, you can use a convenient graphical window called the workspace (see below). If it is not already visible, you can bring it up by typing <b>workspace</b> at the command prompt or by going to the desktop drop down menu.  You can then drag and place it wherever it is convenient.</p><p><img vspace="5" hspace="5" src="workspace.png" alt=""> </p><p>You can clear all the variables using</p><pre class="codeinput">clear <span class="string">all</span>
 </pre><h2>Command Window<a name="21"></a></h2><p>You have already seen how to type expressions or commands into the command window. If you do not add a semicolon at the end of your commands, the return value will be displayed, otherwise the expression will be silently evaluated. For example, compare</p><pre class="codeinput">a = ones(2,2)
@@ -138,7 +159,7 @@ nnd9sdq                        - Steepest descent for quadratic function demonst
 quadprog                       - Quadratic programming. 
 circustent                     - Large-Scale Quadratic Programming
 qpsub                          - solves quadratic programming problems. 
-</pre><h2>Using this Guide<a name="30"></a></h2><p>This tutorial so broken into several small chapters, which are themselves composed of a number of subsections. For the most part, the chapters are self contained and can be read in isolation as needed. As the code for the examples is embedded right into the document, it may be advantageous to open the tutorial in the Matlab web browser so that you can try out the examples as you read. Just type something like <b>web yagtom.googlecode.com</b> at the command prompt. You can then click on 'Desktop -&gt; dock browser' so the browser will appear inside the matlab <a href="editor.html">editor</a> as illustrated below.</p><p>
+</pre><h2>Using this Guide<a name="30"></a></h2><p>This tutorial so broken into several small chapters, which are themselves composed of a number of subsections. For the most part, the chapters are self contained and can be read in isolation as needed. As the code for the examples is embedded right into the document, it may be advantageous to open the tutorial in the Matlab web browser so that you can try out the examples as you read. Just type something like <b>web yagtom.googlecode.com</b> at the command prompt. You can then click on 'Desktop -&gt; dock browser' so the browser will appear inside the matlab <a href="writingFunctions.html#Editor">editor</a> as illustrated below.</p><p>
 <img src="matlabTutorialBrowser.png" height="500">
 </p><p>You can execute code by highlighting it on the web page and pressing <b>F9</b>. The statements are processed as though they were typed one at a time in the command window. Or you can cut and paste between different windows. Note that some of the examples use functions or data that are not built-in to matlab. These can be download here: <a href="http://code.google.com/p/yagtom/downloads/list">http://code.google.com/p/yagtom/downloads/list</a>. You should unzip these in some directory, and then add them to your matlab path by typing something like</p><pre class="codeinput">addpath(genpath(<span class="string">'C:\matlabTutorial\mfiles'</span>))
 </pre><p>Click <a href="files.html#MatlabPath">here</a> for more details on the matlab path.</p><h2>Other Matlab resources<a name="34"></a></h2><p>There are many other resources related to Matlab. We list some of them below.</p><p>
@@ -341,7 +362,7 @@ lookfor quadratic
 % Just type something like
 % *web yagtom.googlecode.com*
 % at the command prompt. You can then click on 'Desktop -> dock browser'
-% so the browser will appear inside the matlab <editor.html editor> as illustrated below.
+% so the browser will appear inside the matlab <writingFunctions.html#Editor editor> as illustrated below.
 %%
 % <html>
 % <img src="matlabTutorialBrowser.png" height="500">

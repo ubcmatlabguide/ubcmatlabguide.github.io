@@ -6,7 +6,7 @@
    <!--
 This HTML is auto-generated from an M-file.
 To make changes, update the M-file and republish this document.
-      --><title>Object Oriented Programming in Matlab: basics</title><meta name="generator" content="MATLAB 7.10"><meta name="date" content="2010-07-15"><meta name="m-file" content="objectOriented"><style type="text/css">
+      --><title>Object Oriented Programming in Matlab: basics</title><meta name="generator" content="MATLAB 7.10"><meta name="date" content="2010-07-16"><meta name="m-file" content="objectOriented"><style type="text/css">
 
 body {
   background-color: white;
@@ -152,7 +152,7 @@ d1 = d.rollDay(3);</pre><p>The second option is probably more familiar to java a
  end</pre><p>
 <hr>
 </p><p>They are useful when you have methods are are thematically related to the class but which do not use any information particular to specific instances of that class. Methods that demo class functionality are also good candidates.</p><p>To call a static method, you specify the classname, followed by a dot and the static method name.</p><pre class="codeinput">  mydate.printCurrentDate()
-</pre><pre class="codeoutput">15-Jul-2010 22:35:36
+</pre><pre class="codeoutput">16-Jul-2010 00:14:25
 </pre><p>Methods can also be hidden with <i>methods(Hidden = true)</i> hiding them from functions that display class methods such as <i>methods()</i> or <i>methodsview()</i> . We will discuss abstract and sealed methods after first introducing inheritance.</p><p>
 <A NAME="ExternalFunctionsAndMethods"></a>
 </p><h2>External Functions &amp; Methods<a name="63"></a></h2><p>Our class methods are free to call out to any external function on the Matlab path to perform interim calculations. Moreover, if we save our classdef m-file in a directory with the same name as the class but preceded by the @ symbol,(e.g. @mydate), we can write methods in their own files, store them here, and use them as we would any other method. The declaration looks just like the function declarations above and the file name is the same as the function name.</p><p>However, we cannot assign such methods any of the method attributes just discussed, (like static, hidden, or protected), they are automatically public.</p><p>To write external private methods, save them into a subdirectory called private, e.g. \@mydate\private\myMethod.m.</p><p>The alternative is to put everything in one file: the classdef, and any other 'local' functions can come at the end. Such functions will not be visible outside of the classdef file.</p><p>

@@ -6,7 +6,7 @@
    <!--
 This HTML is auto-generated from an M-file.
 To make changes, update the M-file and republish this document.
-      --><title>Speedup tricks</title><meta name="generator" content="MATLAB 7.10"><meta name="date" content="2010-07-15"><meta name="m-file" content="speedup"><style type="text/css">
+      --><title>Speedup tricks</title><meta name="generator" content="MATLAB 7.10"><meta name="date" content="2010-07-16"><meta name="m-file" content="speedup"><style type="text/css">
 
 body {
   background-color: white;
@@ -78,7 +78,7 @@ close(w);                                               <span class="comment">% 
 <span class="keyword">end</span>
 without = toc
 </pre><pre class="codeoutput">without =
-    1.2891
+    1.2843
 </pre><pre class="codeinput">tic
 B = zeros(30000,1);      <span class="comment">% Preallocate B with the zeros command.</span>
 <span class="keyword">for</span> i = 1:30000
@@ -87,9 +87,9 @@ B = zeros(30000,1);      <span class="comment">% Preallocate B with the zeros co
 with = toc
 ratio = without / with
 </pre><pre class="codeoutput">with =
-    0.0462
+    0.0473
 ratio =
-   27.8734
+   27.1599
 </pre><p>
 <A NAME="Vectorization"></A>
 </p><h2>Vectorization<a name="14"></a></h2><p>Vectorization is the process of making your code work on array-structured data in parallel, rather than using for-loops. This can make your code much faster and is an essential skill to learn. We give various examples below which should give you some good idioms to copy. Many more examples can be found <a href="http://www.mathworks.com/support/tech-notes/1100/1109.html">here</a>.</p><h2>Using built-in functions which are vectorized<a name="15"></a></h2><p>Most functions in Matlab are already vectorized. For example, to take the log of every number in an array A,  we simply execute B = log(A). Let us compare this vectorized version to calling log on each element.</p><pre class="codeinput">A = rand(200,200);                    <span class="comment">% We will use this as our data</span>
@@ -107,7 +107,7 @@ vec = toc;
 assert(isequal(Bnv,Bv));
 ratio = nonvec / vec
 </pre><pre class="codeoutput">ratio =
-   34.5092
+   35.1350
 </pre><p>Some functions, like <i>mvnpdf()</i> for example, interpret an n-by-d matrix, not as n-times-d elements but as n, d-dimensional vectors. If this is not what we are after, we can convert the matrix into a vector using the (:) operator, pass it to the function, and reshape the output back into the original size with the <i>reshape()</i> function.</p><h2>Logical indexing.<a name="20"></a></h2><p>Here we see the benefit of logical indexing in making code shorter, faster and easier to read.</p><p><b>non-vectorized version</b></p><pre class="codeinput">tic
 B1 = [];                                <span class="comment">% note, it is difficult to preallocate here</span>
 counter = 1;
@@ -126,7 +126,7 @@ vec = toc;
 ratio = nonvec / vec
 assert(isequal(B1,B2));
 </pre><pre class="codeoutput">ratio =
-  255.5226
+  259.5101
 </pre><h2>A slightly more complex example of vectorization<a name="23"></a></h2><p>Here we perform three tricks at once as it were. Recall that operators such as ^, \, have  element-wise equivalents, (e.g. .^), which we can apply to the corresponding elements of two same-sized matrices. Secondly, Matlab performs automatic scalar expansion in expressions like <b>A+1</b>, and thirdly, we can easily multiply two matrices together without loops. Most loops involving patterned additions and multiplications of vector elements can be translated, with a little thought, into equivalent <i>vectorized</i> statements.</p><p><b>non-vectorized version</b></p><pre class="codeinput">tic
 B1 = zeros(size(A));
 <span class="keyword">for</span> i=1:size(A,1)
@@ -147,7 +147,7 @@ ratio = nonvec / vec
 </pre><pre class="codeoutput">test =
   3.4986e-015
 ratio =
-  2.2689e+003
+  4.0449e+003
 </pre><p>
 <a name="bsxfun"></a>
 </p><h2>Bsxfun<a name="28"></a></h2><p>One often finds it necessary to subtract say a row vector from a matrix, (e.g. perhaps you want to standardize your data). Since the row vector is neither a scalar, nor the same size as the matrix, Matlab will not let you do this directly. One option is to use the <i>repmat()</i> function we saw earlier to replicate the vector so that it is the same size as the matrix and then subtract. However, a better option is to use the <i>bsxfun()</i> function (bsx stands for binary singleton expansion). You must first specify the operation you wish to perform preceded by the @ symbol. Typical choices include @minus, @plus, @times, @rdivide (however, any binary function can be used - type <b>doc bsxfun</b> for a list). Next the arguments to the function are specified, beginning with the argument whose size does not need to be changed: bsxfun then expands any singleton dimensions in the third argument to the correct size. This function supports multidimensional arrays.</p><pre class="codeinput">A = meshgrid(1:6,1:5)'
@@ -205,12 +205,12 @@ m = mean(A1,3);
 <span class="keyword">end</span>
 nonvec = toc
 </pre><pre class="codeoutput">nonvec =
-    0.0356
+    0.0301
 </pre><p><b>vectorized version</b></p><pre class="codeinput">tic
 A2 = bsxfun(@minus,A2,mean(A2,3));
 vec = toc
 </pre><pre class="codeoutput">vec =
-    0.0187
+    0.0168
 </pre><p>We could have also used <i>repmat()</i> as follows, but this requires more memory and is slightly slower.</p><pre class="codeinput">tic
 A3 = A3 - repmat(mean(A3,3),[1,1,size(A3,3)]);
 rep = toc

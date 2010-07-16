@@ -6,7 +6,7 @@
    <!--
 This HTML is auto-generated from an M-file.
 To make changes, update the M-file and republish this document.
-      --><title>Writing and Using Functions</title><meta name="generator" content="MATLAB 7.10"><meta name="date" content="2010-07-15"><meta name="m-file" content="writingFunctions"><style type="text/css">
+      --><title>Writing and Using Functions</title><meta name="generator" content="MATLAB 7.10"><meta name="date" content="2010-07-16"><meta name="m-file" content="writingFunctions"><style type="text/css">
 
 body {
   background-color: white;
@@ -131,18 +131,32 @@ options.maxIter = 20;
 options.display = <span class="string">'off'</span>;
 xstart = [0 0]';
 xmin = minFunc(@rosenbrock, xstart, options)
-</pre><pre class="codeoutput">Undefined function or method 'minFunc' for input arguments of type 'function_handle'.
-
-Error in ==&gt; writingFunctions at 281
-xmin = minFunc(@rosenbrock, xstart, options)  
+</pre><pre class="codeoutput">xmin =
+    0.9993
+    0.9986
 </pre><p>We can also create functions 'on the fly'. These are called anonymous or inline functions; in lisp they are called 'lambda functions'. For example, rather than making a file called rosenbrock.m we can write</p><pre class="codeinput">rosen = @(x) sum(100*(x(2)-x(1).^2).^2 + (1-x(1)).^2);
 xmin2 = minFunc(rosen, xstart, options)
+</pre><pre class="codeoutput">xmin2 =
+    0.9993
+    0.9986
 </pre><p>We can also make anonymous functions which take multiple arguments.</p><pre class="codeinput">g = @(x,y)sqrt(exp(x).*y.^sin(x))+x.*y      <span class="comment">% create a more complicated inline function</span>
 g(3,5)                                      <span class="comment">% evaluate g</span>
+</pre><pre class="codeoutput">g = 
+    @(x,y)sqrt(exp(x).*y.^sin(x))+x.*y
+ans =
+   20.0207
 </pre><p>As an alternative to using function handles, we can pass the string names of functions and either convert to handles using the <i>str2func()</i> function or evaluate them using the <i>feval()</i> function. The <i>eval()</i> function lets you execute any string as if it were typed at the command prompt. However, these methods are much slower than using function handles and are not recommended.</p><pre class="codeinput">s = str2func(<span class="string">'sin'</span>)
 s(0)
 feval(<span class="string">'cos'</span>,pi)
 eval(<span class="string">'E = 3'</span>)
+</pre><pre class="codeoutput">s = 
+    @sin
+ans =
+     0
+ans =
+    -1
+E =
+     3
 </pre><h2>Function composition<a name="38"></a></h2><p>It can often be useful to compose two or more functions together to create a new function.</p><pre class="codeinput">f = @(x) 2*x.^2;                                <span class="comment">% start with functions f, g</span>
 g = @(x,y) log(x.*y);
 h = @(x,y) f(x) + 2*g(x,f(y))-f(g(x,y)).*g(2,y);<span class="comment">% create a new function, h, from f and g.</span>
@@ -179,6 +193,8 @@ end</pre><p>If we call  result = mysum(1,2,3,6,2,9,7) the result will be 30 = 1+
 <span class="comment">% end</span>
 </pre><pre class="codeinput">processOptionsDemoFun(<span class="string">'second'</span>,<span class="string">'foo'</span>, <span class="string">'first'</span>,1, <span class="string">'third'</span>,3);
 processOptionsDemoFun(<span class="string">'fourth'</span>, 4, <span class="string">'third'</span>,3);
+</pre><pre class="codeoutput">a 1, b foo, c 3, d 4
+a 1, b foo, c 3, d 4
 </pre><p>
 <A NAME="processArgs"></A>
 <hr>
@@ -202,6 +218,10 @@ processArgsDemoFun(1, <span class="string">'foo'</span>,  <span class="string">'
 <span class="keyword">catch</span> ME
    display(ME.message);
 <span class="keyword">end</span>
+</pre><pre class="codeoutput">a 1, b foo, c 3, d 4
+a 1, b foo, c 3, d 4
+Undefined function or method 'cellString' for input arguments of type 'cell'.
+Argument 2 must be of type char
 </pre><p>
 <A NAME="inputParser"></A>
 <hr>
@@ -230,6 +250,11 @@ inputparserDemoFun(1, <span class="string">'two'</span>, s);
 <span class="keyword">catch</span> ME
    display(ME.message);
 <span class="keyword">end</span>
+</pre><pre class="codeoutput">a 1, b two, c 3, d 4
+a 1, b two, c 3, d 4
+a 1, b two, c 3, d 4
+Argument 'first' failed validation isnumeric.
+Argument 'second' failed validation ischar.
 </pre><h2>Variable number of Output Arguments<a name="57"></a></h2><p>Matlab also supports variable number of output arguments using <i>varargout()</i> , although this is fairly uncommon. Type <b>doc varargout</b> for more information. The <i>nargout()</i> function is more useful, returning the number of outputs the caller of the function has asked for.  Suppose, for instance, a function normally returns 3 outputs but all three take a long time to compute. If <i>nargout()</i> indicates that the user only asked for one output as in <b>A = myfunc(2,4)</b> as opposed to <b>[A,B,C] = myfunc(2,4)</b> we can bypass the expensive computation of B and C. For example, below is the source for the  <a href="mfiles/rosenbrock.m">rosenbrock</a> function. It always evaluates the objective function, but only evaluates the gradient and Hessian if asked to do so.</p><pre class="codeinput"><span class="comment">%function [f, df, ddf] = rosenbrock(x);</span>
 <span class="comment">%</span>
 <span class="comment">% rosenbrock.m This function returns the function value, partial derivatives</span>
@@ -261,6 +286,8 @@ tic; <span class="keyword">for</span> t=1:Ntrials, f  = rosenbrock(x); <span cla
 tic; <span class="keyword">for</span> t=1:Ntrials, [f,g]  = rosenbrock(x); <span class="keyword">end</span>; time2=toc;
 tic; <span class="keyword">for</span> t=1:Ntrials, [f,g,H]  = rosenbrock(x); <span class="keyword">end</span>; time3=toc;
 [time1 time2 time3]
+</pre><pre class="codeoutput">ans =
+    0.0025    0.0070    0.0213
 </pre><h2>Matlab path<a name="61"></a></h2><p>For a function to be runnable, it has to be in the current directory and/or on the matlab path. See <a href="files.html#MatlabPath">here</a> for details on how to set the path.</p><p class="footer"><br>
       Published with MATLAB&reg; 7.10<br></p></div><!--
 ##### SOURCE BEGIN #####

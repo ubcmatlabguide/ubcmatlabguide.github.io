@@ -6,7 +6,7 @@
    <!--
 This HTML is auto-generated from an M-file.
 To make changes, update the M-file and republish this document.
-      --><title>Compiling and calling other languages</title><meta name="generator" content="MATLAB 7.10"><meta name="date" content="2010-07-15"><meta name="m-file" content="external"><style type="text/css">
+      --><title>Compiling and calling other languages</title><meta name="generator" content="MATLAB 7.10"><meta name="date" content="2010-07-16"><meta name="m-file" content="external"><style type="text/css">
 
 body {
   background-color: white;
@@ -145,7 +145,7 @@ getClass   notify     toString
 
 </pre><p>Static methods can be used as well</p><pre class="codeinput">Math.random()
 </pre><pre class="codeoutput">ans =
-    0.6612
+    0.6656
 </pre><p>To create objects of java classes, the classes must be on the Matlab java class path. Matlab uses both a static and dynamic path. The static path is loaded when Matlab is started and is defined in the <b>classpath.txt</b> file. To include classes you have written to the static path, edit this file, add the directory name containing your .class files at the bottom, and restart Matlab. They will then be available every time you load Matlab. Classes added to the dynamic path are available right away without having to restart Matlab, but are cleared when Matlab is closed. Also, using classes loaded dynamically is slightly less efficient. To add a directory to the dynamic path use the <i>javaaddpath()</i> function.</p><pre class="codeinput">javaaddpath(pwd);          <span class="comment">% add a directory to the dynamic path</span>
 clear <span class="string">java</span>;                                             <span class="comment">% clear the dynamic path</span>
 </pre><p>
@@ -159,7 +159,7 @@ hTable
 hTable.get(<span class="string">'foo'</span>)
 hTable.get(0)
 </pre><pre class="codeoutput">hTable =
-{2.0=test string, foo=bar, 1.0=41.287, 0.0=[[D@121e820}
+{2.0=test string, foo=bar, 1.0=41.287, 0.0=[[D@1b3846b}
 ans =
 bar
 ans =

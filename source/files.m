@@ -3,7 +3,7 @@
 % and data.
 %% Changing directories
 % You can change directory using the *cd* command
-cd C:\kmurphy\webMirror\matlabTutorial\source\matlabTutorial
+%cd C:\googleCode\yagtom\source
 %%
 % Inside the editor, The _current directory_ window, unsurprisingly, displays the files in the
 % current working directory. You can open it via the drop down menu
@@ -76,7 +76,7 @@ a = userpath                     % display,(or change) default save directory
 %% Packages (2008a)
 % Packages can be used to 
 % partition the name space,
-% which means that functions (or <ObjectOriented.html classes>)
+% which means that functions (or <objectOriented.html classes>)
 % of the same name will not clash with each other.
 % Packages are directories beginning with the '+'
 % symbol. Any functions (or classes) you place into these directories are then only
@@ -102,7 +102,7 @@ a = userpath                     % display,(or change) default save directory
 % 'C:\Program Files\MATLAB\R2008a\bin'.
 % For example, my startup.m file contains the following:
 %%
-cd C:\kmurphy\webMirror\matlabTutorial\source\matlabTutorial
+%cd C:\googleCode\yagtom\source\
 addpath(genpath(pwd))
 format compact
 dbstop if error
@@ -159,14 +159,14 @@ dbstop if error
 % first have to open the file, however, with _fopen()_ and then close it
 % when you are done with _fclose()_. You can find an advanced
 % worked example
-% <StringsCellsStructsSets.html#50 here>.
+% <dataStructures.html#50 here>.
 %%
 % To write arbitrary data, including text, to a file, use the _fprintf()_
 % function in conjunction with _fopen()_ and _fclose()_: _fopen()_ returns
 % a file id, which you then pass as the first argument to _fprintf()_. If
 % you do not specify a file id, _fprintf()_ prints the data to the command
 % window. We discuss the formatting options available with this function
-% <StringsCellsStructsSets.html#11 here>.
+% <dataStructures.html#11 here>.
 %% 
 % For more information on, say, the _textscan_ function type *doc textscan*
 % at the command prompt.

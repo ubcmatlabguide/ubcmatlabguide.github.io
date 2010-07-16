@@ -4,6 +4,7 @@ function publishSource(fname)
 %  (run initYagtom before calling this function)
 % e.g publishSource('gettingStarted)
 %%
+initYagtom(); 
 cd(fullfile(yagtomRoot(), 'html')); 
 src = fullfile(yagtomRoot, 'source'); 
 
