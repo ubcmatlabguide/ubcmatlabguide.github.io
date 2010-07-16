@@ -79,8 +79,8 @@ foo
 ans =
      1
 ans =
-    0.5377   -2.2588
-    1.8339    0.8622
+    3.5784   -1.3499
+    2.7694    3.0349
 </pre><img vspace="5" hspace="5" src="gettingStarted_01.png" alt=""> <p>We explain the built-in functions and data types in more detail below.</p><p>Typing <b>matlab -nojvm</b> starts Matlab  without the Java virtual machine, significantly reducing memory requirements at the cost of reduced functionality. None of the Matlab desktop windows are available in this mode, except for the command window. Here is how it looks.</p><p><img vspace="5" hspace="5" src="nojvm.png" alt=""> </p><h2>Variables<a name="10"></a></h2><p>We can create named memory locations to store data, called variables, very easily in Matlab.</p><pre class="codeinput">myvar = 3
 a   = <span class="string">'hello'</span>
 f   = log10(100)
@@ -138,7 +138,7 @@ nnd9sdq                        - Steepest descent for quadratic function demonst
 quadprog                       - Quadratic programming. 
 circustent                     - Large-Scale Quadratic Programming
 qpsub                          - solves quadratic programming problems. 
-</pre><h2>Using this Guide<a name="30"></a></h2><p>This tutorial so broken into several small chapters, which are themselves composed of a number of subsections. For the most part, the chapters are self contained and can be read in isolation as needed. As the code for the examples is embedded right into the document, it may be advantageous to open the tutorial in the Matlab web browser so that you can try out the examples as you read. Just type something like <b>web yagtom.googlecode.com</b> at the command prompt. You can then click on 'Desktop -&gt; dock browser' so the browser will appear inside the matlab editor as illustrated below.</p><p>
+</pre><h2>Using this Guide<a name="30"></a></h2><p>This tutorial so broken into several small chapters, which are themselves composed of a number of subsections. For the most part, the chapters are self contained and can be read in isolation as needed. As the code for the examples is embedded right into the document, it may be advantageous to open the tutorial in the Matlab web browser so that you can try out the examples as you read. Just type something like <b>web yagtom.googlecode.com</b> at the command prompt. You can then click on 'Desktop -&gt; dock browser' so the browser will appear inside the matlab <a href="editor.html">editor</a> as illustrated below.</p><p>
 <img src="matlabTutorialBrowser.png" height="500">
 </p><p>You can execute code by highlighting it on the web page and pressing <b>F9</b>. The statements are processed as though they were typed one at a time in the command window. Or you can cut and paste between different windows. Note that some of the examples use functions or data that are not built-in to matlab. These can be download here: <a href="http://code.google.com/p/yagtom/downloads/list">http://code.google.com/p/yagtom/downloads/list</a>. You should unzip these in some directory, and then add them to your matlab path by typing something like</p><pre class="codeinput">addpath(genpath(<span class="string">'C:\matlabTutorial\mfiles'</span>))
 </pre><p>Click <a href="files.html#MatlabPath">here</a> for more details on the matlab path.</p><h2>Other Matlab resources<a name="34"></a></h2><p>There are many other resources related to Matlab. We list some of them below.</p><p>
@@ -341,7 +341,7 @@ lookfor quadratic
 % Just type something like
 % *web yagtom.googlecode.com*
 % at the command prompt. You can then click on 'Desktop -> dock browser'
-% so the browser will appear inside the matlab editor as illustrated below.
+% so the browser will appear inside the matlab <editor.html editor> as illustrated below.
 %%
 % <html>
 % <img src="matlabTutorialBrowser.png" height="500">

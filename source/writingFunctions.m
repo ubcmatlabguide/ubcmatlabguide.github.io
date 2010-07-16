@@ -19,7 +19,7 @@
 % * In Matlab, executing functions is faster than
 %   executing  scripts.  
 %% Creating Functions
-% To create your own function, open a new file in the <editor editor>
+% To create your own function, open a new file in the <Editor editor>
 % by typing *edit filename.m* and begin by
 % creating the function header, which includes the name of the function and
 % its inputs and outputs. When you save the m-file, you should give it

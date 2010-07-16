@@ -179,7 +179,7 @@ lookfor quadratic
 % Just type something like
 % *web yagtom.googlecode.com*
 % at the command prompt. You can then click on 'Desktop -> dock browser'
-% so the browser will appear inside the matlab editor as illustrated below.
+% so the browser will appear inside the matlab <editor.html editor> as illustrated below.
 %%
 % <html>
 % <img src="matlabTutorialBrowser.png" height="500">
