@@ -107,7 +107,7 @@ c(:,:,1) =
 c(:,:,2) =
      1     1
      1     1
-</pre><p>We discuss matrices and vectors in much more detail <a href="matrixOperations.html">here</a>. The built-in scalar data types are: real, int, char, bool. The 'container' types are:  <a href="matrixOperations.html">numeric or logical arrays</a>, <a href="dataStructures.html#cellArrays">cell arrays</a>, <a href="dataStructures.html#structs">structures</a>, and <a href="objectOriented.html">objects</a>.</p><p>Since Matlab is a dynamically typed language, we do not predefine the type of data we will store in a particular variable and can overwrite data of one type with data of another. Notice that the variable g, currently holds the number 1023. We will now assign it the following string.</p><pre class="codeinput">g = <span class="string">'does this really work?'</span>
+</pre><p>We discuss matrices and vectors in much more detail <a href="matrixOperations.html">here</a>.</p><p>In Matlab, scalars are really matrices of size 1x1. The basic 'scalar' types are double (real), char, and logical (boolean), although a number of (infrequently used) integer types also exist. The 'container' types are:  <a href="matrixOperations.html">numeric or logical arrays (matrices)</a>, <a href="dataStructures.html#cellArrays">cell arrays</a>, <a href="dataStructures.html#structs">structures</a>, and <a href="objectOriented.html">objects</a>.</p><p>Since Matlab is a dynamically typed language, we do not predefine the type of data we will store in a particular variable and can overwrite data of one type with data of another. Notice that the variable g, currently holds the number 1023. We will now assign it the following string.</p><pre class="codeinput">g = <span class="string">'does this really work?'</span>
 </pre><pre class="codeoutput">g =
 does this really work?
 </pre><p>You can save all of the variables in a workspace to a file by typing <b>save filename</b> at the command prompt and reload them again with <b>load filename</b>.</p><h2>Workspace<a name="17"></a></h2><p>To see which variables you have defined, and what their size and type is, type <b>whos</b></p><pre class="codeinput">whos
@@ -138,9 +138,9 @@ nnd9sdq                        - Steepest descent for quadratic function demonst
 quadprog                       - Quadratic programming. 
 circustent                     - Large-Scale Quadratic Programming
 qpsub                          - solves quadratic programming problems. 
-</pre><h2>Using this Guide<a name="30"></a></h2><p>This tutorial so broken into several small chapters, which are themselves composed of a number of subsections. For the most part, the chapters are self contained and can be read in isolation as needed. As the code for the examples is embedded right into the document, it may be advantageous to open the tutorial in the Matlab web browser so that you can try out the examples as you read. Just type something like <b>web www.cs.ubc.ca/~murphyk/matlabTutorial/html/index.html</b> at the command prompt. You can then click on 'Desktop -&gt; dock browser' so the browser will appear inside the matlab <a href="#Editor">editor</a>, as illustrated below.</p><p>
+</pre><h2>Using this Guide<a name="30"></a></h2><p>This tutorial so broken into several small chapters, which are themselves composed of a number of subsections. For the most part, the chapters are self contained and can be read in isolation as needed. As the code for the examples is embedded right into the document, it may be advantageous to open the tutorial in the Matlab web browser so that you can try out the examples as you read. Just type something like <b>web yagtom.googlecode.com</b> at the command prompt. You can then click on 'Desktop -&gt; dock browser' so the browser will appear inside the matlab editor as illustrated below.</p><p>
 <img src="matlabTutorialBrowser.png" height="500">
-</p><p>You can execute code by highlighting it on the web page and pressing <b>F9</b>. The statements are processed as though they were typed one at a time in the command window. Or you can cut and paste between different windows. Note that some of the examples use functions or data that are not built-in to matlab. These can be download here: <a href="http://www.cs.ubc.ca/~murphyk/Software/matlabTutorial/mfiles.zip">mfiles.zip</a>. You should unzip these in some directory, and then add them to your matlab path by typing something like</p><pre class="codeinput">addpath(genpath(<span class="string">'C:\kmurphy\matlabTutorial\mfiles'</span>))
+</p><p>You can execute code by highlighting it on the web page and pressing <b>F9</b>. The statements are processed as though they were typed one at a time in the command window. Or you can cut and paste between different windows. Note that some of the examples use functions or data that are not built-in to matlab. These can be download here: <a href="http://code.google.com/p/yagtom/downloads/list">http://code.google.com/p/yagtom/downloads/list</a>. You should unzip these in some directory, and then add them to your matlab path by typing something like</p><pre class="codeinput">addpath(genpath(<span class="string">'C:\matlabTutorial\mfiles'</span>))
 </pre><p>Click <a href="files.html#MatlabPath">here</a> for more details on the matlab path.</p><h2>Other Matlab resources<a name="34"></a></h2><p>There are many other resources related to Matlab. We list some of them below.</p><p>
 <ul>
 <li>
@@ -254,9 +254,12 @@ c = ones(2,2,2) % 3d array
 %%
 % We discuss matrices and vectors in
 % much more detail <matrixOperations.html here>.
-% The built-in scalar data types are: real, int, char, bool.
+% 
+% In Matlab, scalars are really matrices of size 1x1. The basic 'scalar'
+% types are double (real), char, and logical (boolean), although a number of
+% (infrequently used) integer types also exist. 
 % The 'container' types are:
-%  <matrixOperations.html numeric or logical arrays>,
+%  <matrixOperations.html numeric or logical arrays (matrices)>,
 % <dataStructures.html#cellArrays cell arrays>,
 % <dataStructures.html#structs structures>,
 % and <objectOriented.html objects>.
@@ -271,7 +274,7 @@ g = 'does this really work?'
 %%
 % You can save all of the variables in a workspace to a file by typing
 % *save filename* at the command prompt and reload them again with *load
-% filename*.
+% filename*. 
 %% Workspace
 % To see which variables you have defined, and what their size and type is,
 % type *whos*
@@ -336,10 +339,9 @@ lookfor quadratic
 % to open the tutorial in the Matlab web browser so that you can try out
 % the examples as you read. 
 % Just type something like
-% *web www.cs.ubc.ca/~murphyk/matlabTutorial/html/index.html*
+% *web yagtom.googlecode.com*
 % at the command prompt. You can then click on 'Desktop -> dock browser'
-% so the browser will appear inside the matlab <#Editor editor>,
-% as illustrated below.
+% so the browser will appear inside the matlab editor as illustrated below.
 %%
 % <html>
 % <img src="matlabTutorialBrowser.png" height="500">
@@ -351,11 +353,11 @@ lookfor quadratic
 % Or you can cut and paste between different windows.
 % Note that some of the examples use functions or data that
 % are not built-in to matlab.
-% These can be download here: <http://www.cs.ubc.ca/~murphyk/Software/matlabTutorial/mfiles.zip mfiles.zip>.
+% These can be download here: <http://code.google.com/p/yagtom/downloads/list>.
 % You should unzip these in some directory,
 % and then add them to your matlab path by typing
 % something like
-addpath(genpath('C:\kmurphy\matlabTutorial\mfiles'))
+addpath(genpath('C:\matlabTutorial\mfiles'))
 %%
 % Click <files.html#MatlabPath here> for more details on the matlab path.
 %% Other Matlab resources

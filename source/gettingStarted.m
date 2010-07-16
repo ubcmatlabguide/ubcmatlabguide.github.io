@@ -92,9 +92,12 @@ c = ones(2,2,2) % 3d array
 %%
 % We discuss matrices and vectors in
 % much more detail <matrixOperations.html here>.
-% The built-in scalar data types are: real, int, char, bool.
+% 
+% In Matlab, scalars are really matrices of size 1x1. The basic 'scalar'
+% types are double (real), char, and logical (boolean), although a number of
+% (infrequently used) integer types also exist. 
 % The 'container' types are:
-%  <matrixOperations.html numeric or logical arrays>,
+%  <matrixOperations.html numeric or logical arrays (matrices)>,
 % <dataStructures.html#cellArrays cell arrays>,
 % <dataStructures.html#structs structures>,
 % and <objectOriented.html objects>.
@@ -109,7 +112,7 @@ g = 'does this really work?'
 %%
 % You can save all of the variables in a workspace to a file by typing
 % *save filename* at the command prompt and reload them again with *load
-% filename*.
+% filename*. 
 %% Workspace
 % To see which variables you have defined, and what their size and type is,
 % type *whos*
@@ -174,10 +177,9 @@ lookfor quadratic
 % to open the tutorial in the Matlab web browser so that you can try out
 % the examples as you read. 
 % Just type something like
-% *web www.cs.ubc.ca/~murphyk/matlabTutorial/html/index.html*
+% *web yagtom.googlecode.com*
 % at the command prompt. You can then click on 'Desktop -> dock browser'
-% so the browser will appear inside the matlab <#Editor editor>,
-% as illustrated below.
+% so the browser will appear inside the matlab editor as illustrated below.
 %%
 % <html>
 % <img src="matlabTutorialBrowser.png" height="500">
@@ -189,11 +191,11 @@ lookfor quadratic
 % Or you can cut and paste between different windows.
 % Note that some of the examples use functions or data that
 % are not built-in to matlab.
-% These can be download here: <http://www.cs.ubc.ca/~murphyk/Software/matlabTutorial/mfiles.zip mfiles.zip>.
+% These can be download here: <http://code.google.com/p/yagtom/downloads/list>.
 % You should unzip these in some directory,
 % and then add them to your matlab path by typing
 % something like
-addpath(genpath('C:\kmurphy\matlabTutorial\mfiles'))
+addpath(genpath('C:\matlabTutorial\mfiles'))
 %%
 % Click <files.html#MatlabPath here> for more details on the matlab path.
 %% Other Matlab resources

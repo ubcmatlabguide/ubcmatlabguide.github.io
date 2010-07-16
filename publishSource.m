@@ -1,7 +1,7 @@
 function publishSource(fname)
 %% Publish the tutorial to the html directory
 % If fname is specified, only it is published
-%
+%  (run initYagtom before calling this function)
 % e.g publishSource('gettingStarted)
 %%
 cd(fullfile(yagtomRoot(), 'html')); 
