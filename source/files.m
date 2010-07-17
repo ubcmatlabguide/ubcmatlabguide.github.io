@@ -303,9 +303,10 @@ class(X4000)
 mmap.Data.Xtrain(1, 30:35) = 255;
 mmap.Data.Xtrain(1, 30:35)
 %%
-% We can perform the usual operations on the data, such as taking the mean.
+% Finally, we can perform usual operations on the data, such as taking the mean.
 xbar = mean(mmap.Data.Xtest, 2);
 %%
+% Don't forget to clean up when you're done.
 clear mmap
 delete(fname);
 %%

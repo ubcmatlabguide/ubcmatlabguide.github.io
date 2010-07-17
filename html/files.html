@@ -171,12 +171,12 @@ fclose(fid);
 X4000 = mmap.Data.Xtrain(4000, :); <span class="comment">% 1x784</span>
 y4000 = mmap.Data.ytrain(4000);
 toc
-</pre><pre class="codeoutput">Elapsed time is 0.031978 seconds.
+</pre><pre class="codeoutput">Elapsed time is 0.024885 seconds.
 </pre><p>but once the region is cached, access is usually faster.</p><pre class="codeinput">tic
 X4000 = mmap.Data.Xtrain(4000, :);
 y4000 = mmap.Data.ytrain(4000);
 toc
-</pre><pre class="codeoutput">Elapsed time is 0.001371 seconds.
+</pre><pre class="codeoutput">Elapsed time is 0.001207 seconds.
 </pre><p>If we want the data returned to be of type double, as required by many functions, we can simply cast it.</p><pre class="codeinput">class(X4000)
 X4000 = double(X4000);
 class(X4000)
@@ -188,8 +188,8 @@ double
 mmap.Data.Xtrain(1, 30:35)
 </pre><pre class="codeoutput">ans =
     255    255    255    255    255    255
-</pre><p>We can perform the usual operations on the data, such as taking the mean.</p><pre class="codeinput">xbar = mean(mmap.Data.Xtest, 2);
-</pre><pre class="codeinput">clear <span class="string">mmap</span>
+</pre><p>Finally, we can perform usual operations on the data, such as taking the mean.</p><pre class="codeinput">xbar = mean(mmap.Data.Xtest, 2);
+</pre><p>Don't forget to clean up when you're done.</p><pre class="codeinput">clear <span class="string">mmap</span>
 delete(fname);
 </pre><p class="footer"><br>
       Published with MATLAB&reg; 7.10<br></p></div><!--
@@ -499,9 +499,10 @@ class(X4000)
 mmap.Data.Xtrain(1, 30:35) = 255;
 mmap.Data.Xtrain(1, 30:35)
 %%
-% We can perform the usual operations on the data, such as taking the mean.
+% Finally, we can perform usual operations on the data, such as taking the mean.
 xbar = mean(mmap.Data.Xtest, 2);
 %%
+% Don't forget to clean up when you're done.
 clear mmap
 delete(fname);
 %%
