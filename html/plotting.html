@@ -135,22 +135,22 @@ get(gca)
 	LineWidth = [0.5]
 	MinorGridLineStyle = :
 	NextPlot = add
-	OuterPosition = [ (1 by 4) double array]
+	OuterPosition = [0 0 1 1]
 	PlotBoxAspectRatio = [1 1 1]
 	PlotBoxAspectRatioMode = auto
 	Projection = orthographic
-	Position = [ (1 by 4) double array]
+	Position = [0.13 0.11 0.775 0.815]
 	TickLength = [0.01 0.025]
 	TickDir = in
 	TickDirMode = auto
-	TightInset = [ (1 by 4) double array]
-	Title = [1072]
+	TightInset = [0.0821429 0.097619 0.00892857 0.0595238]
+	Title = [712]
 	Units = normalized
 	View = [0 90]
 	XColor = [0 0 0]
 	XDir = normal
 	XGrid = on
-	XLabel = [1073]
+	XLabel = [713]
 	XAxisLocation = bottom
 	XLim = [-3 3]
 	XLimMode = manual
@@ -171,7 +171,7 @@ get(gca)
 	YColor = [0 0 0]
 	YDir = normal
 	YGrid = on
-	YLabel = [1074]
+	YLabel = [714]
 	YAxisLocation = left
 	YLim = [-5 15]
 	YLimMode = manual
@@ -190,7 +190,7 @@ get(gca)
 	ZColor = [0 0 0]
 	ZDir = normal
 	ZGrid = on
-	ZLabel = [1075]
+	ZLabel = [715]
 	ZLim = [-1 1]
 	ZLimMode = auto
 	ZMinorGrid = off
@@ -211,7 +211,7 @@ get(gca)
 	HandleVisibility = on
 	HitTest = on
 	Interruptible = on
-	Parent = [5]
+	Parent = [3]
 	Selected = off
 	SelectionHighlight = on
 	Tag = 
@@ -342,19 +342,17 @@ legend([p5,p6,p8],{<span class="string">'f(x) = x^2'</span>,<span class="string"
 </pre><img vspace="5" hspace="5" src="plotting_07.png" alt=""> <p>As you can see, most plotting commands, such as <i>legend()</i> above, have many possible parameters and parameterizations. It would be redundant to go into them all here; type <b>doc legend</b> ,for example, to see more information on the legend command.</p><p>There are Matlab functions designed to make function plotting easier such as <i>fplot()</i> , <i>ezplot()</i> , <i>ezsurf()</i> , <i>ezmesh()</i> , <i>ezcontour()</i> , etc... While these can be useful for quick and dirty figures, they can make customization more difficult and so we recommend using, and learning to use, <i>plot()</i> instead. All of these functions take function handles as arguements and the ez*** functions auto set the axes limits for you.</p><p>The <i>loglog()</i> , <i>semilogx()</i> , and <i>semilogy()</i> functions are useful for plotting on logarithmic scales. However we can achieve the exact same effect by plotting with <i>plot()</i> and calling <b>set(gca,'XScale','log')</b> and/or <b>set(gca,'YScale','log')</b> .  We can reverse the direction of an axis with <b>set(gca,'YDir','reverse')</b> or <b>set(gca,'XDir','reverse')</b> and move an axis with <b>set(gca,'YAxisLocation','right')</b> or <b>set(gca,'XAxisLocation','top')</b> . Recall that we can find the names of these properties with <b>get(gca)</b> or the valid values with say <b>set(gca,'YDir')</b> .</p><h2>Tickmarks<a name="20"></a></h2><p>We can change the tick marks and their labels as follows on the axes. For example,</p><pre class="codeinput">figure(f1);
 xs = linspace(min(X1), max(X1), 5);
 set(gca, <span class="string">'xtick'</span>, xs, <span class="string">'xticklabel'</span>, {<span class="string">'a'</span>,<span class="string">'b'</span>,<span class="string">'c'</span>,<span class="string">'d'</span>}) <span class="comment">% gca = get current axis</span>
-</pre><pre class="codeoutput">Subscript indices must either be real positive integers or logicals.
-
-Error in ==&gt; plotting at 159
-xs = linspace(min(X1), max(X1), 5);
-</pre><p>When we have long strings for the tick marks, we can use <a href="http://www.mathworks.com/matlabcentral/fileexchange/loadFile.do?objectId=3150&amp;objectType=file">xticklabelrot</a>, which prints them at an angle to save space.</p><pre class="codeinput">figure(f1); xticklabelRot({<span class="string">'foo'</span>,<span class="string">'bar'</span>,22,<span class="string">'apple'</span>,<span class="string">'long string'</span>}, 45)
-</pre><h2>Histograms<a name="23"></a></h2><p>Histograms are one of the most useful plots for 1d data, and for probability mass functions. Below we display a histogram of a hypothetical class grade distribution.</p><pre class="codeinput">figure;
+</pre><img vspace="5" hspace="5" src="plotting_08.png" alt=""> <p>When we have long strings for the tick marks, we can use <a href="http://www.mathworks.com/matlabcentral/fileexchange/loadFile.do?objectId=3150&amp;objectType=file">xticklabelrot</a>, which prints them at an angle to save space.</p><pre class="codeinput">figure(f1); xticklabelRot({<span class="string">'foo'</span>,<span class="string">'bar'</span>,22,<span class="string">'apple'</span>,<span class="string">'long string'</span>}, 45)
+</pre><pre class="codeoutput">Warning: You may need to manually reset the XLABEL
+vertical position 
+</pre><img vspace="5" hspace="5" src="plotting_09.png" alt=""> <h2>Histograms<a name="23"></a></h2><p>Histograms are one of the most useful plots for 1d data, and for probability mass functions. Below we display a histogram of a hypothetical class grade distribution.</p><pre class="codeinput">figure;
 grades = fix(normrnd(70,10,100,1));
 hist(grades);                               <span class="comment">% plot the histogram</span>
 xlabel(<span class="string">'percent'</span>); ylabel(<span class="string">'count'</span>);
 title(<span class="string">'grade distribution'</span>);
 set(gca,<span class="string">'XLim'</span>,[0,100],<span class="string">'YGrid'</span>,<span class="string">'on'</span>); <span class="comment">% gca = get current axis</span>
 set(gca,<span class="string">'YMinorTick'</span>,<span class="string">'on'</span>);
-</pre><p>Here we organize marks into bins representing letter grades. We use the extremely quick <i>histc()</i> function to count the number of data points that fall between specified edges. Once we have obtained the counts, we can visualize them with the <i>bar()</i> function.</p><pre class="codeinput">figure;
+</pre><img vspace="5" hspace="5" src="plotting_10.png" alt=""> <p>Here we organize marks into bins representing letter grades. We use the extremely quick <i>histc()</i> function to count the number of data points that fall between specified edges. Once we have obtained the counts, we can visualize them with the <i>bar()</i> function.</p><pre class="codeinput">figure;
 bins = [0,50,55,60,64,68,72,76,80,85,90,inf];                   <span class="comment">% The bins</span>
 letters = {<span class="string">'F'</span>,<span class="string">'D'</span>,<span class="string">'C-'</span>,<span class="string">'C'</span>,<span class="string">'C+'</span>,<span class="string">'B-'</span>,<span class="string">'B'</span>,<span class="string">'B+'</span>,<span class="string">'A-'</span>,<span class="string">'A'</span>,<span class="string">'A+'</span>};  <span class="comment">% The labels</span>
 counts = histc(grades,bins);                                    <span class="comment">% count grades</span>
@@ -363,7 +361,7 @@ set(gca,<span class="string">'XTickLabel'</span>,letters,<span class="string">'Y
 xlabel(<span class="string">'grade'</span>); ylabel(<span class="string">'count'</span>);
 title(<span class="string">'grade distribution'</span>);
 set(gca,<span class="string">'YMinorTick'</span>,<span class="string">'on'</span>)
-</pre><h2>Plotting 1d probability density functions<a name="26"></a></h2><p>As an example of some other functions,  we make a fancy plot of the Gaussian pdf in which we shade the tails using an <i>area()</i> plot, and add a few vertical bars using the <i>stem()</i> command.</p><pre class="codeinput">figure;
+</pre><img vspace="5" hspace="5" src="plotting_11.png" alt=""> <h2>Plotting 1d probability density functions<a name="26"></a></h2><p>As an example of some other functions,  we make a fancy plot of the Gaussian pdf in which we shade the tails using an <i>area()</i> plot, and add a few vertical bars using the <i>stem()</i> command.</p><pre class="codeinput">figure;
 domain = -4:0.01:4;
 plot(domain,normpdf(domain),<span class="string">'-r'</span>,<span class="string">'LineWidth'</span>,3);
 hold <span class="string">on</span>
@@ -377,19 +375,19 @@ stem([-0.7,0.1,0.4],normpdf([-0.7,0.1,0.4]),<span class="string">'LineWidth'</sp
 axis([-4,4,0,0.5]);
 set(gca,<span class="string">'XMinorTick'</span>,<span class="string">'on'</span>);
 set(gca,<span class="string">'YMinorTick'</span>,<span class="string">'on'</span>);
-</pre><h2>Plotting images<a name="27"></a></h2><p>The <i>imagesc()</i> function can be used to view an image. (If you have the image processing toolbox, you can use <b>imshow</b> instead.)</p><pre class="codeinput">load <span class="string">mandrill</span> <span class="comment">% built-in image</span>
+</pre><img vspace="5" hspace="5" src="plotting_12.png" alt=""> <h2>Plotting images<a name="27"></a></h2><p>The <i>imagesc()</i> function can be used to view an image. (If you have the image processing toolbox, you can use <b>imshow</b> instead.)</p><pre class="codeinput">load <span class="string">mandrill</span> <span class="comment">% built-in image</span>
 figure; imagesc(X);                         <span class="comment">% display it</span>
 axis <span class="string">image</span>                                  <span class="comment">% window dimensions appropriate for an imag</span>
 map = colormap(gray);                       <span class="comment">% a possible color scheme.</span>
 axis <span class="string">off</span>
-</pre><h2>Heatmaps and Hinton diagrams<a name="29"></a></h2><p>We can also use <i>imagesc</i> to make <b>heatmaps</b> of a 2d matrix.</p><pre class="codeinput">figure;
+</pre><img vspace="5" hspace="5" src="plotting_13.png" alt=""> <h2>Heatmaps and Hinton diagrams<a name="29"></a></h2><p>We can also use <i>imagesc</i> to make <b>heatmaps</b> of a 2d matrix.</p><pre class="codeinput">figure;
 rand(<span class="string">'twister'</span>,1);
 X = randn(10,10);
 imagesc(X);
 colorbar
-</pre><p>Often it is preferable to use <a href="mfiles/graphics/hintonDiagram.m">hintonDiagram</a> (named after Geoff Hinton, who used this type of display to plot the weight matrix of a neural network), where the size of the square represents the magnitude, and the color represents the polarity (red = positive, green = negative).</p><pre class="codeinput">figure;
+</pre><img vspace="5" hspace="5" src="plotting_14.png" alt=""> <p>Often it is preferable to use <a href="mfiles/graphics/hintonDiagram.m">hintonDiagram</a> (named after Geoff Hinton, who used this type of display to plot the weight matrix of a neural network), where the size of the square represents the magnitude, and the color represents the polarity (red = positive, green = negative).</p><pre class="codeinput">figure;
 hintonDiagram(X)
-</pre><h2>Saving and Printing<a name="32"></a></h2><p>We can print figures and save them as any major graphics type from the file drop down menu of a figure window. Also here is the 'export setup' option which opens a window where the default figure resolution and size settings can be set. Newer versions of Matlab also let you automatically increase the line widths and font sizes of the figures you are exporting. To save or print programatically, we can use the <i>print()</i> function. Type <b>doc print</b> for more details.</p><pre class="codeinput"><span class="comment">%figure(gcf);</span>
+</pre><img vspace="5" hspace="5" src="plotting_15.png" alt=""> <h2>Saving and Printing<a name="32"></a></h2><p>We can print figures and save them as any major graphics type from the file drop down menu of a figure window. Also here is the 'export setup' option which opens a window where the default figure resolution and size settings can be set. Newer versions of Matlab also let you automatically increase the line widths and font sizes of the figures you are exporting. To save or print programatically, we can use the <i>print()</i> function. Type <b>doc print</b> for more details.</p><pre class="codeinput"><span class="comment">%figure(gcf);</span>
 <span class="comment">%print -djpeg test.jpg</span>
 <span class="comment">%print(gcf, '-djpeg', 'test.jpg');  % equivalent, useful if filename is a variable</span>
 </pre><p>If you find that there is too much white space surrounding the exported figure, (a particular problem when exporting to pdf) try changing the figure's paper size before exporting, with the following commands.</p><pre class="codeinput"><span class="comment">%pos = get(gcf,'Position');</span>
@@ -402,7 +400,11 @@ hintonDiagram(X)
 <span class="comment">%  figure; imagesc(rand(10,10));</span>
 <span class="comment">%end</span>
 placeFigures
-</pre><p class="footer"><br>
+</pre><pre class="codeoutput">ans =
+  173.0074    3.0000    6.0000    9.0000
+    2.0000    1.0000    7.0000   10.0000
+    4.0000    5.0000    8.0000   -1.0000
+</pre><img vspace="5" hspace="5" src="plotting_16.png" alt=""> <img vspace="5" hspace="5" src="plotting_17.png" alt=""> <img vspace="5" hspace="5" src="plotting_18.png" alt=""> <img vspace="5" hspace="5" src="plotting_19.png" alt=""> <img vspace="5" hspace="5" src="plotting_20.png" alt=""> <img vspace="5" hspace="5" src="plotting_21.png" alt=""> <img vspace="5" hspace="5" src="plotting_22.png" alt=""> <img vspace="5" hspace="5" src="plotting_23.png" alt=""> <img vspace="5" hspace="5" src="plotting_24.png" alt=""> <img vspace="5" hspace="5" src="plotting_25.png" alt=""> <img vspace="5" hspace="5" src="plotting_26.png" alt=""> <p class="footer"><br>
       Published with MATLAB&reg; 7.10<br></p></div><!--
 ##### SOURCE BEGIN #####
 %% Plotting
