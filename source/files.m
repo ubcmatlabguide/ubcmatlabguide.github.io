@@ -251,4 +251,61 @@ exist('writingFunctions','file');
 % A worked example on how to use this to analyse the CG content of the
 % whole human genome can be found 
 % <http://www.mathworks.com/products/demos/bioinfo/biomemorymapdemo/biomemorymapdemo.html here>
-
+%%
+% Here is a toy example. To run this yourself, you will need the  mnist 
+% data, available 
+% <http://pmtkdata.googlecode.com/svn/trunk/docs/dataTable.html here>.
+%%
+[Xtrain, ytrain, Xtest, ytest] = setupMnist('keepSparse', false);
+whos('Xtrain', 'ytrain', 'Xtest', 'ytest')
+%%
+% Here we save the data as int16 and int8, but double works as well if the
+% data is not integer typed. Note, however, that double access can be
+% considerably slower and take up much more memory.
+%%
+fname = fullfile(tempdir(), 'mnist.dat');
+fid = fopen(fname, 'w');
+fwrite(fid, Xtrain, 'int16');
+fwrite(fid, ytrain, 'int8');
+fwrite(fid, Xtest,  'int16'); % max int16 value is 32767
+fwrite(fid, ytest,  'int8');  % max int8 value is 127
+fclose(fid);
+%%
+% For each section of the data, we specify the data type, size, and a name.
+mmap = memmapfile(fname, 'Writable', true, 'Format', ...
+    {'int16', size(Xtrain), 'Xtrain';
+    'int8',  size(ytrain), 'ytrain';
+    'int16', size(Xtest),  'Xtest';
+    'int8',  size(ytest),  'ytest';
+    });
+%%
+% Access works just like a regular matlab struct. Our data is stored
+% under the 'Data' field.
+% The first time a region is requested, access can be slow,
+tic
+X4000 = mmap.Data.Xtrain(4000, :); % 1x784
+y4000 = mmap.Data.ytrain(4000);
+toc
+%%
+% but once the region is cached, access is usually faster.
+tic
+X4000 = mmap.Data.Xtrain(4000, :);
+y4000 = mmap.Data.ytrain(4000);
+toc
+%%
+% If we want the data returned to be of type double, as required by many
+% functions, we can simply cast it.
+class(X4000)
+X4000 = double(X4000);
+class(X4000)
+%%
+% Since we specified that the map was writable, we can set values too.
+mmap.Data.Xtrain(1, 30:35) = 255;
+mmap.Data.Xtrain(1, 30:35)
+%%
+% We can perform the usual operations on the data, such as taking the mean.
+xbar = mean(mmap.Data.Xtest, 2);
+%%
+clear mmap
+delete(fname);
+%%

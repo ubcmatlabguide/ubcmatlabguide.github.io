@@ -74,7 +74,6 @@ addpath(pwd);         <span class="comment">% add current directory to the path 
 </pre><pre class="codeinput">which <span class="string">-all</span> <span class="string">exp</span>;                     <span class="comment">% names of all implementations</span>
 </pre><pre class="codeoutput">built-in (C:\Program Files\MATLAB\R2010a\toolbox\matlab\elfun\@double\exp)     % double method
 built-in (C:\Program Files\MATLAB\R2010a\toolbox\matlab\elfun\@single\exp)     % Shadowed single method
-exp is a Java method                                                           % Shadowed java.lang.Math method
 C:\Program Files\MATLAB\R2010a\toolbox\distcomp\parallel\@codistributed\exp.m  % Shadowed codistributed method
 </pre><h2>Userpath<a name="13"></a></h2><p>Matlab automatically sets up a default directory where you can save your own Matlab files; it opens  this directory, whenever its started. You can view and change this default by typing <b>userpath</b> or say <b>userpath c:\Users\matt\Matlab\</b> at the command prompt.</p><pre class="codeinput">a = userpath                     <span class="comment">% display,(or change) default save directory</span>
 </pre><pre class="codeoutput">a =
@@ -135,7 +134,7 @@ c:\windows\temp\myfile.tmp
 \
 </pre><p>get a struct holding directory info.</p><pre class="codeinput">dinfo = dir
 </pre><pre class="codeoutput">dinfo = 
-93x1 struct array with fields:
+112x1 struct array with fields:
     name
     date
     bytes
@@ -146,7 +145,53 @@ c:\windows\temp\myfile.tmp
 C:\Program Files\MATLAB\R2010a
 </pre><p>list all of the m-files in the current directory</p><pre class="codeinput">allfiles = what;
 </pre><p>check if the specified file exists</p><pre class="codeinput">exist(<span class="string">'writingFunctions'</span>,<span class="string">'file'</span>);
-</pre><h2>Memory mapped files<a name="44"></a></h2><p>If your datafile is too large to load into memory in one shot, you can create a memmapfile object. This will let you access the data like a regular array, with standard indexing notation, without having to load it all in at once. Instead, parts of the file will be read on demand, transparently to you. Details can be found <a href="http://www.mathworks.co.uk/access/helpdesk/help/techdoc/import_export/braidws-1.html">here</a>. A worked example on how to use this to analyse the CG content of the whole human genome can be found <a href="http://www.mathworks.com/products/demos/bioinfo/biomemorymapdemo/biomemorymapdemo.html">here</a></p><p class="footer"><br>
+</pre><h2>Memory mapped files<a name="44"></a></h2><p>If your datafile is too large to load into memory in one shot, you can create a memmapfile object. This will let you access the data like a regular array, with standard indexing notation, without having to load it all in at once. Instead, parts of the file will be read on demand, transparently to you. Details can be found <a href="http://www.mathworks.co.uk/access/helpdesk/help/techdoc/import_export/braidws-1.html">here</a>. A worked example on how to use this to analyse the CG content of the whole human genome can be found <a href="http://www.mathworks.com/products/demos/bioinfo/biomemorymapdemo/biomemorymapdemo.html">here</a></p><p>Here is a toy example. To run this yourself, you will need the  mnist data, available <a href="http://pmtkdata.googlecode.com/svn/trunk/docs/dataTable.html">here</a>.</p><pre class="codeinput">[Xtrain, ytrain, Xtest, ytest] = setupMnist(<span class="string">'keepSparse'</span>, false);
+whos(<span class="string">'Xtrain'</span>, <span class="string">'ytrain'</span>, <span class="string">'Xtest'</span>, <span class="string">'ytest'</span>)
+</pre><pre class="codeoutput">  Name            Size                 Bytes  Class     Attributes
+
+  Xtest       10000x784             62720000  double              
+  Xtrain      60000x784            376320000  double              
+  ytest       10000x1                  80000  double              
+  ytrain      60000x1                 480000  double              
+
+</pre><p>Here we save the data as int16 and int8, but double works as well if the data is not integer typed. Note, however, that double access can be considerably slower and take up much more memory.</p><pre class="codeinput">fname = fullfile(tempdir(), <span class="string">'mnist.dat'</span>);
+fid = fopen(fname, <span class="string">'w'</span>);
+fwrite(fid, Xtrain, <span class="string">'int16'</span>);
+fwrite(fid, ytrain, <span class="string">'int8'</span>);
+fwrite(fid, Xtest,  <span class="string">'int16'</span>); <span class="comment">% max int16 value is 32767</span>
+fwrite(fid, ytest,  <span class="string">'int8'</span>);  <span class="comment">% max int8 value is 127</span>
+fclose(fid);
+</pre><p>For each section of the data, we specify the data type, size, and a name.</p><pre class="codeinput">mmap = memmapfile(fname, <span class="string">'Writable'</span>, true, <span class="string">'Format'</span>, <span class="keyword">...</span>
+    {<span class="string">'int16'</span>, size(Xtrain), <span class="string">'Xtrain'</span>;
+    <span class="string">'int8'</span>,  size(ytrain), <span class="string">'ytrain'</span>;
+    <span class="string">'int16'</span>, size(Xtest),  <span class="string">'Xtest'</span>;
+    <span class="string">'int8'</span>,  size(ytest),  <span class="string">'ytest'</span>;
+    });
+</pre><p>Access works just like a regular matlab struct. Our data is stored under the 'Data' field. The first time a region is requested, access can be slow,</p><pre class="codeinput">tic
+X4000 = mmap.Data.Xtrain(4000, :); <span class="comment">% 1x784</span>
+y4000 = mmap.Data.ytrain(4000);
+toc
+</pre><pre class="codeoutput">Elapsed time is 0.031978 seconds.
+</pre><p>but once the region is cached, access is usually faster.</p><pre class="codeinput">tic
+X4000 = mmap.Data.Xtrain(4000, :);
+y4000 = mmap.Data.ytrain(4000);
+toc
+</pre><pre class="codeoutput">Elapsed time is 0.001371 seconds.
+</pre><p>If we want the data returned to be of type double, as required by many functions, we can simply cast it.</p><pre class="codeinput">class(X4000)
+X4000 = double(X4000);
+class(X4000)
+</pre><pre class="codeoutput">ans =
+int16
+ans =
+double
+</pre><p>Since we specified that the map was writable, we can set values too.</p><pre class="codeinput">mmap.Data.Xtrain(1, 30:35) = 255;
+mmap.Data.Xtrain(1, 30:35)
+</pre><pre class="codeoutput">ans =
+    255    255    255    255    255    255
+</pre><p>We can perform the usual operations on the data, such as taking the mean.</p><pre class="codeinput">xbar = mean(mmap.Data.Xtest, 2);
+</pre><pre class="codeinput">clear <span class="string">mmap</span>
+delete(fname);
+</pre><p class="footer"><br>
       Published with MATLAB&reg; 7.10<br></p></div><!--
 ##### SOURCE BEGIN #####
 %% Filing system issues
@@ -402,7 +447,63 @@ exist('writingFunctions','file');
 % A worked example on how to use this to analyse the CG content of the
 % whole human genome can be found 
 % <http://www.mathworks.com/products/demos/bioinfo/biomemorymapdemo/biomemorymapdemo.html here>
-
-
+%%
+% Here is a toy example. To run this yourself, you will need the  mnist 
+% data, available 
+% <http://pmtkdata.googlecode.com/svn/trunk/docs/dataTable.html here>.
+%%
+[Xtrain, ytrain, Xtest, ytest] = setupMnist('keepSparse', false);
+whos('Xtrain', 'ytrain', 'Xtest', 'ytest')
+%%
+% Here we save the data as int16 and int8, but double works as well if the
+% data is not integer typed. Note, however, that double access can be
+% considerably slower and take up much more memory.
+%%
+fname = fullfile(tempdir(), 'mnist.dat');
+fid = fopen(fname, 'w');
+fwrite(fid, Xtrain, 'int16');
+fwrite(fid, ytrain, 'int8');
+fwrite(fid, Xtest,  'int16'); % max int16 value is 32767
+fwrite(fid, ytest,  'int8');  % max int8 value is 127
+fclose(fid);
+%%
+% For each section of the data, we specify the data type, size, and a name.
+mmap = memmapfile(fname, 'Writable', true, 'Format', ...
+    {'int16', size(Xtrain), 'Xtrain';
+    'int8',  size(ytrain), 'ytrain';
+    'int16', size(Xtest),  'Xtest';
+    'int8',  size(ytest),  'ytest';
+    });
+%%
+% Access works just like a regular matlab struct. Our data is stored
+% under the 'Data' field.
+% The first time a region is requested, access can be slow,
+tic
+X4000 = mmap.Data.Xtrain(4000, :); % 1x784
+y4000 = mmap.Data.ytrain(4000);
+toc
+%%
+% but once the region is cached, access is usually faster.
+tic
+X4000 = mmap.Data.Xtrain(4000, :);
+y4000 = mmap.Data.ytrain(4000);
+toc
+%%
+% If we want the data returned to be of type double, as required by many
+% functions, we can simply cast it.
+class(X4000)
+X4000 = double(X4000);
+class(X4000)
+%%
+% Since we specified that the map was writable, we can set values too.
+mmap.Data.Xtrain(1, 30:35) = 255;
+mmap.Data.Xtrain(1, 30:35)
+%%
+% We can perform the usual operations on the data, such as taking the mean.
+xbar = mean(mmap.Data.Xtest, 2);
+%%
+clear mmap
+delete(fname);
+%%
 ##### SOURCE END #####
 --></body></html>
