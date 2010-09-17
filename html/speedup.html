@@ -64,7 +64,7 @@ p.footer {
 
   </style></head><body><div class="content"><h1>Speedup tricks</h1><!--introduction--><p>One of the main disadvantages of MATLAB compared to compiled languages such as C is that it can be much slower. However, there are a few simple tricks that can make a big difference to the speed of your code. We discuss some of these below.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">The danger of premature optimization</a></li><li><a href="#3">Profiling your code</a></li><li><a href="#6">Timing code</a></li><li><a href="#7">Progress bar</a></li><li><a href="#11">Memory preallocation</a></li><li><a href="#15">Vectorization</a></li><li><a href="#16">Using built-in functions that are already vectorized</a></li><li><a href="#21">Logical indexing.</a></li><li><a href="#24">A slightly more complex example of vectorization</a></li><li><a href="#29">Bsxfun</a></li><li><a href="#34">Bsxfun vs repmat</a></li><li><a href="#50">histc</a></li><li><a href="#54">sub2ind</a></li><li><a href="#56">accumarray</a></li><li><a href="#60">Example using mat2cell and cellfun</a></li><li><a href="#67">More speedup tips</a></li><li><a href="#72">Compiling MATLAB</a></li></ul></div><h2>The danger of premature optimization<a name="1"></a></h2><p>Before spending a lot of time optimizing your code, you should first identify the key bottlenecks using the <a href="Profiling">profiler</a>. The usual pattern is that 80% of the the time is spent in 20% of the code, so you can focus your efforts accordingly. Also, remember that correctness is more important than speed!</p><p>
 <A NAME="Profiling"></A>
-</p><h2>Profiling your code<a name="3"></a></h2><p>MATLAB has an excellent profiler, which can tell you how much time your code spends in each one of its functions. It automatically generates a web page summarizing the results, which you can click on to 'drill down'. See the example below.</p><p><img vspace="5" hspace="5" src="profile.png" alt=""> </p><p>The report shows a breakdown of all the functions called from your function, the number of times they were called, and the total time spent executing them. Self-time, denoted by a dark blue band, is the time spent within a function not including how long was spent in functions called from here. This is really the statistic you should pay attention to. You can click on a function name to bring up its sourcecode.</p><p>You can turn on profiling with the <b>profile on</b> command and turn it off again with <b>profile off</b>. Once profiling is on, execute your code, and then type <b>profile viewer</b> to see the report.</p><h2>Timing code<a name="6"></a></h2><p>The profiler tells you where all the time is being spent, but maybe you just want to know how much time your code is taking. The simplest way to time code is to call <b>tic</b> before your code starts and <b>toc</b> afterwards. A more reliable method is the <a href="http://www.mathworks.com/MATLABcentral/fileexchange/18798">timeit</a> function, which calls tic/toc multiple times and averages. The first time a function is called, MATLAB generates an optimized p-code file. While this is usually very fast, you will sometimes notice that a function is faster to execute the second time round. MATLAB used to have a flops command, but it was removed. Tom Minka has written some flop counting routines as part of his <a href="http://research.microsoft.com/en-us/um/people/minka/software/lightspeed/">lightspeed package</a>. Note that the process of publishing this document can throw off the timing results - try the code out for yourself.</p><h2>Progress bar<a name="7"></a></h2><p>MATLAB's graphical progress bar can be a useful tool for getting a sense of how long operations are taking, particularly ones involving loops. Note, however, that this doesn't currently work in Octave. (To be precise, Octave has a waitbar function, but does not support all of the same operations, e.g. close(w)).</p><pre class="codeinput">w = waitbar(0,<span class="string">'My Progress Bar'</span>);                       <span class="comment">% create a new waitbar, w with 0% progress</span>
+</p><h2>Profiling your code<a name="3"></a></h2><p>MATLAB has an excellent profiler, which can tell you how much time your code spends in each one of its functions. It automatically generates a web page summarizing the results, which you can click on to 'drill down'. See the example below.</p><p><img vspace="5" hspace="5" src="profile.png" alt=""> </p><p>The report shows a breakdown of all the functions called from your function, the number of times they were called, and the total time spent executing them. Self-time, denoted by a dark blue band, is the time spent within a function not including how long was spent in functions called from here. This is really the statistic you should pay attention to. You can click on a function name to bring up its sourcecode.</p><p>You can turn on profiling with the <b>profile on</b> command and turn it off again with <b>profile off</b>. Once profiling is on, execute your code, and then type <b>profile viewer</b> to see the report.</p><h2>Timing code<a name="6"></a></h2><p>The profiler tells you where all the time is being spent, but maybe you just want to know how much time your code is taking. The simplest way to time code is to call <b>tic</b> before your code starts and <b>toc</b> afterwords. A more reliable method is the <a href="http://www.mathworks.com/MATLABcentral/fileexchange/18798">timeit</a> function, which calls tic/toc multiple times and averages. The first time a function is called, MATLAB generates an optimized p-code file. While this is usually very fast, you will sometimes notice that a function is faster to execute the second time round. MATLAB used to have a flops command, but it was removed. Tom Minka has written some flop counting routines as part of his <a href="http://research.microsoft.com/en-us/um/people/minka/software/lightspeed/">lightspeed package</a>. Note that the process of publishing this document can throw off the timing results - try the code out for yourself.</p><h2>Progress bar<a name="7"></a></h2><p>MATLAB's graphical progress bar can be a useful tool for getting a sense of how long operations are taking, particularly ones involving loops. Note, however, that this doesn't currently work in Octave. (To be precise, Octave has a waitbar function, but does not support all of the same operations, e.g. close(w)).</p><pre class="codeinput">w = waitbar(0,<span class="string">'My Progress Bar'</span>);                       <span class="comment">% create a new waitbar, w with 0% progress</span>
 <span class="keyword">for</span> i=1:500
    isprime(i);
    w = waitbar(i/500,w,[<span class="string">'iteration: '</span>,num2str(i)]);     <span class="comment">% update the wait bar each iteration</span>
@@ -78,7 +78,7 @@ p.footer {
 <span class="keyword">end</span>
 without = toc
 </pre><pre class="codeoutput">without =
-    1.3277
+    1.2772
 </pre><pre class="codeinput">tic
 B = zeros(30000,1);      <span class="comment">% Preallocate B with the zeros command.</span>
 <span class="keyword">for</span> i = 1:30000
@@ -87,9 +87,9 @@ B = zeros(30000,1);      <span class="comment">% Preallocate B with the zeros co
 with = toc
 ratio = without / with
 </pre><pre class="codeoutput">with =
-    0.0488
+    0.0447
 ratio =
-   27.2192
+   28.5625
 </pre><p>
 <A NAME="Vectorization"></A>
 </p><h2>Vectorization<a name="15"></a></h2><p>Vectorization is the process of making your code work on array-structured data in parallel, rather than using for-loops. This can make your code much faster and is an essential skill to learn. Vectorized operations take advantage of low level optimized routines such as lapack or blas, and can often utilize multiple system cores. We give various examples below which should give you some good idioms to copy. Many more examples can be found <a href="http://www.mathworks.com/support/tech-notes/1100/1109.html">here</a>.</p><h2>Using built-in functions that are already vectorized<a name="16"></a></h2><p>Most functions in MATLAB are already vectorized. For example, to take the log of every number in an array A,  we simply execute B = log(A). Let us compare this vectorized version to calling log on each element.</p><pre class="codeinput">A = rand(200,200);                    <span class="comment">% We will use this as our data</span>
@@ -107,7 +107,7 @@ vec = toc;
 assert(isequal(Bnv,Bv));
 ratio = nonvec / vec
 </pre><pre class="codeoutput">ratio =
-   35.4638
+   33.0086
 </pre><p>Some functions, like <i>mvnpdf()</i> for example, interpret an n-by-d matrix, not as n-times-d elements but as n, d-dimensional vectors. If this is not what we are after, we can convert the matrix into a vector using the (:) operator, pass it to the function, and reshape the output back into the original size with the <i>reshape()</i> function.</p><h2>Logical indexing.<a name="21"></a></h2><p>Here we see the benefit of logical indexing in making code shorter, faster and easier to read.</p><p><b>non-vectorized version</b></p><pre class="codeinput">tic
 B1 = [];                                <span class="comment">% note, it is difficult to preallocate here</span>
 counter = 1;
@@ -126,7 +126,7 @@ vec = toc;
 ratio = nonvec / vec
 assert(isequal(B1,B2));
 </pre><pre class="codeoutput">ratio =
-  266.7564
+  260.4643
 </pre><h2>A slightly more complex example of vectorization<a name="24"></a></h2><p>Here we perform three tricks at once as it were. Recall that operators such as ^, \, have  element-wise equivalents, (e.g. .^), which we can apply to the corresponding elements of two same-sized matrices. Secondly, MATLAB performs automatic scalar expansion in expressions like <b>A+1</b>, and thirdly, we can easily multiply two matrices together without loops. Most loops involving patterned additions and multiplications of vector elements can be translated, with a little thought, into equivalent <i>vectorized</i> statements.</p><p><b>non-vectorized version</b></p><pre class="codeinput">tic
 B1 = zeros(size(A));
 <span class="keyword">for</span> i=1:size(A,1)
@@ -145,7 +145,7 @@ vec = toc;
 assert(approxeq(B1, B2));
 ratio = nonvec / vec
 </pre><pre class="codeoutput">ratio =
-  4.2808e+003
+  3.5823e+003
 </pre><p>
 <a name="bsxfun"></a>
 </p><h2>Bsxfun<a name="29"></a></h2><p>Bsxfun, introduced in version 2007a, is now perhaps the most useful and important function for vectorizing your code. One often finds it necessary, for example, to subtract say a row vector from a matrix, (e.g. perhaps you want to standardize your data). Since the row vector is neither a scalar, nor the same size as the matrix, MATLAB will not let you do this directly. One option is to use the <i>repmat()</i> function we saw earlier to replicate the vector so that it is the same size as the matrix and then subtract. However, a better option (in terms of speed, memory, and arguably readability too) is to use the <i>bsxfun()</i> function (bsx stands for binary singleton expansion).</p><p>You must first specify the operation you wish to perform as a function handle. Simply precede the name of the function by the @ symbol. Typical choices include @minus, @plus, @times, @rdivide (however, any binary function can be used - type <b>doc bsxfun</b> for a list of suggestions, or write your own). The next two inputs are the (possibly multidimensional) matrices to which you want to apply the function, element-wise. Here is where the singleton expansion comes in. The sizes of the dimensions must match up between the matrices unless the size of a dimension of one of the matrices is 1, a singleton, in which case it is implicitly replicated to match the size of the corresponding dimension in the other matrix. This can often save huge amounts of memory over repmat, and can significantly speed up your code. In recent versions, bsxfun is multithreaded and can take advantage of multiple cpus. Here are some examples.</p><pre class="codeinput">A = meshgrid(1:6,1:5)'
@@ -201,17 +201,17 @@ m = mean(A1,3);
 <span class="keyword">end</span>
 nonvec = toc
 </pre><pre class="codeoutput">nonvec =
-    0.6755
+    0.8712
 </pre><p><b>vectorized version</b></p><pre class="codeinput">tic
 A2 = bsxfun(@minus,A2,mean(A2,3));
 vec = toc
 </pre><pre class="codeoutput">vec =
-    0.4369
+    0.5949
 </pre><p>We could have also used <i>repmat()</i> as follows, but this requires more memory and is slightly slower.</p><pre class="codeinput">tic
 A3 = A3 - repmat(mean(A3,3),[1,1,size(A3,3)]);
 rep = toc
 </pre><pre class="codeoutput">rep =
-    0.5487
+    0.7487
 </pre><pre class="codeinput">assert(isequal(A1,A2,A3));
 </pre><p>Now let us look at a slightly more complicated example. Suppose we have two matrices, X, and y, where X is real-valued and of size n-by-d, and y is of size n-by-1, and contains integers in the range 1:C. Further suppose we want to sum up the rows of X according to the integer labels in y, resulting in a C-by-d matrix. Here is the setup.</p><pre class="codeinput">n = 100;
 d = 5;
@@ -246,11 +246,11 @@ size(C)
 X = randi(5, [3, 4]);
 counts = histc(X, 1:C)
 </pre><pre class="codeoutput">counts =
-     2     0     1     1
-     0     1     1     0
-     1     0     0     0
      0     1     0     1
-     0     1     1     1
+     0     0     0     0
+     1     1     1     0
+     1     0     2     0
+     1     1     0     2
 </pre><p>If you have a cell array of string labels, and not integers, you can convert these to integers first by calling the 'unique' function, and grabbing its 3rd output.</p><pre class="codeinput">A = {<span class="string">'alpha'</span>, <span class="string">'alpha'</span>, <span class="string">'beta'</span>, <span class="string">'beta'</span>, <span class="string">'gamma'</span>, <span class="string">'alpha'</span>, <span class="string">'beta'</span>, <span class="string">'beta'</span>};
 [j, j, X] = unique(A);
 X
@@ -278,14 +278,14 @@ C = [3 4 5 6];
 <span class="comment">% directly into X:</span>
 X(R, C)
 </pre><pre class="codeoutput">ans =
-    0.5104    0.4588    0.0029    0.8291
-    0.9779    0.0192    0.1023    0.2291
-    0.9779    0.0192    0.1023    0.2291
-    0.1384    0.8364    0.3380    0.1096
+    0.4462    0.7346    0.4032    0.4629
+    0.3830    0.1767    0.2086    0.6274
+    0.3830    0.1767    0.2086    0.6274
+    0.4895    0.1850    0.1792    0.0070
 </pre><p>However, we get the elements indexed by every combination of R, and C, which is not what we want. Instead use sub2ind as follows:</p><pre class="codeinput">X(sub2ind(size(X), R, C))
 <span class="comment">%</span>
 </pre><pre class="codeoutput">ans =
-    0.5104    0.0192    0.1023    0.1096
+    0.4462    0.1767    0.2086    0.0070
 </pre><h2>accumarray<a name="56"></a></h2><p>There are many uses of the somewhat complicated accumarray function. We give just one simple example here. Suppose we have a vector of indices in 1:C and we want to count how often we transition from one value to the next. Suppose for example that Z = [1 1 2 1 2 2 3 1 1]: 1 transitions to itself twice, 2 transitions to 1 only once, and to itself once, 3 transitions to 1 once, etc...</p><pre class="codeinput">Z = [1 1 2 1 2 2 3 1 1]';
 subs = [Z(1:end-1), Z(2:end)]  <span class="comment">% indices</span>
 </pre><pre class="codeoutput">subs =
@@ -337,7 +337,7 @@ A = accumarray(subs, vals, sz, fn)
     [20x8 double]
     [40x8 double]
 </pre><p>We then convert back to a numeric matrix with the same size as our original matrix A.</p><pre class="codeinput">B = cell2mat(groupMax);
-</pre><p>See also the <b>filter2</b> command. If you have the image processing toolbox, check out the <b>blkproc</b> and <b>im2col</b> commands, which are similar.</p><h2>More speedup tips<a name="67"></a></h2><p>In the last example, we used <i>cellfun()</i> function but there is a similar function <i>arrayfun()</i> that applies a function to every element of an array. When other <i>vectorization</i> techniques fail, this can be a better alternative than looping over every element yourself, but is not always much faster.</p><p>The <i>vectorize()</i> function takes in a string or function handle and converts all operators, (e.g ^) to their element-wise equivalents, (e.g. .^). This can be useful when using someone else's function that was not vectorized to begin with.</p><p>Recall from the matrix chapter that there are many functions that will create matrices such as <i>meshgrid()</i>, or <i>blkdiag()</i>, yet again helping us avoid loops.</p><p>When a value vec(i) depends on on entries v(1)...v(i-1) for instance, we can use functions like <i>cumsum()</i>, <i>cumprod()</i>, <i>filter()</i>, or <i>conv()</i>. See their help entries for more information. See also the kron function, which can be another useful primative for use in vectorization.</p><p>Tom Minka has some tips, and references to other people's tips, <a href="http://research.microsoft.com/en-us/um/people/minka/software/MATLAB.html">here</a>.</p><h2>Compiling MATLAB<a name="72"></a></h2><p>MATLAB lets you compile your code so that others, without MATLAB installed can run your code: Mathwork's licensing model lets you do this royalty free. Details can be found <a href="external.html#mcc">here</a>. However, this does not usually result in a speed increase since the 'compiled' code simply calls out to an encapsulated version of MATLAB, called the MCR, (MATLAB compiler runtime).</p><p>There is a method called <a href="external.html#emlmex">emlmex</a> that does give speedups, but only for a narrow set of functions. In particular, every time the size of the memory footprint of the function changes, it must be recompiled. Newer versions of MATLAB relax this restriction somewhat by letting you specify an upper bound on the size of a matrix.</p><p>Sometimes the only way to get really big speedup is to implement your code in another language like C, compile it with mex, and then call that code from within your MATLAB program. For details, click <a href="external.html#mex">here</a>. Note however, that vectorized MATLAB code is often faster than all but the most expertly implemented c-code. There is little use, for instance, in implementing your own linear algebraic operations, like matrix multiplication, or solving systems of linear equations.</p><p class="footer"><br>
+</pre><p>See also the <b>filter2</b> command. If you have the image processing toolbox, check out the <b>blkproc</b> and <b>im2col</b> commands, which are similar.</p><h2>More speedup tips<a name="67"></a></h2><p>In the last example, we used <i>cellfun()</i> function but there is a similar function <i>arrayfun()</i> that applies a function to every element of an array. When other <i>vectorization</i> techniques fail, this can be a better alternative than looping over every element yourself, but is not always much faster.</p><p>The <i>vectorize()</i> function takes in a string or function handle and converts all operators, (e.g ^) to their element-wise equivalents, (e.g. .^). This can be useful when using someone else's function that was not vectorized to begin with.</p><p>Recall from the matrix chapter that there are many functions that will create matrices such as <i>meshgrid()</i>, or <i>blkdiag()</i>, yet again helping us avoid loops.</p><p>When a value vec(i) depends on on entries v(1)...v(i-1) for instance, we can use functions like <i>cumsum()</i>, <i>cumprod()</i>, <i>filter()</i>, or <i>conv()</i>. See their help entries for more information. See also the kron function, which can be another useful primitive for use in vectorization.</p><p>Tom Minka has some tips, and references to other people's tips, <a href="http://research.microsoft.com/en-us/um/people/minka/software/MATLAB.html">here</a>.</p><h2>Compiling MATLAB<a name="72"></a></h2><p>MATLAB lets you compile your code so that others, without MATLAB installed can run your code: Mathwork's licensing model lets you do this royalty free. Details can be found <a href="external.html#mcc">here</a>. However, this does not usually result in a speed increase since the 'compiled' code simply calls out to an encapsulated version of MATLAB, called the MCR, (MATLAB compiler runtime).</p><p>There is a method called <a href="external.html#emlmex">emlmex</a> that does give speedups, but only for a narrow set of functions. In particular, every time the size of the memory footprint of the function changes, it must be recompiled. Newer versions of MATLAB relax this restriction somewhat by letting you specify an upper bound on the size of a matrix.</p><p>Sometimes the only way to get really big speedup is to implement your code in another language like C, compile it with mex, and then call that code from within your MATLAB program. For details, click <a href="external.html#mex">here</a>. Note however, that vectorized MATLAB code is often faster than all but the most expertly implemented c-code. There is little use, for instance, in implementing your own linear algebraic operations, like matrix multiplication, or solving systems of linear equations.</p><p class="footer"><br>
       Published with MATLAB&reg; 7.10<br></p></div><!--
 ##### SOURCE BEGIN #####
 %% Speedup tricks
@@ -381,7 +381,7 @@ A = accumarray(subs, vals, sz, fn)
 % The profiler tells you where all the time is being spent,
 % but maybe you just want to know how much time your code is taking.
 % The simplest way to time code is to call *tic* before your code
-% starts and *toc* afterwards. 
+% starts and *toc* afterwords. 
 % A more reliable method is the
 % <http://www.mathworks.com/MATLABcentral/fileexchange/18798 timeit>
 % function, which calls tic/toc multiple times and averages. The first time
@@ -796,7 +796,7 @@ B = cell2mat(groupMax);
 % When a value vec(i) depends on on entries v(1)...v(i-1) for instance,
 % we can use functions like _cumsum()_, _cumprod()_, _filter()_, or _conv()_.
 % See their help entries for more information. See also the kron function,
-% which can be another useful primative for use in vectorization. 
+% which can be another useful primitive for use in vectorization. 
 %%
 % Tom Minka has some tips, and references to other people's tips,
 % <http://research.microsoft.com/en-us/um/people/minka/software/MATLAB.html

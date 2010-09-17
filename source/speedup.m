@@ -39,7 +39,7 @@
 % The profiler tells you where all the time is being spent,
 % but maybe you just want to know how much time your code is taking.
 % The simplest way to time code is to call *tic* before your code
-% starts and *toc* afterwards. 
+% starts and *toc* afterwords. 
 % A more reliable method is the
 % <http://www.mathworks.com/MATLABcentral/fileexchange/18798 timeit>
 % function, which calls tic/toc multiple times and averages. The first time
@@ -454,7 +454,7 @@ B = cell2mat(groupMax);
 % When a value vec(i) depends on on entries v(1)...v(i-1) for instance,
 % we can use functions like _cumsum()_, _cumprod()_, _filter()_, or _conv()_.
 % See their help entries for more information. See also the kron function,
-% which can be another useful primative for use in vectorization. 
+% which can be another useful primitive for use in vectorization. 
 %%
 % Tom Minka has some tips, and references to other people's tips,
 % <http://research.microsoft.com/en-us/um/people/minka/software/MATLAB.html
