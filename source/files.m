@@ -144,6 +144,18 @@ dbstop if error
 % useful functions. We describe these first and show examples at the bottom
 % of this section.
 %
+%%
+% The _importdata_ function is perhaps the easiest to use,
+% since it automatically figures out the kind of file by looking
+% at the file extension and the contents of the file.
+% 
+% For example, to read in numeric data from a text file,
+% use |data = importdata(filename)|.
+% This will contain data.data for the numeric data,
+% data.colheaders for textual column headers (if any),
+% and data.textdata for textual data.
+% For more information  type *doc importdata*
+% at the command prompt
 %% 
 % The _dlmread()_ is very useful for importing ascii delimited data into
 % Matlab. You simply specify the filename and optionally the delimiter,
@@ -167,9 +179,6 @@ dbstop if error
 % you do not specify a file id, _fprintf()_ prints the data to the command
 % window. We discuss the formatting options available with this function
 % <dataStructures.html#11 here>.
-%% 
-% For more information on, say, the _textscan_ function type *doc textscan*
-% at the command prompt.
 %%
 % Here a a number of examples.
 %%
