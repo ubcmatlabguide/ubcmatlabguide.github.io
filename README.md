@@ -1,9 +1,8 @@
-ubcmatlabguide
-==============
+UBC Matlab Guide
+================
 
+Formerly known as [YAGTOM: Yet Another Guide TO Matlab](https://code.google.com/p/yagtom/).
 
-YAGTOM: Yet Another Guide TO Matlab
+See <http://ubcmatlabguide.github.io/> for the latest published version.
 
-This is a duplicate o 
-https://code.google.com/p/yagtom/
-which currently easier to read (due to automatical html formatting).
+Run `publishSource` in Matlab from the `yagtomRoot` directory to generate `html/` directory.  See [wiki](https://github.com/ubcmatlabguide/ubcmatlabguide.github.io/wiki) for more info.
