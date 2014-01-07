@@ -41,6 +41,7 @@ else
 end
 l = filterCell(l, @(c)~endswith(c, '.') &&...
     ~endswith(c, '..') && ...
+    ~endswith(c, '.git') && ...
     ~endswith(c, '.svn'))';
 l = unique(l);
 l = l(sortidx(lower(l))); 
@@ -54,6 +55,10 @@ if(nargin < 1);
 end
 if(nargin < 3)
     files = {};
+end
+if endswith(directory, '.git')
+    info = [];
+    return
 end
 if endswith(directory, '.svn')
     info = [];
