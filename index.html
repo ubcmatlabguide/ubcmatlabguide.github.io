@@ -1,1 +1,247 @@
-<h2><a name="YAGTOM:_Yet_Another_Guide_TO_Matlab"></a>YAGTOM: Yet Another Guide TO Matlab<a href="#YAGTOM:_Yet_Another_Guide_TO_Matlab" class="section_anchor"></a></h2><p>A copy of this is available at <a href="https://github.com/ubcmatlabguide/ubcmatlabguide" rel="nofollow">https://github.com/ubcmatlabguide/ubcmatlabguide</a> </p><p>By <a href="http://www.cs.ubc.ca/~mdunham/" rel="nofollow">Matt Dunham</a> and <a href="http://people.cs.ubc.ca/~murphyk/" rel="nofollow">Kevin Murphy</a> </p><p>University of British Columbia. </p><p>Last update: September 2010 </p><p>This tutorial covers a number of topics on the <a href="http://www.mathworks.com/products/matlab/" rel="nofollow">Matlab</a> programming language and environment, focussing on the features likely to be of use to people performing general purpose programming as well as data analysis/ statistics/ machine learning. In particular, it covers basic features as well as some recent additions to the language, such as  <a href="http://yagtom.googlecode.com/svn/trunk/html/speedup.html#bsxfun" rel="nofollow">bsxfun</a> (added 2007a), the new <a href="http://yagtom.googlecode.com/svn/trunk/html/objectOriented.html" rel="nofollow">object oriented programming</a> interface (added 2008a), the  <a href="http://yagtom.googlecode.com/svn/trunk/html/dataStructures.html#Containers.map" rel="nofollow">containers.map</a> hash table (added 2008b), etc. Many matlab programmers do not know about these useful features  since they are buried deep inside the <a href="http://www.mathworks.com/access/helpdesk/help/techdoc/index.html" rel="nofollow">official documentation</a>.  </p><p>All the code for the examples in this tutorial is embedded directly into the document, allowing you to easily try it out for yourself as you work your way through the tutorial. Most of the code will work on all versions of matlab released since 2004 (version 7), although some examples require more recent versions. </p><p>We have grouped the topics by importance: &#x27;basic&#x27; topics are essential to all users, &#x27;intermediate&#x27; topics are useful to know about once you have gained some experience, and &#x27;advanced&#x27; topics are for experts only and/or of limited interest. </p><h3><a name="Basics"></a>Basics<a href="#Basics" class="section_anchor"></a></h3><ul><li><a href="http://yagtom.googlecode.com/svn/trunk/html/gettingStarted.html" rel="nofollow">Getting started</a> </li><li><a href="http://yagtom.googlecode.com/svn/trunk/html/matrixOperations.html" rel="nofollow">Matrix operations</a> </li><li><a href="http://yagtom.googlecode.com/svn/trunk/html/writingFunctions.html" rel="nofollow">Functions</a> </li><li><a href="http://yagtom.googlecode.com/svn/trunk/html/flowOfControl.html" rel="nofollow">Flow of control</a> </li><li><a href="http://yagtom.googlecode.com/svn/trunk/html/dataStructures.html" rel="nofollow">Data structures</a> </li><li><a href="http://yagtom.googlecode.com/svn/trunk/html/files.html" rel="nofollow">File system issues</a> </li><li><a href="http://yagtom.googlecode.com/svn/trunk/html/plotting.html" rel="nofollow">Plotting</a> </li><li><a href="http://code.google.com/p/yagtom/wiki/Octave" rel="nofollow">Octave</a> </li></ul><h3><a name="Intermediate"></a>Intermediate<a href="#Intermediate" class="section_anchor"></a></h3><ul><li><a href="http://yagtom.googlecode.com/svn/trunk/html/speedup.html" rel="nofollow">Speedup tricks</a> </li><li><a href="http://yagtom.googlecode.com/svn/trunk/html/plottingAdvanced.html" rel="nofollow">More plotting</a> </li><li><a href="http://yagtom.googlecode.com/svn/trunk/html/debugging.html" rel="nofollow">Debugging</a> </li><li><a href="http://yagtom.googlecode.com/svn/trunk/html/style.html" rel="nofollow">Programming style guidelines</a>   </li><li><a href="http://yagtom.googlecode.com/svn/trunk/html/objectOriented.html" rel="nofollow">Object oriented programming</a> </li><li><a href="http://code.google.com/p/matlabtools/" rel="nofollow">Matlabtools</a> has various useful utility functions written by us and others </li><li><a href="http://www.mathworks.com/matlabcentral/" rel="nofollow">Matlabcentral</a> has even more utility functions </li></ul><h3><a name="Advanced"></a>Advanced<a href="#Advanced" class="section_anchor"></a></h3><ul><li><a href="http://yagtom.googlecode.com/svn/trunk/html/objectOrientedAdvanced.html" rel="nofollow">OOP: advanced topics</a> </li><li><a href="http://yagtom.googlecode.com/svn/trunk/html/objectOrientedOldStyle.html" rel="nofollow">OOP: using the old (pre 2008a) system</a> </li><li><a href="http://yagtom.googlecode.com/svn/trunk/html/external.html" rel="nofollow">Compiling and calling external functions</a> </li><li><a href="http://yagtom.googlecode.com/svn/trunk/html/symbolic.html" rel="nofollow">Symbolic algebra</a> </li></ul><hr/><p>Authorized users can modify this tutorial by following <a href="/p/yagtom/wiki/UpdatingTutorial">these instructions</a>. (Send Kevin Murphy an email if you want to permission to edit the source.) </p>
+<h2>
+    <a name="YAGTOM:_Yet_Another_Guide_TO_Matlab">
+    </a>
+    YAGTOM: Yet Another Guide TO Matlab
+    <a href="#YAGTOM:_Yet_Another_Guide_TO_Matlab" class="section_anchor">
+    </a>
+</h2>
+<p>
+The source code of this guide is available at
+<a href="https://github.com/ubcmatlabguide/ubcmatlabguide.github.io" rel="nofollow">
+    https://github.com/ubcmatlabguide/ubcmatlabguide.github.io
+</a>
+
+
+
+</p>
+<p>
+By 
+<a href="http://www.cs.ubc.ca/~mdunham/" rel="nofollow">
+    Matt Dunham
+</a>
+and 
+<a href="http://people.cs.ubc.ca/~murphyk/" rel="nofollow">
+    Kevin Murphy
+</a>
+
+
+
+</p>
+<p>
+University of British Columbia. 
+</p>
+<p>
+Last update: September 2010 
+</p>
+<p>
+This tutorial covers a number of topics on the 
+<a href="http://www.mathworks.com/products/matlab/" rel="nofollow">
+    Matlab
+</a>
+programming language and environment, focussing on the features likely to be of use to people performing general purpose programming as well as data analysis/ statistics/ machine learning. In particular, it covers basic features as well as some recent additions to the language, such as  
+<a href="https://ubcmatlabguide.github.io/html/speedup.html#bsxfun" rel="nofollow">
+    bsxfun
+</a>
+(added 2007a), the new 
+<a href="https://ubcmatlabguide.github.io/html/objectOriented.html" rel="nofollow">
+    object oriented programming
+</a>
+interface (added 2008a), the  
+<a href="https://ubcmatlabguide.github.io/html/dataStructures.html#Containers.map" rel="nofollow">
+    containers.map
+</a>
+hash table (added 2008b), etc. Many matlab programmers do not know about these useful features  since they are buried deep inside the 
+<a href="http://www.mathworks.com/access/helpdesk/help/techdoc/index.html" rel="nofollow">
+    official documentation
+</a>
+.  
+</p>
+<p>
+All the code for the examples in this tutorial is embedded directly into the document, allowing you to easily try it out for yourself as you work your way through the tutorial. Most of the code will work on all versions of matlab released since 2004 (version 7), although some examples require more recent versions. 
+</p>
+<p>
+We have grouped the topics by importance: &#x27;basic&#x27; topics are essential to all users, &#x27;intermediate&#x27; topics are useful to know about once you have gained some experience, and &#x27;advanced&#x27; topics are for experts only and/or of limited interest. 
+</p>
+<h3>
+    <a name="Basics">
+    </a>
+    Basics
+    <a href="#Basics" class="section_anchor">
+    </a>
+</h3>
+<ul>
+    <li>
+    <a href="https://ubcmatlabguide.github.io/html/gettingStarted.html" rel="nofollow">
+        Getting started
+    </a>
+
+
+
+    </li>
+    <li>
+    <a href="https://ubcmatlabguide.github.io/html/matrixOperations.html" rel="nofollow">
+        Matrix operations
+    </a>
+
+
+
+    </li>
+    <li>
+    <a href="https://ubcmatlabguide.github.io/html/writingFunctions.html" rel="nofollow">
+        Functions
+    </a>
+
+
+
+    </li>
+    <li>
+    <a href="https://ubcmatlabguide.github.io/html/flowOfControl.html" rel="nofollow">
+        Flow of control
+    </a>
+
+
+
+    </li>
+    <li>
+    <a href="https://ubcmatlabguide.github.io/html/dataStructures.html" rel="nofollow">
+        Data structures
+    </a>
+
+
+
+    </li>
+    <li>
+    <a href="https://ubcmatlabguide.github.io/html/files.html" rel="nofollow">
+        File system issues
+    </a>
+
+
+
+    </li>
+    <li>
+    <a href="https://ubcmatlabguide.github.io/html/plotting.html" rel="nofollow">
+        Plotting
+    </a>
+
+
+
+    </li>
+    <li>
+    <a href="https://github.com/ubcmatlabguide/ubcmatlabguide.github.io/wiki/Octave-vs-Matlab" rel="nofollow">
+        Octave vs Matlab
+    </a>
+
+
+
+    </li>
+</ul>
+<h3>
+    <a name="Intermediate">
+    </a>
+    Intermediate
+    <a href="#Intermediate" class="section_anchor">
+    </a>
+</h3>
+<ul>
+    <li>
+    <a href="https://ubcmatlabguide.github.io/html/speedup.html" rel="nofollow">
+        Speedup tricks
+    </a>
+
+
+
+    </li>
+    <li>
+    <a href="https://ubcmatlabguide.github.io/html/plottingAdvanced.html" rel="nofollow">
+        More plotting
+    </a>
+
+
+
+    </li>
+    <li>
+    <a href="https://ubcmatlabguide.github.io/html/debugging.html" rel="nofollow">
+        Debugging
+    </a>
+
+
+
+    </li>
+    <li>
+    <a href="https://ubcmatlabguide.github.io/html/style.html" rel="nofollow">
+        Programming style guidelines
+    </a>
+
+
+
+    </li>
+    <li>
+    <a href="https://ubcmatlabguide.github.io/html/objectOriented.html" rel="nofollow">
+        Object oriented programming
+    </a>
+
+
+
+    </li>
+    <li>
+    <a href="https://github.com/murphyk/matlabtools/" rel="nofollow">
+        Matlabtools
+    </a>
+    has various useful utility functions written by us and others 
+    </li>
+    <li>
+    <a href="http://www.mathworks.com/matlabcentral/" rel="nofollow">
+        Matlabcentral
+    </a>
+    has even more utility functions 
+    </li>
+</ul>
+<h3>
+    <a name="Advanced">
+    </a>
+    Advanced
+    <a href="#Advanced" class="section_anchor">
+    </a>
+</h3>
+<ul>
+    <li>
+    <a href="https://ubcmatlabguide.github.io/html/objectOrientedAdvanced.html" rel="nofollow">
+        OOP: advanced topics
+    </a>
+
+
+
+    </li>
+    <li>
+    <a href="https://ubcmatlabguide.github.io/html/objectOrientedOldStyle.html" rel="nofollow">
+        OOP: using the old (pre 2008a) system
+    </a>
+
+
+
+    </li>
+    <li>
+    <a href="https://ubcmatlabguide.github.io/html/external.html" rel="nofollow">
+        Compiling and calling external functions
+    </a>
+
+
+
+    </li>
+    <li>
+    <a href="https://ubcmatlabguide.github.io/html/symbolic.html" rel="nofollow">
+        Symbolic algebra
+    </a>
+
+
+
+    </li>
+</ul>
+<hr/>
+<p>
+Authorized users can modify this tutorial by following 
+<a href="https://github.com/ubcmatlabguide/ubcmatlabguide.github.io/wiki/Details-on-updating-this-tutorial">
+    these instructions
+</a>
+. (Send Kevin Murphy an email if you want to permission to edit the source.) 
+</p>
